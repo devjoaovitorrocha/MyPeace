@@ -6,31 +6,29 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f4f4f4;
+    background-color: #ADD8E6;
 }
 .login-container {
     background-color: #ADD8E6;
     padding: 20px;
     border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     width: 400px;
     text-align: center;
-height: 800px;
-box-shadow: 2px 2px 2px 2px;
+    height: 800px;
 }
-
 h2 {
     margin-bottom: 20px;
 }
 
 input[type="text"],
-input[type="password"] {
+input[type="email"],
+input[type="tel"],
+select {
     width: 90%;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 3px;
-    
 }
 
 button {
@@ -54,17 +52,14 @@ button:hover {
 }
 
 
-.esqueci{
-    text-align: end;
-    font-size: 90%;
-}
 .cadastrar{
     margin-top: 3vh;
-    display: flex;
-    flex-direction: column; 
-    align-items: center;
 }
 
-#login-form {
-    padding-top: 70px;
+#tel{
+    margin-top: 1vh;
+}
+
+#register-form {
+    padding-top: 70px; 
 }

@@ -1,18 +1,34 @@
-document.getElementById("login-form").addEventListener("submit", function(event) {
-    event.preventDefault();
 
-  
-    var username = document.getElementById("Email");
-    var password = document.getElementById("senha");
+function login(){
 
-    if (username === "" || password === "") {
-        document.getElementById("error-message").textContent = "Please enter username and password";
-    } else {
-    
-        document.getElementById("error-message").textContent = "";
-        alert("Login successful! Welcome, " + username + "!");
-        window.location.href = "http://pt.stackoverflow.com";
-        
-    }
-    
-});
+    const email = document.getElementById('username').value
+    const password = document.getElementById('password').value
+
+    const data = {
+        "email": email,
+        "password": password
+     };
+
+    fetch("http://localhost:3333/auth/login", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+        if(data.message == 'user logged'){
+            if(data.type == 'psychologist'){
+                window.location.href = '/interfacePsicologo/interfacePsicologo.html'
+            }else{
+                window.location.href = '/interfacePaciente/interfacePaciente.html'
+            }
+        }else{
+            console.log(data.message)
+        }
+    })
+    .catch((error) => {
+        console.error("Error:", error);
+    });
+}
