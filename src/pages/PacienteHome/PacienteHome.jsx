@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import Cabecalho from "../../components/cabecalho/Cabecalho";
 import Rodape from "../../components/rodape/rodape";
-
+import './PacienteHome.css'
 
 export default function PacienteHome() {
     const navigate = useNavigate();
