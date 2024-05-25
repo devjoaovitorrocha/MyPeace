@@ -7,7 +7,7 @@ import { http } from "../../App";
 import './Diario.css';
 
 export default function Diario() {
-   
+   const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjQ1ZjBkNDJmYTkwMDlkNTQyMGE1ZGIiLCJuYW1lIjoiSm9hbyBWaXRvciIsImNwZiI6NzA1MTU5OTQ2MTgsInJlZ2lzdGVyTnVtYmVyIjozNDk4NTkzNCwiZW1haWwiOiJqb2Fvdml0b3Jjb21lcmNpYWwwNkBnbWFpbC5jb20iLCJpYXQiOjE3MTY1OTEzNjksImV4cCI6MTcxNjU5NDk2OX0.a6Xi8AdlgloA19EnQ8bzuwgpJWV-49GeS9C124f3fgM';
     const { day } = useParams();
     const [descricao, setDescricao] = useState('');
     const [feeling, setFeeling] = useState(''); 
@@ -44,10 +44,14 @@ export default function Diario() {
         if (descricao === '' || emojiSelecionado === '') {
             setMensagem('Por favor, preencha a descrição e selecione um emoji.');
         } else {
-            http.post(`/register/report/6646139dd98e3e2d2893731d`, {
-                feeling: feeling,
-                description: descricao
-            })
+            http.post('/register/report/6646139dd98e3e2d2893731d', {
+             feeling: feeling,
+             description: descricao
+         }, {
+             headers: {
+                 'Authorization': `Bearer ${token}`
+             }
+         })
             .then(response => {
                 console.log('Resposta da solicitação:', response);
                 setMensagem('Salvo com sucesso!');
