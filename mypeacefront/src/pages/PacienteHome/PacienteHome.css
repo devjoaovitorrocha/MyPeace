@@ -1,0 +1,60 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+   
+  }
+  
+  .calendar {
+    
+    flex-direction: column;
+    align-items: center;
+    background: #87B7C1;
+    min-height: 100vh;
+  }
+  
+ 
+  .main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  
+  h2 {
+    margin: 20px 0 10px;
+  }
+  
+  p {
+    margin: 10px 0 10px;
+  }
+  
+  .tabela {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .tabela th, .tabela td {
+    border: 1px solid #002244;
+    text-align: center;
+    padding: 10px;
+    font-size: 18px;
+  }
+  
+  .tabela th {
+    background-color: #002244;
+    color: white;
+  }
+  
+  .tabela td {
+    background-color: #f0f8ff;
+    cursor: pointer;
+  }
+  
+  .tabela td:hover {
+    background-color: #ddeeff;
+  }
+  
+  

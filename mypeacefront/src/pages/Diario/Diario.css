@@ -1,0 +1,143 @@
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #87B7C1;
+}
+
+header {
+    background-color: #2C3E50;
+    color: white;
+    text-align: left;
+    padding: 15px;
+}
+
+header h1 {
+    display: inline;
+    margin: 0;
+    font-size: 24px;
+}
+
+header img {
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+.content-container {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: calc(130vh - 140px); 
+    background-color: #87B7C1; 
+}
+
+
+.content-box {
+    background-color: #0D1B2A; 
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+
+h2 {
+    color: white;
+}
+
+
+.emojis {
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0;
+}
+
+.emojis span {
+    font-size: 2rem;
+    margin: 0 0.5rem;
+    cursor: pointer;
+}
+
+
+.emoji-selecionado {
+    border: 2px solid white;
+    border-radius: 50%;
+}
+
+
+label {
+    display: block;
+    margin-top: 1rem;
+    color: white;
+}
+
+input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    border: none;
+    border-radius: 5px;
+}
+
+
+.eventos {
+    margin: 1rem 0;
+    text-align: left;
+}
+
+.evento {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 0.5rem;
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+    color: black;
+}
+
+.evento span:first-child {
+    background-color: #CFD8DC;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
+}
+
+
+.botoes {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: space-around;
+}
+
+.botao-salvar, .botao-cancelar {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.botao-salvar:hover, .botao-cancelar:hover {
+    background-color: #0056b3;
+}
+
+
+.mensagem {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+}
+
+.mensagem.erro {
+    background-color: #f44336;
+}

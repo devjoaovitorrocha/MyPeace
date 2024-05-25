@@ -1,0 +1,104 @@
+/* texto e img sobre o app*/
+
+.inicio {
+    display: flex;
+    justify-content: center; /* Centraliza o conteúdo horizontalmente */
+    margin: 20px 0; /* Adiciona um espaço vertical */
+}
+
+.texto {
+    display: flex;
+    align-items: center; /* Alinha a imagem e o texto verticalmente */
+}
+
+.texto h1 {
+    flex: 1; /* Faz o texto ocupar o espaço restante */
+    margin-right: 20px; /* Espaço entre o texto e a imagem */
+    text-align: left; /* Alinha o texto à esquerda */
+}
+
+.texto img {
+    max-width: 30%; /* Ajuste a largura conforme necessário */
+    height: auto;
+}
+
+/*  fim do texto e img sobre o app*/
+
+h2{
+    text-align: center;
+}
+
+/* diario inicio */
+
+.img_diario {
+    display: flex;
+    justify-content: center; /* Centraliza o conteúdo horizontalmente */
+    margin: 20px 0; /* Adiciona um espaço vertical */
+}
+
+.central_diario {
+    display: flex;
+    align-items: center; /* Alinha a imagem e o texto verticalmente */
+}
+
+.imgdiario {
+    max-width: 30%; /* Ajuste a largura conforme necessário */
+    height: auto;
+    margin-right: 20px; /* Espaço entre a imagem e o texto */
+}
+
+.h1diario {
+    flex: 1; /* Faz o texto ocupar o espaço restante */
+    text-align: left; /* Alinha o texto à esquerda */
+}
+/* diario fim */
+
+/* inicio respirasão*/
+.img_resp {
+    display: flex;
+    justify-content: center; /* Centraliza o conteúdo horizontalmente */
+    margin: 20px 0; /* Adiciona um espaço vertical */
+}
+
+.central_resp {
+    display: flex;
+    align-items: center; /* Alinha a imagem e o texto verticalmente */
+    flex-direction: row-reverse; /* Coloca a imagem à direita e o texto à esquerda */
+}
+
+.imgresp {
+    max-width: 30%; /* Ajuste a largura conforme necessário */
+    height: auto;
+    margin-left: 20px; /* Espaço entre o texto e a imagem */
+}
+
+.h1respirasao {
+    flex: 1; /* Faz o texto ocupar o espaço restante */
+    text-align: left; /* Alinha o texto à esquerda */
+}
+/*fim rep*/
+
+/*incio chat*/
+.img_chat {
+    display: flex;
+    justify-content: center; /* Centraliza o conteúdo horizontalmente */
+    margin: 20px 0; /* Adiciona um espaço vertical */
+}
+
+.central_chat {
+    display: flex;
+    align-items: center; /* Alinha a imagem e o texto verticalmente */
+}
+
+.imgchat {
+    max-width: 30%; /* Ajuste a largura conforme necessário */
+    height: auto;
+    margin-right: 20px; /* Espaço entre a imagem e o texto */
+}
+
+.h1chat {
+    flex: 1; /* Faz o texto ocupar o espaço restante */
+    text-align: left; /* Alinha o texto à esquerda */
+}
+/*fim chat*/
+

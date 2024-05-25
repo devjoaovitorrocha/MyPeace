@@ -1,0 +1,84 @@
+
+header {
+    background-color: #06152A;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  header h1 {
+    margin: 0;
+   text-align: left;
+   margin-left: 10%;
+   margin-top: -5vh;
+  }
+  
+
+  .user{
+    margin-top: -6vh;
+  }
+
+  .login-container {
+    background-color: #06152A;
+    max-width: 300px;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-top: 15vh;
+    border-color: #405E87;
+    height: 350px;
+  }
+
+  .forgot{
+margin-top: 5vh;
+
+margin-left: 50%;}
+  
+  
+  .login-container h2 {
+    margin-bottom: 20px;
+  }
+  
+  .input-group {
+    position: relative;
+    margin-bottom: 20px;
+    margin-top: 3vh;
+    margin-left: -12px;
+  }
+  
+  .input-group img {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+  }
+  
+  .input-group input {
+    width: calc(100% - 40px);
+    padding: 10px;
+    padding-left: 40px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+  }
+  
+  .input-group input:focus {
+    border-color: #007bff;
+  }
+  
+  .btn {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+  }
+  
+  .btn:hover {
+    background-color: #0056b3;
+  }

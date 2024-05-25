@@ -1,0 +1,20 @@
+.cabecalho_header {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 7vw;
+  background-color: #06152A;
+  color: #fff; 
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+}
+.nomeapp {
+  display: flex;
+  align-items: center; 
+}
+
+.nomeapp img {
+  width: 40px;
+}
+
