@@ -29,8 +29,8 @@ export default function Login() {
                 window.location.href = '/'; // coloquei voltando para a pagina inicial pq nao tem essa pagina - p
             } 
         } catch (error) {
-            console.error('Login error:', error);
-            setMensagem('Failed to login. Please try again.');
+            console.error('Erro no Login', error);
+            setMensagem('Falha ao fazer login. Por favor, tente novamente.');
         }
     }
 

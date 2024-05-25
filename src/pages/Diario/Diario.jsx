@@ -38,13 +38,13 @@ export default function Diario() {
     };
 
     const handleSalvar = () => {
-        console.log('feeling:', feeling); // para ve 
-        console.log('descricao:', descricao); // para ve como esta sendo enviando
+        console.log('feeling:', feeling); // para verificar
+        console.log('descricao:', descricao); // para verificar como está sendo enviada
     
         if (descricao === '' || emojiSelecionado === '') {
             setMensagem('Por favor, preencha a descrição e selecione um emoji.');
         } else {
-            http.post(`/register/report/6646139dd98e3e2d2893731d`, { 
+            http.post(`/register/report/6646139dd98e3e2d2893731d`, {
                 feeling: feeling,
                 description: descricao
             })
@@ -52,6 +52,9 @@ export default function Diario() {
                 console.log('Resposta da solicitação:', response);
                 setMensagem('Salvo com sucesso!');
                 setTimeout(() => setMensagem(''), 3000);
+                setDescricao(''); //limpar os dados se for salvo 
+                setEmojiSelecionado('');
+                setFeeling('');
             })
             .catch(error => {
                 console.error('Erro ao enviar dados:', error);
