@@ -1,37 +1,18 @@
-
 body {
     margin: 0;
     font-family: Arial, sans-serif;
     background-color: #87B7C1;
 }
 
-header {
-    background-color: #2C3E50;
-    color: white;
-    text-align: left;
-    padding: 15px;
-}
-
-header h1 {
-    display: inline;
-    margin: 0;
-    font-size: 24px;
-}
-
-header img {
-    vertical-align: middle;
-    margin-right: 10px;
-}
 
 .content-container {
     justify-content: center;
     align-items: center;
     display: flex;
     flex-direction: column;
-    height: calc(130vh - 140px); 
+    height: calc(100vh - 60px); /* Ajuste para o cabeçalho */
     background-color: #87B7C1; 
 }
-
 
 .content-box {
     background-color: #0D1B2A; 
@@ -43,11 +24,9 @@ header img {
     color: white;
 }
 
-
 h2 {
     color: white;
 }
-
 
 .emojis {
     display: flex;
@@ -61,12 +40,10 @@ h2 {
     cursor: pointer;
 }
 
-
 .emoji-selecionado {
     border: 2px solid white;
     border-radius: 50%;
 }
-
 
 label {
     display: block;
@@ -74,42 +51,14 @@ label {
     color: white;
 }
 
-input {
+textarea {
     width: 100%;
-    padding: 0.5rem;
-    margin-top: 0.5rem;
     border: none;
     border-radius: 5px;
+    resize: vertical; 
+    background-color: #ffffff; 
+    height: 100px; 
 }
-
-
-.eventos {
-    margin: 1rem 0;
-    text-align: left;
-}
-
-.evento {
-    display: flex;
-    align-items: center;
-    background-color: white;
-    padding: 0.5rem;
-    border-radius: 5px;
-    margin-bottom: 0.5rem;
-    color: black;
-}
-
-.evento span:first-child {
-    background-color: #CFD8DC;
-    border-radius: 50%;
-    width: 1.5rem;
-    height: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 0.5rem;
-}
-
-
 .botoes {
     margin-top: 1rem;
     display: flex;
@@ -128,7 +77,6 @@ input {
 .botao-salvar:hover, .botao-cancelar:hover {
     background-color: #0056b3;
 }
-
 
 .mensagem {
     margin-top: 1rem;

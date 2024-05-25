@@ -82,3 +82,16 @@ margin-left: 50%;}
   .btn:hover {
     background-color: #0056b3;
   }
+
+  
+.mensagem {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 5px;
+}
+
+.mensagem.erro {
+  background-color: #f44336;
+}
