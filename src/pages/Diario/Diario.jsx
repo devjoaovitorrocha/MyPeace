@@ -1,4 +1,4 @@
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import Cabecalho from "../../components/cabecalho/Cabecalho";
 import Rodape from "../../components/rodape/rodape";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -12,20 +12,21 @@ export default function Diario() {
     const [dataAtual, setDataAtual] = useState('');
     const [emojiSelecionado, setEmojiSelecionado] = useState('');
     const [mensagem, setMensagem] = useState('');
-    const {state} = useLocation();
-    const [token, setToken] = useState()
-    const [id, setId] = useState()
+    const [savedFeelings, setSavedFeelings] = useState([]);
+    const { state } = useLocation();
+    const [token, setToken] = useState();
+    const [id, setId] = useState();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if(!state?.token || !state?.id){
-            navigate("/login")
-        }else{
-            setToken(state.token)
-            setId(state.id)
+        if (!state?.token || !state?.id) {
+            navigate("/login");
+        } else {
+            setToken(state.token);
+            setId(state.id);
         }
-    }, [setId, setToken, navigate, state])
-    
+    }, [setId, setToken, navigate, state]);
+
     useEffect(() => {
         const data = new Date();
         const dia = String(data.getDate()).padStart(2, '0');
@@ -44,7 +45,6 @@ export default function Diario() {
             }
         }
     }, [day]);
-    
 
     const handleDescricaoChange = (e) => setDescricao(e.target.value);
 
@@ -54,12 +54,20 @@ export default function Diario() {
     };
 
     const handleSalvar = () => {
-        console.log('feeling:', feeling); // para verificar 
+        console.log('feeling:', feeling);
         console.log('descricao:', descricao); // para verificar como está sendo enviada
 
         if (descricao === '' || emojiSelecionado === '') {
             setMensagem('Por favor, preencha a descrição e selecione um emoji.');
         } else {
+            const newEntry = {
+                id: Date.now(),
+                feeling: feeling,
+                description: descricao,
+                dataAtual: new Date().toLocaleDateString('pt-BR')
+            };
+            setSavedFeelings([...savedFeelings, newEntry]);
+
             http.post(`/register/report/${id}`, {
                 feeling: feeling,
                 description: descricao
@@ -82,7 +90,11 @@ export default function Diario() {
         }
     };
 
-    
+    const handleExcluir = (entryId) => {
+        setSavedFeelings(savedFeelings.filter(entry => entry.id !== entryId));
+    };
+
+
     const handleCancelar = () => {
         setMensagem('');
         setDescricao('');
@@ -141,8 +153,17 @@ export default function Diario() {
                     </div>
                     {mensagem && <div className="mensagem">{mensagem}</div>}
                 </div>
+
+                <div className="saved-feelings">
+                    {savedFeelings.map((entry) => (
+                        <div key={entry.id} className="saved-feeling-item">
+                            <span>{entry.feeling} - {entry.dataAtual}</span>
+                            <button onClick={() => handleExcluir(entry.id)}>❌</button>
+                        </div>
+                    ))}
+                </div>
             </main>
             <Rodape />
         </>
-    )
+    );
 }
