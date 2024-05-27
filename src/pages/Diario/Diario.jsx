@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import Cabecalho from "../../components/cabecalho/Cabecalho";
 import Rodape from "../../components/rodape/rodape";
 import { useParams } from "react-router-dom";
-import axios from 'axios'; 
+import axios from 'axios';
 import { http } from "../../App";
 import './Diario.css';
 
 export default function Diario() {
-   const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjQ1ZjBkNDJmYTkwMDlkNTQyMGE1ZGIiLCJuYW1lIjoiSm9hbyBWaXRvciIsImNwZiI6NzA1MTU5OTQ2MTgsInJlZ2lzdGVyTnVtYmVyIjozNDk4NTkzNCwiZW1haWwiOiJqb2Fvdml0b3Jjb21lcmNpYWwwNkBnbWFpbC5jb20iLCJpYXQiOjE3MTY1OTEzNjksImV4cCI6MTcxNjU5NDk2OX0.a6Xi8AdlgloA19EnQ8bzuwgpJWV-49GeS9C124f3fgM';
     const { day } = useParams();
     const [descricao, setDescricao] = useState('');
     const [feeling, setFeeling] = useState(''); 
@@ -26,9 +25,14 @@ export default function Diario() {
     useEffect(() => {
         if (day) {
             const [diaParam, mesParam, anoParam] = day.split('-');
-            setDataAtual(`${diaParam.padStart(2, '0')}/${mesParam.padStart(2, '0')}/${anoParam}`);
+            if (diaParam && mesParam && anoParam) {
+                setDataAtual(`${diaParam.padStart(2, '0')}/${mesParam.padStart(2, '0')}/${anoParam}`);
+            } else {
+                console.error('', day);
+            }
         }
     }, [day]);
+    
 
     const handleDescricaoChange = (e) => setDescricao(e.target.value);
 
@@ -38,20 +42,23 @@ export default function Diario() {
     };
 
     const handleSalvar = () => {
-        console.log('feeling:', feeling); // para verificar
+        console.log('feeling:', feeling); // para verificar 
         console.log('descricao:', descricao); // para verificar como está sendo enviada
-    
+
         if (descricao === '' || emojiSelecionado === '') {
             setMensagem('Por favor, preencha a descrição e selecione um emoji.');
         } else {
-            http.post('/register/report/6646139dd98e3e2d2893731d', {
-             feeling: feeling,
-             description: descricao
-         }, {
-             headers: {
-                 'Authorization': `Bearer ${token}`
-             }
-         })
+            const token = localStorage.getItem('token');
+            const id = localStorage.getItem('id');
+
+            http.post(`/register/report/${id}`, {
+                feeling: feeling,
+                description: descricao
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
             .then(response => {
                 console.log('Resposta da solicitação:', response);
                 setMensagem('Salvo com sucesso!');
@@ -66,8 +73,8 @@ export default function Diario() {
             });
         }
     };
-    
 
+    
     const handleCancelar = () => {
         setMensagem('');
         setDescricao('');

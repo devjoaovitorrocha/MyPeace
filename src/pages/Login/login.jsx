@@ -13,26 +13,29 @@ export default function Login() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
+    
         try {
             const response = await http.post('/auth/login', {
-                 email, password  
+                email: email,
+                password: password
             });
             
             const data = response.data;
+            const { token, id, type: userType } = data;
 
-            const userType = data.type;
-
+            localStorage.setItem('token', token);
+            localStorage.setItem('id', id);
+    
             if (userType === 'pacient') {
                 window.location.href = '/pacienteHome';
             } else if (userType === 'psychologist') {
                 window.location.href = '/'; // coloquei voltando para a pagina inicial pq nao tem essa pagina - p
             } 
         } catch (error) {
-            console.error('Erro no Login', error);
+            console.error('Erro no Login', error); 
             setMensagem('Falha ao fazer login. Por favor, tente novamente.');
         }
-    }
+    } 
 
     return (
         <>
