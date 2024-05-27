@@ -1,10 +1,24 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Cabecalho from "../../components/cabecalho/Cabecalho";
 import Rodape from "../../components/rodape/rodape";
 import './PacienteHome.css'
+import { useEffect, useState } from "react";
 
 export default function PacienteHome() {
+    const {state} = useLocation();
+    const [token, setToken] = useState()
+    const [id, setId] = useState()
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if(!state?.token || !state?.id){
+            navigate("/login")
+        }else{
+            setToken(state.token)
+            setId(state.id)
+        }
+    }, [setId, setToken, navigate, state])
+
 
     const days = [
         [1, 2, 3, 4, 5, 6, 7],
@@ -16,7 +30,7 @@ export default function PacienteHome() {
 
     const handleClick = (day) => {
         if (day) {
-            navigate(`/diario/${day}`);
+            navigate(`/diario/${day}`, {state: {token, id}});
         }
     };
 

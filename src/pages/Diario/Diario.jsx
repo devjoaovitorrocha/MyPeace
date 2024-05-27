@@ -1,7 +1,7 @@
 import { useEffect, useState} from "react";
 import Cabecalho from "../../components/cabecalho/Cabecalho";
 import Rodape from "../../components/rodape/rodape";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { http } from "../../App";
 import './Diario.css';
 
@@ -12,6 +12,19 @@ export default function Diario() {
     const [dataAtual, setDataAtual] = useState('');
     const [emojiSelecionado, setEmojiSelecionado] = useState('');
     const [mensagem, setMensagem] = useState('');
+    const {state} = useLocation();
+    const [token, setToken] = useState()
+    const [id, setId] = useState()
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if(!state?.token || !state?.id){
+            navigate("/login")
+        }else{
+            setToken(state.token)
+            setId(state.id)
+        }
+    }, [setId, setToken, navigate, state])
     
     useEffect(() => {
         const data = new Date();
@@ -47,9 +60,6 @@ export default function Diario() {
         if (descricao === '' || emojiSelecionado === '') {
             setMensagem('Por favor, preencha a descrição e selecione um emoji.');
         } else {
-            const token = localStorage.getItem('token');
-            const id = localStorage.getItem('id');
-
             http.post(`/register/report/${id}`, {
                 feeling: feeling,
                 description: descricao
@@ -67,8 +77,7 @@ export default function Diario() {
                 setFeeling('');
             })
             .catch(error => {
-                console.error('Erro ao enviar dados:', error);
-                setMensagem('Erro ao enviar dados. Por favor, tente novamente mais tarde.');
+                setMensagem(error.response.data.msg);
             });
         }
     };

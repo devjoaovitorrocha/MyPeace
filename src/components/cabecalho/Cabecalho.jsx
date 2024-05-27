@@ -11,11 +11,11 @@ function Cabecalho(){
                     <img src={logo} alt="Logo"></img>
                     <h1>MyPeace</h1>
                 </div>
+                <div className='sign-in'>
+                    <h1><a href="/cadastroPsicologo">Cadastro</a></h1>
+                    <h1><a href="/login">Login</a></h1>
+                </div>
             </header>    
-
-   
-
-        
         </>
     )
 }

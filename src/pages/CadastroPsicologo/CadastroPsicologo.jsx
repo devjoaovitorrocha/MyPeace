@@ -8,8 +8,6 @@ import { useState } from "react";
 import { http } from "../../App";
 
 export default function CadastroPsicologo() {
-    const id = '6645f0d42fa9009d5420a5db'; 
-    
     const [mensagem, setMensagem] = useState('');
     const [nome, setNome] = useState('');
     const [email, setEmail] = useState('');

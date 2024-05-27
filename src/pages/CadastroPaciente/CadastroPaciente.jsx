@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Cabecalho from "../../components/cabecalho/Cabecalho"
 import Rodape from "../../components/rodape/rodape"
 import { http } from "../../App";
@@ -6,12 +6,24 @@ import fotocadastro from '../../assets/fotocadastro.png'
 import emailIcon from '../../assets/email_icon.png'
 import passwordIcon from '../../assets/password_icon.png'
 import './CadastroPaciente.css'
+import { useLocation, useNavigate } from "react-router-dom";
 
 
 export default function CadastroPaciente(){
-    const id = '6645f0d42fa9009d5420a5db' // esse id vai ser pego na hora de fazer o login como psicologo...
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NjQ1ZjBkNDJmYTkwMDlkNTQyMGE1ZGIiLCJuYW1lIjoiSm9hbyBWaXRvciIsImNwZiI6NzA1MTU5OTQ2MTgsInJlZ2lzdGVyTnVtYmVyIjozNDk4NTkzNCwiZW1haWwiOiJqb2Fvdml0b3Jjb21lcmNpYWwwNkBnbWFpbC5jb20iLCJpYXQiOjE3MTY1OTEzNjksImV4cCI6MTcxNjU5NDk2OX0.a6Xi8AdlgloA19EnQ8bzuwgpJWV-49GeS9C124f3fgM'
-    //esse token também vai ser pego na hora de fazer login
+    const {state} = useLocation();
+    const [token, setToken] = useState()
+    const [id, setId] = useState()
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if(!state?.token || !state?.id){
+            navigate("/login")
+        }else{
+            setToken(state.token)
+            setId(state.id)
+        }
+    }, [setToken, setId, navigate, state])
+
     const [mensagem, setMensagem] = useState(''); //variavel para a mensagem de erro
     const [name, setName] = useState(''); //variavel para o nome
     const [email, setEmail] = useState(''); //variavel para o email
@@ -29,12 +41,17 @@ export default function CadastroPaciente(){
                 'Authorization': `Bearer ${token}` // esse token vai ser pego na hora de fazer o login como psicologo...
             }})
             .then(resp => { 
-
-                window.location.href ='/' // aqui o psicologo vai ter concluido o cadastro do paciente e vai ser redirecionado para a pagina de pacientes que o psicologo possui
+                alert(resp.data.password)
+                navigate("/pacientes", {state: {token, id}}) // aqui o psicologo vai ter concluido o cadastro do paciente e vai ser redirecionado para a pagina de pacientes que o psicologo possui
 
             }).catch(error => { //Aqui vai ter dado algum erro, seja ele de servidor, banco de dados, ou alguma informação incorreta dada pelo usuario
-                if (error.response) { 
-                    setMensagem(error.response.data.msg); //Aqui está colocando a mensagem do erro na nossa variavel mensagem para que possa ser mostrada pro usuario
+                if (error.response) {
+                    if(error.request.status === 401){
+                        alert("Sessão expirada")
+                        navigate("/login")
+                    }else{
+                        setMensagem(error.response.data.msg);
+                    }
                 } else {
                     setMensagem('Erro ao cadastrar paciente. Por favor, tente novamente mais tarde.');
                 }
