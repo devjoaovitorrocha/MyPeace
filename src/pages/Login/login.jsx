@@ -52,7 +52,7 @@ export default function Login() {
                         <input type="password" name="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
                     </div>
                     <nav className="forgot"><a href="/login"><p>Forgot password?</p></a></nav>
-                    <button type="submit" className="btn">Login</button>
+                    <button type="submit" className="btn" onClick={handleSubmit}>Login</button>
                     {mensagem && <p>{mensagem}</p>}
                 </form>
             </div>

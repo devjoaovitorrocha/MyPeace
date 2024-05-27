@@ -2,7 +2,6 @@ import { useEffect, useState} from "react";
 import Cabecalho from "../../components/cabecalho/Cabecalho";
 import Rodape from "../../components/rodape/rodape";
 import { useParams } from "react-router-dom";
-import axios from 'axios';
 import { http } from "../../App";
 import './Diario.css';
 
