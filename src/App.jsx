@@ -1,13 +1,14 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import CadastroPaciente from './pages/CadastroPaciente/CadastroPaciente';
-import PacienteHome from './pages/PacienteHome/PacienteHome';
-import PaginaInicial from './pages/PaginaInicial/PaginaInicial';
-import axios from 'axios'
-import CadastroPsicologo from './pages/CadastroPsicologo/CadastroPsicologo';
-import Login from './pages/Login/login';
-import Diario from './pages/Diario/Diario';
+import CadastroPsicologo from './pages/CadastroPsico/CadastroPsicologo';
+import Corpo from './pages/Home/corpo';
+import PrincipalPsico from './pages/PrincipalPsico/PrincipalPsico';
+import PrincipalCliente from './pages/PrincipalCliente/PrincipalCliente';
 import Cronometro from './pages/Cronometro/Cronometro';
+import Login from './pages/Login/Login';
+import ListaPaciente from './pages/ListaPaciente/lista';
+import Sobre from './pages/About/sobre';
+import axios from 'axios';
 
 export const http = axios.create({
   baseURL: 'https://api-mypeace.vercel.app'
@@ -18,18 +19,14 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path='/cadastroPsicologo' element={<CadastroPsicologo />} />
-        <Route path='/cadastroPaciente' element={<CadastroPaciente />} />
-        
-        <Route path='/pacienteHome' element={<PacienteHome />} />
-        
-        <Route path='/' element={<PaginaInicial />} />
-
+        <Route path='/principalCliente' element={<PrincipalCliente />} />
+        <Route path='/principalPsico' element={<PrincipalPsico />} />
+        <Route path='/' element={<Corpo />} />
         <Route path='/login' element={<Login />} />
-        <Route path='/diario' element={<Diario />} />
-        <Route path='/diario/:day' element={<Diario />} />
-        <Route path='/cronometro/' element={<Cronometro />} />
-        
-      </Routes>    
+        <Route path='/principalCliente/cronometro' element={<Cronometro />} />
+        <Route path='/principalPsico/listapaciente' element={<ListaPaciente />} />
+        <Route path='/sobre' element={<Sobre />} />
+      </Routes>
     </BrowserRouter>
   );
 }

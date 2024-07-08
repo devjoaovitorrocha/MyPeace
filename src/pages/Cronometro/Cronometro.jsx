@@ -1,7 +1,7 @@
 import './Cronometro.css'
-import Cabecalho from '../../components/cabecalho/Cabecalho'
-import Rodape from '../../components/rodape/rodape'
-import { useState } from 'react';
+import Cabecalho from '../../components/header/cabecalho'
+import Rodape from '../../components/base/rodape'
+import { useState, useEffect } from 'react';
 
 export default function Cronometro(){
     const [time, setTime] = useState(0);

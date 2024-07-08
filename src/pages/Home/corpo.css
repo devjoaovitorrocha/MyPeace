@@ -1,0 +1,181 @@
+.topohome {
+  position: relative;
+}
+
+.topohome img {
+  width: 100%;
+  height: 80vh;
+  position: relative;
+}
+
+.topohome img > img {
+  width: 100%;
+  height: 100%;
+}
+
+.verde {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background-color: #4db6ac;
+  opacity: 0.8;
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 90px;
+}
+
+form {
+  width: 60vw;
+  background-color: #d9d9d9;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  border-bottom: 4px solid #4db6ac;
+  position: absolute;
+  transform: translate(33%, -50px);
+}
+
+form h4 {
+  margin-bottom: 10px;
+}
+
+.inputs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.inputs input {
+  outline: none;
+}
+
+.inputs button {
+  background-color: #fff;
+  border: 1px solid #4db6ac;
+  padding: 2px;
+}
+
+.divverde {
+  background-color: #3c5454;
+  padding-top: 110px;
+  height: 50vh;
+}
+
+.aaa {
+  text-align: center;
+  color: white;
+  font-size: 3vh;
+  margin-bottom: 100px;
+}
+
+.caixas {
+  background-color: #d9d9d9;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  width: 350px;
+  height: 350px;
+  position: relative;
+  top: 0px;
+  border-radius: 16px;
+  transition: 0.2s ease-in-out;
+}
+
+.caixas h6 {
+  font-size: 14px;
+}
+
+.ferramentas {
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: space-around;
+  gap: 10%;
+  margin: 0 auto;
+  position: relative;
+  top: -200px;
+  max-width: 1200px; 
+}
+
+.caixas:hover {
+  background-color: #4db6ac;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.maira {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.verde2 {
+  background-color: #3c5454;
+}
+
+.divverde2h1 {
+  color: white;
+}
+
+.mairaverde {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 25px;
+}
+
+.btnconferir {
+  background: transparent;
+  border: 1px solid #4db6ac;
+  padding: 10px 40px;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 8px;
+  font-size: 18px;
+  transition: 0.2s ease-in;
+}
+
+.btnconferir:hover {
+  cursor: pointer;
+  background-color: #4db6ac;
+}
+
+.direita,
+.esquerda {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.direita h1,
+.esquerda h1 {
+  text-align: center;
+}
+
+
+.direita {
+  margin-top: -6vh;
+  gap: 5%;
+}
+
+.esquerda {
+  gap: 5%;
+}
+
+.verde2 {
+  margin-top: 10vh;
+}
