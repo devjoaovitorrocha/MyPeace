@@ -35,7 +35,7 @@ body {
 
 .titulos {
     display: flex;
-    justify-content: space-around; 
+    justify-content: space-around;
     margin: 10px 0;
     font-size: 14px;
     font-weight: bold;
@@ -48,9 +48,7 @@ body {
     margin: 20px;
     border-radius: 16px;
     border: 2px solid #3c5454;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: block;
     padding: 15px;
     background-color: #f9f9f9;
 }
@@ -61,7 +59,8 @@ body {
     gap: 20px;
     font-size: 14px;
     color: #3c5454;
-    width: 80%;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
 .cadastros div {
@@ -90,7 +89,7 @@ body {
 }
 
 .imgs img {
-    width: 30px; 
+    width: 30px;
     height: 30px;
     cursor: pointer;
     transition: transform 0.3s ease;

@@ -137,7 +137,7 @@ export default function ListaP() {
                 <h1>{new Date().toLocaleDateString()}</h1>
                 <h1 onClick={() => setModalAdd(true)}>Adicionar Paciente</h1>
             </div>
-            <div className="títulos">
+            <div className="titulos">
                 <h1>n°</h1>
                 <h1>Nome</h1>
                 <h1>E-mail</h1>
@@ -145,7 +145,7 @@ export default function ListaP() {
                 <h1>Perfil</h1>
             </div>
             <div className="conteudo">
-                {pacientes && pacientes.length > 0 ? (
+                {pacientes.length > 0 ? (
                     pacientes.map((paciente, index) => (
                         <div className="cadastros" key={paciente.id}>
                             <div className="dados1">{index + 1}</div>
