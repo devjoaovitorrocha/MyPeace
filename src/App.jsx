@@ -9,6 +9,7 @@ import Login from './pages/Login/Login';
 import ListaPaciente from './pages/ListaPaciente/lista';
 import Sobre from './pages/About/sobre';
 import axios from 'axios';
+import CadastroCliente from './pages/CadastroCliente/CadastroCliente';
 
 export const http = axios.create({
   baseURL: 'https://api-mypeace.vercel.app'
@@ -18,6 +19,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+      <Route path='/cadastroCliente' element={<CadastroCliente/>} />
         <Route path='/cadastroPsicologo' element={<CadastroPsicologo />} />
         <Route path='/principalCliente' element={<PrincipalCliente />} />
         <Route path='/principalPsico' element={<PrincipalPsico />} />
