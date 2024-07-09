@@ -8,6 +8,7 @@ import Emocao from "../../assets/emocao.png";
 import Chat from "../../assets/chat.png";
 import Ok from "../../assets/ok.png";
 import Cabecalho from "../../components/header/cabecalho";
+import Rodape from "../../components/base/rodape";
 
 export default function Corpo() {
   return (
@@ -105,6 +106,7 @@ export default function Corpo() {
           <button className="btnconferir">Conferir</button>
         </div>
       </div>
+      <Rodape/>
     </>
   );
 }
