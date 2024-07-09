@@ -29,7 +29,7 @@ export default function Rodape() {
         <h4>Redes Sociais</h4>
         <img src={Insta} alt="" />
         <img src={Face} alt="" />
-        <h5 onClick={() => navigate('/sobre')}>Quem Somos</h5>
+        <h5 onClick={() => navigate('/sobre')}> <a href="">Quem Somos</a></h5>
       </div>
       <div className="baixo">
         <h4>Copyright © 2024 - Todos os direitos reservados - Site desenvolvido por MyPeace</h4>

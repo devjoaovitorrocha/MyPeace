@@ -5,11 +5,12 @@ import Corpo from './pages/Home/corpo';
 import PrincipalPsico from './pages/PrincipalPsico/PrincipalPsico';
 import PrincipalCliente from './pages/PrincipalCliente/PrincipalCliente';
 import Cronometro from './pages/Cronometro/Cronometro';
-import Login from './pages/Login/Login';
+import Login from './pages/Login/login';
 import ListaPaciente from './pages/ListaPaciente/lista';
 import Sobre from './pages/About/sobre';
 import axios from 'axios';
 import CadastroCliente from './pages/CadastroCliente/CadastroCliente';
+import RegistroEmocoes from './pages/RegistroEmocoes/RegistroEmocoes';
 
 export const http = axios.create({
   baseURL: 'https://api-mypeace.vercel.app'
