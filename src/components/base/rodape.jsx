@@ -12,7 +12,7 @@ export default function Rodape() {
   return (
     <footer>
       <div className="esquerda">
-        <img src={Logo}></img>
+        <img src={Logo} width={100}></img>
         <h1>MyPeace</h1>
       </div>
       <div className="meio">
