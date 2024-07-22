@@ -17,7 +17,6 @@ export default function AddP() {
       {modal ? 
         <div className="telaverde-container">
           <div className="modal">
-          
             <h1>Adicionar Paciente</h1>
             <input type="text" name="name" placeholder="Nome Completo do Paciente" />
             <input type="text" name="name" placeholder="Email do Paciente" />

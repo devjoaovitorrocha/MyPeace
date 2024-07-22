@@ -33,7 +33,7 @@ function PrincipalPsico() {
     };
 
     return (
-        <div className="container">
+        <div>
             <header className="cabecalho-aplicativo">
                 <div className="perfil">
                     <div className="foto-placeholder">Foto do Psicólogo</div>

@@ -7,13 +7,6 @@ body {
   background-color: #2d3e3f;
 }
 
-.container {
-  display: flex;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
-}
-
 .form-container {
   background-color: #ffffff;
   padding: 2rem;
