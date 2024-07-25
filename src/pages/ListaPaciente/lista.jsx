@@ -10,6 +10,7 @@ export default function ListaP() {
     const [modalEdt, setModalEdt] = useState(false);
     const [modalAdd, setModalAdd] = useState(false);
 
+
     const { state } = useLocation();
     const navigate = useNavigate();
     const [token, setToken] = useState('');
@@ -32,14 +33,11 @@ export default function ListaP() {
 
     async function fetchPacientes(token, idUser) {
         try {
-            console.log(`Fetching pacientes with token: ${token} and idUser: ${idUser}`);
             const response = await axios.get(`https://api-mypeace.vercel.app/getAll/pacients/${idUser}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            console.log("Pacientes fetched successfully:", response.data.allPacients);
             setPacientes(response.data.allPacients);
         } catch (error) {
-            console.error("Erro ao buscar pacientes:", error);
             setMensagem('Erro ao buscar pacientes. Por favor, tente novamente mais tarde.');
         }
     }
@@ -47,7 +45,6 @@ export default function ListaP() {
     async function cadastrar(event) {
         event.preventDefault();
         try {
-            console.log(`Cadastrando paciente com nome: ${name} e email: ${email}`);
             const response = await axios.post(`https://api-mypeace.vercel.app/register/pacient/${id}`, { 
                 name, 
                 email, 
@@ -57,22 +54,45 @@ export default function ListaP() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log("Paciente cadastrado com sucesso!", response.data);
+            setMensagem(response.data.msg || "Paciente cadastrado com sucesso!");
             setModalAdd(false);
-            fetchPacientes(token, id); // Atualizar a lista de pacientes
+            fetchPacientes(token, id);
         } catch (error) {
-            if (error.response) {
-                if(error.response.status === 401){
-                    alert("Sessão expirada");
-                    navigate("/login");
-                } else {
-                    setMensagem(error.response.data.msg);
-                }
-            } else {
-                setMensagem('Erro ao cadastrar paciente. Por favor, tente novamente mais tarde.');
-            }
-            console.error("Erro ao cadastrar paciente:", error);
+            handleErrorResponse(error);
         }
+    }
+
+    async function editar(event) {
+       
+    }
+
+    async function deletar() {
+       
+    }
+
+    function handleErrorResponse(error) {
+        if (error.response) {
+            if (error.response.status === 401) {
+                alert("Sessão expirada");
+                navigate("/login");
+            } else {
+                setMensagem(error.response.data.msg || "Erro ao processar a solicitação. Por favor, tente novamente mais tarde.");
+            }
+        } else {
+            setMensagem('Erro ao processar a solicitação. Por favor, tente novamente mais tarde.');
+        }
+    }
+
+    function openEditModal(paciente) {
+        
+        setName(paciente.name);
+        setEmail(paciente.email);
+        setModalEdt(true);
+    }
+
+    function openDeleteModal(paciente) {
+        
+        setModalDel(true);
     }
 
     return (
@@ -81,23 +101,43 @@ export default function ListaP() {
                 <div className="telaverdecontainer">
                     <div className="modal1">
                         <h1>Excluir Conta</h1>
-                        <h1>Ao excluir a conta seu paciente será deslogado do MyPeace e a conta será deletada permanentemente</h1>
-                        <h1>Deletar conta permanentemente?</h1>
-                        <button>Deletar</button>
+                        <p>Ao excluir a conta seu paciente será deslogado do MyPeace e a conta será deletada permanentemente</p>
+                        <p>Deletar conta permanentemente?</p>
+                        <button onClick={deletar}>Deletar</button>
                         <button onClick={() => setModalDel(false)}>Sair</button>
+                        <p>{mensagem}</p>
                     </div>
                 </div>
             )}
 
             {modalEdt && (
                 <div className="telaverdecontainer">
-                    <div className="modal1">
-                        <h1>Editar Conta</h1>
-                        <h1>Nome:</h1>
-                        <h1>Email:</h1>
-                        <button>Confirmar</button>
-                        <button onClick={() => setModalEdt(false)}>Sair</button>
-                    </div>
+                    <form onSubmit={editar}>
+                        <div className="modal1">
+                            <h1>Editar Conta</h1>
+                            <input 
+                                type="text" 
+                                id="nome" 
+                                name="nome" 
+                                placeholder="Nome" 
+                                required
+                                value={name}
+                                onChange={e => setName(e.target.value)} 
+                            />
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                placeholder="Email" 
+                                required 
+                                value={email}
+                                onChange={e => setEmail(e.target.value)} 
+                            />
+                            <button type="submit">Confirmar</button>
+                            <button type="button" onClick={() => setModalEdt(false)}>Sair</button>
+                        </div>
+                        <p>{mensagem}</p>
+                    </form>
                 </div>
             )}
 
@@ -129,6 +169,7 @@ export default function ListaP() {
                     </form>
                 </div>
             )}
+
             <div className="divverde2">
                 <h1>Lista de Pacientes</h1>
             </div>
@@ -152,8 +193,8 @@ export default function ListaP() {
                             <div className="dados3">{paciente.email}</div>
                             <button className="verificarbtn">Verificar</button>
                             <div className="imgs">
-                                <img onClick={() => setModalDel(true)} src={Deletar} alt="Excluir" />
-                                <img onClick={() => setModalEdt(true)} src={Editar} alt="Editar" />
+                                <img onClick={() => openDeleteModal(paciente)} src={Deletar} alt="Excluir" />
+                                <img onClick={() => openEditModal(paciente)} src={Editar} alt="Editar" />
                             </div>
                         </div>
                     ))
