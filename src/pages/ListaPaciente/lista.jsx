@@ -19,14 +19,18 @@ const App = () => {
     const { state } = useLocation();
 
     useEffect(() => {
-        if (!state?.token || !state?.id) {
-            navigate("/login");
-        } else {
+        if (state?.token && state?.id) {
             setToken(state.token);
             setId(state.id);
-            fetchPacientes(state.token, state.id);
+        } else {
+            navigate("/login");
         }
-    }, [navigate, state]);
+
+    
+        if (state?.openModal === 'add') {
+            setModalAdd(true);
+        }
+    }, [state, navigate]);
 
     function fetchPacientes(token, idUser) {
         console.log(`Fetching pacientes with token: ${token} and idUser: ${idUser}`);
@@ -151,7 +155,7 @@ const App = () => {
             </div>
 
             <div className={styles.adicionaeedata}>
-                <h1> <a href="/" ></a>Início</h1> 
+                <a href="/" >Início</a>
                 <h1>{new Date().toLocaleDateString()}</h1>
                 <h1 onClick={() => setModalAdd(true)}>Adicionar Paciente</h1>
                 
