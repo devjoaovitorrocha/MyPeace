@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import './CadastroCliente.css'
 import Logo from '../../assets/logo.png';
 import { http } from "../../App";
 import { useLocation, useNavigate } from "react-router-dom";

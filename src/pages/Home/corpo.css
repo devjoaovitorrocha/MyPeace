@@ -29,7 +29,7 @@
   font-size: 90px;
 }
 
-form {
+.form {
   width: 60vw;
   background-color: #d9d9d9;
   padding: 20px;
@@ -43,7 +43,7 @@ form {
   transform: translate(33%, -50px);
 }
 
-form h4 {
+.form .calm {
   margin-bottom: 10px;
 }
 
@@ -54,11 +54,11 @@ form h4 {
   gap: 10px;
 }
 
-.inputs input {
+.inputs .inputs {
   outline: none;
 }
 
-.inputs button {
+.inputs .botao {
   background-color: #fff;
   border: 1px solid #4db6ac;
   padding: 2px;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import './Login.css';
+import './login.css';
 import Logo from '../../assets/logo.png';
 import { http } from "../../App";
 import { useNavigate } from 'react-router-dom';
@@ -38,17 +38,17 @@ const Login = () => {
     };
 
     return (
-        <div className="container">
+        <div className="container11">
             <div className="form-half">
                 <div className="form-container">
-                    <div className="header">
-                        <div className="logo">
-                            <img src={Logo} alt="logo" />
-                            <span>MyPeace</span>
-                        </div>
-                        <h1 className="back-button"><a href="/">Voltar</a></h1>
+                <div className="header">
+                    <div className="logo">
+                        <img src={Logo} alt="logo" />
+                        <span>MyPeace</span>
                     </div>
-                    <form className="login-form" onSubmit={handleSubmit}>
+                    <h1 className="back-button"><a href="/">Voltar</a></h1>
+                </div>
+                    <form className="signup-form" onSubmit={handleSubmit}>
                         <h2>Faça seu Login!</h2>
                         <input type="email" name="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
                         <input type="password" name="password" placeholder="Senha" value={password} onChange={e => setPassword(e.target.value)} required />

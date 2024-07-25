@@ -1,49 +1,76 @@
+
+
 .divverde2 {
     background-color: #3c5454;
     color: white;
     text-align: center;
+    padding: 20px 0;
+    font-size: 24px;
+    font-weight: bold;
 }
 
 .adicionaeedata {
     display: flex;
     align-items: center;
     gap: 25px;
-    margin: 20px 0 0 20px;
-    font-size: 14px; 
+    margin: 20px;
+    font-size: 16px;
+}
+
+.adicionaeedata h1 {
+    cursor: pointer;
+    color: #3c5454;
+    transition: color 0.3s ease;
+}
+
+.adicionaeedata h1:hover {
+    color: #5a7b7b;
 }
 
 .titulos {
     display: flex;
-    justify-content: space-around; 
+    justify-content: space-around;
     margin: 10px 0;
-    font-size: 13px;
+    font-size: 14px;
+    font-weight: bold;
     color: #3c5454;
+    padding: 10px 0;
+    border-bottom: 2px solid #3c5454;
 }
 
-.conteudo {
-    margin: 24px;
+.conteudo32 {
+    margin: 20px;
     border-radius: 16px;
     border: 2px solid #3c5454;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: block;
+    padding: 15px;
+    background-color: #f9f9f9;
 }
 
 .cadastros {
     display: flex;
     align-items: center;
     gap: 20px;
-    font-size: 12px;
+    font-size: 14px;
     color: #3c5454;
+    width: 100%;
+    margin-bottom: 10px;
 }
+
 
 .verificarbtn {
     background-color: #3c5454;
     border-radius: 9px;
-    height: 30px;
+    height: 35px;
     color: white;
     border: none;
-    padding: 0 10px;
+    padding: 0 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.verificarbtn:hover {
+    background-color: #5a7b7b;
 }
 
 .imgs {
@@ -56,32 +83,30 @@
     width: 30px; 
     height: 30px;
 }
-
-.dados1 {
+.dados1{
     padding-left: 140px;
 }
 
-.dados2 {
+.dados2{
     padding-left: 310px;
 }
 
-.dados3 {
+.dados3{
     padding-left: 260px;
 }
 
-.dados4 {
+.dados4{
     margin-left: 250px;
 }
 
-.modal {
+.modal1 {
     width: 400px;
     height: 400px;
-    position: absolute;
-    transform: translate(-50%, 50%);
+    position: absolute; 
     background-color: white;
 }
 
-.telaverde-container {
+.telaverdecontainer {
     position: relative;
 }
 
@@ -93,7 +118,7 @@
     height: 100vh;
 }
 
-.telaverde-container {
+.telaverdecontainer {
     position: fixed;
     top: 0;
     left: 0;
@@ -106,19 +131,19 @@
     z-index: 1000;
 }
 
-.modal {
+.modal1 {
     background-color: white;
     padding: 20px;
     border-radius: 10px;
     text-align: center;
 }
 
-.modal h1 {
+.modal1 h1 {
     margin-bottom: 20px;
     font-size: 20px;
 }
 
-.modal input {
+.modal1 input {
     display: block;
     width: calc(100% - 40px);
     margin: 10px auto;
@@ -128,7 +153,7 @@
     border-radius: 5px;
 }
 
-.modal button {
+.modal1 button {
     margin: 0 10px;
     padding: 10px 20px;
     background-color: rgba(127, 255, 212, 0.363);

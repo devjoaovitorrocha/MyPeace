@@ -18,13 +18,13 @@ export default function Corpo() {
         <img src={Principal} alt="" />
         <div className="verde">MY PEACE</div>
 
-        <div className="form">
-          <form>
-            <h4>Fale Conosco!</h4>
+        <div className="form1">
+          <form className="form">
+            <h4 className="calm">Fale Conosco!</h4>
             <div className="inputs">
-              <input type="text" name="name" placeholder="Nome Completo" />
-              <input type="number" name="name" placeholder="(__) _____-____" />
-              <button>Enviar</button>
+              <input className="inputs" type="text" name="name" placeholder="Nome Completo" />
+              <input className="inputs" type="number" name="name" placeholder="(__) _____-____" />
+              <button >Enviar</button>
             </div>
           </form>
         </div>
@@ -59,7 +59,7 @@ export default function Corpo() {
           </h2>
 
           <div className="maira">
-            <img src={Ok} />
+            <img src={Ok}/>
             <h3>Relacionamento saudáveis</h3>
           </div>
 
@@ -69,12 +69,12 @@ export default function Corpo() {
           </div>
 
           <div className="maira">
-            <img src={Ok} />
+            <img src={Ok}/>
             <h3>Crescimento pessoal</h3>
           </div>
         </div>
 
-        <img src={Ajuda} />
+        <img src={Ajuda}/>
       </div>
 
       <div className="esquerda">
