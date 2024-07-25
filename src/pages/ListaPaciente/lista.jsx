@@ -151,7 +151,7 @@ const App = () => {
             </div>
 
             <div className={styles.adicionaeedata}>
-                <h1 href="/">Início</h1> 
+                <h1> <a href="/" ></a>Início</h1> 
                 <h1>{new Date().toLocaleDateString()}</h1>
                 <h1 onClick={() => setModalAdd(true)}>Adicionar Paciente</h1>
                 
