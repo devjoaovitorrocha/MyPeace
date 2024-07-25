@@ -30,40 +30,39 @@ export default function ListaP() {
         }
     }, [navigate, state]);
 
-    function fetchPacientes(token, idUser) {
-        console.log(`Fetching pacientes with token: ${token} and idUser: ${idUser}`);
-        axios.get(`https://api-mypeace.vercel.app/getAll/pacients/${idUser}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        })
-        .then(response => {
-            console.log("Pacientes fetched successfully:", response.data);
-            setPacientes(response.data);
-        })
-        .catch(error => {
+    async function fetchPacientes(token, idUser) {
+        try {
+            console.log(`Fetching pacientes with token: ${token} and idUser: ${idUser}`);
+            const response = await axios.get(`https://api-mypeace.vercel.app/getAll/pacients/${idUser}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            console.log("Pacientes fetched successfully:", response.data.allPacients);
+            setPacientes(response.data.allPacients);
+        } catch (error) {
             console.error("Erro ao buscar pacientes:", error);
-        });
+            setMensagem('Erro ao buscar pacientes. Por favor, tente novamente mais tarde.');
+        }
     }
 
-    function cadastrar(event) {
+    async function cadastrar(event) {
         event.preventDefault();
-        console.log(`Cadastrando paciente com nome: ${name} e email: ${email}`);
-        axios.post(`https://api-mypeace.vercel.app/register/pacient/${id}`, { 
-            name, 
-            email, 
-            idPsychologist: id 
-        }, { 
-            headers: { 
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        .then(response => {
+        try {
+            console.log(`Cadastrando paciente com nome: ${name} e email: ${email}`);
+            const response = await axios.post(`https://api-mypeace.vercel.app/register/pacient/${id}`, { 
+                name, 
+                email, 
+                idPsychologist: id 
+            }, { 
+                headers: { 
+                    'Authorization': `Bearer ${token}`
+                }
+            });
             console.log("Paciente cadastrado com sucesso!", response.data);
             setModalAdd(false);
             fetchPacientes(token, id); // Atualizar a lista de pacientes
-        })
-        .catch(error => {
+        } catch (error) {
             if (error.response) {
-                if(error.request.status === 401){
+                if(error.response.status === 401){
                     alert("Sessão expirada");
                     navigate("/login");
                 } else {
@@ -73,7 +72,7 @@ export default function ListaP() {
                 setMensagem('Erro ao cadastrar paciente. Por favor, tente novamente mais tarde.');
             }
             console.error("Erro ao cadastrar paciente:", error);
-        });
+        }
     }
 
     return (
@@ -147,9 +146,9 @@ export default function ListaP() {
             <div className="conteudo32">
                 {pacientes.length > 0 ? (
                     pacientes.map((paciente, index) => (
-                        <div className="cadastros" key={paciente.id}>
+                        <div className="cadastros" key={paciente._id}>
                             <div className="dados1">{index + 1}</div>
-                            <div className="dados2">{paciente.nome}</div>
+                            <div className="dados2">{paciente.name}</div>
                             <div className="dados3">{paciente.email}</div>
                             <button className="verificarbtn">Verificar</button>
                             <div className="imgs">
