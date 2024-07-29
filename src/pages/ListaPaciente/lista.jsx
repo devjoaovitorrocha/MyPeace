@@ -1,25 +1,25 @@
+
+import { useEffect, useState } from "react";
 import "./lista.css";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from 'axios';
 import Deletar from "../../assets/excluir.png";
 import Editar from "../../assets/editar.png";
-import axios from 'axios';
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+
 
 export default function ListaP() {
-    const [modalDel, setModalDel] = useState(false);
-    const [modalEdt, setModalEdt] = useState(false);
-    const [modalAdd, setModalAdd] = useState(false);
-
-
     const { state } = useLocation();
     const navigate = useNavigate();
     const [token, setToken] = useState('');
     const [id, setId] = useState('');
-
     const [pacientes, setPacientes] = useState([]);
     const [mensagem, setMensagem] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [modalDel, setModalDel] = useState(false);
+    const [modalEdt, setModalEdt] = useState(false);
+    const [modalAdd, setModalAdd] = useState(false);
+    const [currentPaciente, setCurrentPaciente] = useState(null);
 
     useEffect(() => {
         if (!state?.token || !state?.id) {
@@ -63,11 +63,41 @@ export default function ListaP() {
     }
 
     async function editar(event) {
-       
+        event.preventDefault();
+        if (!currentPaciente) return;
+
+        try {
+            const response = await axios.put(`https://api-mypeace.vercel.app/update/pacient/${currentPaciente._id}`, { 
+                name, 
+                email 
+            }, { 
+                headers: { 
+                    'Autorizado': `Bearer ${token}`
+                }
+            });
+            setMensagem(response.data.msg || "Paciente editado com sucesso!");
+            setModalEdt(false);
+            fetchPacientes(token, id);
+        } catch (error) {
+            handleErrorResponse(error);
+        }
     }
 
     async function deletar() {
-       
+        if (!currentPaciente) return;
+
+        try {
+            const response = await axios.delete(`https://api-mypeace.vercel.app/delete/pacient/${currentPaciente._id}`, {
+                headers: { 
+                    'Autorizado': `Bearer ${token}`
+                }
+            });
+            setMensagem(response.data.msg || "Paciente deletado com sucesso!");
+            setModalDel(false);
+            fetchPacientes(token, id);
+        } catch (error) {
+            handleErrorResponse(error);
+        }
     }
 
     function handleErrorResponse(error) {
@@ -84,14 +114,14 @@ export default function ListaP() {
     }
 
     function openEditModal(paciente) {
-        
+        setCurrentPaciente(paciente);
         setName(paciente.name);
         setEmail(paciente.email);
         setModalEdt(true);
     }
 
     function openDeleteModal(paciente) {
-        
+        setCurrentPaciente(paciente);
         setModalDel(true);
     }
 
