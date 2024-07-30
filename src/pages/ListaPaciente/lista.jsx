@@ -65,16 +65,14 @@ export default function ListaP() {
     async function editar(event) {
         event.preventDefault();
         if (!currentPaciente) return;
-
+    
         try {
-            const response = await axios.put(`https://api-mypeace.vercel.app/update/pacient/${currentPaciente._id}`, { 
+            const response = await axios.push(`https://api-mypeace.vercel.app/update/pacients/${currentPaciente._id}`, 
+            { 
                 name, 
                 email 
-            }, { 
-                headers: { 
-                    'Autorizado': `Bearer ${token}`
-                }
-            });
+            }, 
+           );
             setMensagem(response.data.msg || "Paciente editado com sucesso!");
             setModalEdt(false);
             fetchPacientes(token, id);
@@ -82,12 +80,13 @@ export default function ListaP() {
             handleErrorResponse(error);
         }
     }
+    
 
     async function deletar() {
         if (!currentPaciente) return;
 
         try {
-            const response = await axios.delete(`https://api-mypeace.vercel.app/delete/pacient/${currentPaciente._id}`, {
+            const response = await axios.post(`https://api-mypeace.vercel.app/delete/pacients/${currentPaciente._id}`, {
                 headers: { 
                     'Autorizado': `Bearer ${token}`
                 }
