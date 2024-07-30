@@ -39,6 +39,7 @@ export default function ListaP() {
             setPacientes(response.data.allPacients);
         } catch (error) {
             setMensagem('Erro ao buscar pacientes. Por favor, tente novamente mais tarde.');
+
         }
     }
 
@@ -54,8 +55,9 @@ export default function ListaP() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            setMensagem(response.data.msg || "Paciente cadastrado com sucesso!");
+            setMensagem(`Senha do usuáio: ${response.data.password}` || "Paciente cadastrado com sucesso!");
             setModalAdd(false);
+            alert(mensagem)
             fetchPacientes(token, id);
         } catch (error) {
             handleErrorResponse(error);
@@ -67,10 +69,11 @@ export default function ListaP() {
         if (!currentPaciente) return;
     
         try {
-            const response = await axios.push(`https://api-mypeace.vercel.app/update/pacients/${currentPaciente._id}`, 
+            const response = await axios.post(`https://api-mypeace.vercel.app/update/pacients/${currentPaciente._id}`, 
             { 
                 name, 
-                email 
+                email,
+                idPsychologist: id 
             }, 
            );
             setMensagem(response.data.msg || "Paciente editado com sucesso!");

@@ -32,8 +32,17 @@ const Login = () => {
             setId(response.data.id);
             setToken(response.data.token);
             setType(response.data.type);
-        } catch (error) {
-            setMensagem(error.response.data.msg);
+            if (type === 'pacient') {
+                navigate("/principalCliente", { state: { token, id } });
+                console.log(type)
+            } else if (type === 'psychologist') {
+                navigate("/principalPsico", { state: { token, id } });
+                console.log(type)
+            }
+            console.log(type)
+        } catch (e) {
+            setMensagem(e.response.data.msg);
+            console.log(e)
         }
     };
 
