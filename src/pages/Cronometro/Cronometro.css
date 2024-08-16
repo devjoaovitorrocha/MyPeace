@@ -16,9 +16,10 @@
     width: 100%;
 }
 
-.left-section {
-    display: flex;
-    align-items: center;
+.left-section, .right-section {
+  display: flex;
+  align-items: center;
+  
 }
 
 .title {
@@ -42,6 +43,7 @@
     color: #007bff;
     padding: 10px;
     border-radius: 5px;
+    font-size: 22px;
 }
 
 .right-section a:hover {
@@ -55,6 +57,7 @@
     background-color: #3C5454;
     color: white;
     margin-top: 10px;
+    font-size:  32px;
 }
 
   .timer-container {

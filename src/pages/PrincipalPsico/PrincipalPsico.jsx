@@ -21,7 +21,7 @@ function PrincipalPsico() {
     }, [state, navigate]);
 
     const handleAddPaciente = () => {
-        navigate('/addPaciente', { state: { token, id } });
+        navigate('/principalPsico/listapaciente', { state: { token, id, openModal: true } });
     };
 
     const handleRegistros = () => {

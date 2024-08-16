@@ -1,6 +1,5 @@
 import './Cronometro.css'
-import Cabecalho from '../../components/header/cabecalho'
-import Rodape from '../../components/base/rodape'
+import logo from '../../assets/logo.png'
 import { useState, useEffect } from 'react';
 
 export default function Cronometro(){
@@ -56,17 +55,16 @@ export default function Cronometro(){
 
     return(
         <> 
-            <Cabecalho />
             <header className="header">
             <div className="top-section">
                 <div className="left-section">
-                { <img src="Logo.png" alt="" className='my' /> }
+                 <img src={logo} width={100} alt="" className='my' /> 
                     <h1 className="title">MyPeace</h1>
                 </div>
                 <nav className="right-section">
                     <ul>
-                        <li><a href="#">Perfil</a></li>
-                        <li><a href="#">Home</a></li>
+                        <li><a href="#"> Voltar</a></li>
+                        <li><a href="/">Inicio</a></li>
                     </ul>
                 </nav>
             </div>
@@ -104,15 +102,14 @@ export default function Cronometro(){
       </svg>
       <div className="phase">{phase}</div>
       <div className="button-group">
-        {!running ? (
+      
           <button onClick={startTimer} className="button">Iniciar</button>
-        ) : (
+        
           <button onClick={pauseTimer} className="button">Pausar</button>
-        )}
+      
         <button onClick={resetTimer} className="button">Reiniciar</button>
       </div>
-    </div>
-            <Rodape />
+      </div>
         </>
     )
 }

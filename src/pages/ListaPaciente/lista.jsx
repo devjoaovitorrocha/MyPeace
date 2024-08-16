@@ -1,11 +1,10 @@
-
 import { useEffect, useState } from "react";
 import "./lista.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Deletar from "../../assets/excluir.png";
 import Editar from "../../assets/editar.png";
-
+import { Eye, EyeOff, XCircle } from "lucide-react";
 
 export default function ListaP() {
     const { state } = useLocation();
@@ -16,10 +15,12 @@ export default function ListaP() {
     const [mensagem, setMensagem] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState("");
     const [modalDel, setModalDel] = useState(false);
     const [modalEdt, setModalEdt] = useState(false);
     const [modalAdd, setModalAdd] = useState(false);
     const [currentPaciente, setCurrentPaciente] = useState(null);
+    const [eye, setEye] = useState(false);
 
     useEffect(() => {
         if (!state?.token || !state?.id) {
@@ -28,6 +29,11 @@ export default function ListaP() {
             setToken(state.token);
             setId(state.id);
             fetchPacientes(state.token, state.id);
+
+            // Abre o modal de adição automaticamente se o estado `openModal` for verdadeiro
+            if (state?.openModal) {
+                setModalAdd(true);
+            }
         }
     }, [navigate, state]);
 
@@ -39,7 +45,6 @@ export default function ListaP() {
             setPacientes(response.data.allPacients);
         } catch (error) {
             setMensagem('Erro ao buscar pacientes. Por favor, tente novamente mais tarde.');
-
         }
     }
 
@@ -55,9 +60,9 @@ export default function ListaP() {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            setMensagem(`Senha do usuáio: ${response.data.password}` || "Paciente cadastrado com sucesso!");
+            setMensagem(`Senha do usuário: ${response.data.password}` || "Paciente cadastrado com sucesso!");
             setModalAdd(false);
-            alert(mensagem)
+            alert(mensagem);
             fetchPacientes(token, id);
         } catch (error) {
             handleErrorResponse(error);
@@ -74,8 +79,7 @@ export default function ListaP() {
                 name, 
                 email,
                 idPsychologist: id 
-            }, 
-           );
+            });
             setMensagem(response.data.msg || "Paciente editado com sucesso!");
             setModalEdt(false);
             fetchPacientes(token, id);
@@ -84,7 +88,6 @@ export default function ListaP() {
         }
     }
     
-
     async function deletar() {
         if (!currentPaciente) return;
 
@@ -130,46 +133,70 @@ export default function ListaP() {
     return (
         <>
             {modalDel && (
-                <div className="telaverdecontainer">
-                    <div className="modal1">
-                        <h1>Excluir Conta</h1>
-                        <p>Ao excluir a conta seu paciente será deslogado do MyPeace e a conta será deletada permanentemente</p>
-                        <p>Deletar conta permanentemente?</p>
-                        <button onClick={deletar}>Deletar</button>
-                        <button onClick={() => setModalDel(false)}>Sair</button>
-                        <p>{mensagem}</p>
+                <div className="modal">
+                    <div className="modal-content">
+                        <header>
+                            <h1>Excluir Conta</h1>
+                            <XCircle className="xIcon" onClick={() => setModalDel(false)} />
+                        </header>
+                        <p>
+                            Você tem certeza que deseja deletar esta conta? Esta ação não pode
+                            ser desfeita.
+                        </p>
+                        <div className="delBtns">
+                            <button className="delBtn" onClick={deletar}>
+                                Deletar
+                            </button>
+                            <button
+                                className="delCancelBtn"
+                                onClick={() => setModalDel(false)}
+                            >
+                                Cancelar
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
 
             {modalEdt && (
-                <div className="telaverdecontainer">
-                    <form onSubmit={editar}>
-                        <div className="modal1">
-                            <h1>Editar Conta</h1>
-                            <input 
-                                type="text" 
-                                id="nome" 
-                                name="nome" 
-                                placeholder="Nome" 
-                                required
+                <div className="modal">
+                    <div className="modal-content">
+                        <header>
+                            <h1>Editar Dados</h1>
+                            <XCircle className="xIcon" onClick={() => setModalEdt(false)} />
+                        </header>
+                        <form className="edtDadosForm" onSubmit={editar}>
+                            <input
+                                placeholder="Nome:"
                                 value={name}
-                                onChange={e => setName(e.target.value)} 
+                                onChange={(e) => setName(e.target.value)}
+                                type="text"
+                                required
                             />
-                            <input 
-                                type="email" 
-                                id="email" 
-                                name="email" 
-                                placeholder="Email" 
-                                required 
+                            <input
+                                placeholder="Email:"
                                 value={email}
-                                onChange={e => setEmail(e.target.value)} 
+                                onChange={(e) => setEmail(e.target.value)}
+                                type="email"
+                                required
                             />
-                            <button type="submit">Confirmar</button>
-                            <button type="button" onClick={() => setModalEdt(false)}>Sair</button>
-                        </div>
-                        <p>{mensagem}</p>
-                    </form>
+                            <div className="input-password-eye">
+                                {!eye ? (
+                                    <Eye onClick={() => setEye(true)} className="eyeIcon" />
+                                ) : (
+                                    <EyeOff onClick={() => setEye(false)} className="eyeIcon" />
+                                )}
+                                <input
+                                    placeholder="Senha:"
+                                    value={senha}
+                                    onChange={(e) => setSenha(e.target.value)}
+                                    type={!eye ? "password" : "text"}
+                                    required
+                                />
+                            </div>
+                            <button>Salvar</button>
+                        </form>
+                    </div>
                 </div>
             )}
 
