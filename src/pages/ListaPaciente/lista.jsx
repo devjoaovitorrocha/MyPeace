@@ -19,6 +19,7 @@ export default function ListaP() {
     const [modalDel, setModalDel] = useState(false);
     const [modalEdt, setModalEdt] = useState(false);
     const [modalAdd, setModalAdd] = useState(false);
+    const [modalAddSuccess, setModalAddSuccess] = useState(false);
     const [currentPaciente, setCurrentPaciente] = useState(null);
     const [eye, setEye] = useState(false);
 
@@ -62,7 +63,7 @@ export default function ListaP() {
             });
             setMensagem(`Senha do usuário: ${response.data.password}` || "Paciente cadastrado com sucesso!");
             setModalAdd(false);
-            alert(mensagem);
+            setModalAddSuccess(true);
             fetchPacientes(token, id);
         } catch (error) {
             handleErrorResponse(error);
@@ -226,6 +227,17 @@ export default function ListaP() {
                         </div>
                         <p>{mensagem}</p>
                     </form>
+                </div>
+            )}
+
+
+            {modalAddSuccess && (
+                    <div className="telaverdecontainer">
+                        <div className="modal1">
+                            <h1>Sucesso</h1>
+                            <p>{mensagem}</p>
+                            <button onClick={() => setModalAddSuccess(false)}>Fechar</button>
+                    </div>
                 </div>
             )}
 
