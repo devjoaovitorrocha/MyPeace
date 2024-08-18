@@ -28,6 +28,7 @@ function App() {
         <Route path='/login' element={<Login />} />
         <Route path='/principalCliente/cronometro' element={<Cronometro />} />
         <Route path='/principalPsico/listapaciente' element={<ListaPaciente />} />
+        <Route path='/principalCliente/registroemocao' element={<RegistroEmocoes/>}/>
         <Route path='/sobre' element={<Sobre />} />
       </Routes>
     </BrowserRouter>

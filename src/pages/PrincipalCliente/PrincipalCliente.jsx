@@ -2,22 +2,22 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { XCircle, Trash2 } from "lucide-react";
+// terminar depois import { MdOutlineSettings } from "react-icons/md";
+
 import "./PrincipalCliente.css";
 import diaryicon from "../../assets/diary-icon.png";
 import breathingicon from "../../assets/breathing-icon.png";
 import registericon from "../../assets/diary-icon.png";
 import edtIcon from "../../assets/edtIcon.png";
 
-function PrincipalPsico() {
+function PrincipalCliente() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const [modalEdt, setModalEdt] = useState(false);
   const [modalDel, setModalDel] = useState(false);
   const [modalDelSuccess, setModalDelSuccess] = useState(false);
-  const [eye, setEye] = useState(false);
-  const [nome, setNome] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
@@ -35,26 +35,43 @@ function PrincipalPsico() {
     }
   }, [navigate, state]);
 
+  const handleCronometro = () => {
+    navigate('/principalCliente/cronometro');
+  };  
+
+  const handleRegistroEmocoes = () => {
+    navigate('/principalCliente/registroemocao', { state: { token, id} });
+  }; 
+
+  const handleDiario = () => {
+    navigate('/principalCliente/registroemocao', { state: { token, id, openModal: true } });
+  }; 
+
+ 
   const edtDadosSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `https://api-mypeace.vercel.app/update/pacients/${id}`,
-        {
-          name: nome,
-          email: email
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setMensagem(response.data.msg || "Dados editados com sucesso!");
-      alert(mensagem)
-      setModalEdt(false);
+        const response = await axios.post(`https://api-mypeace.vercel.app/update/pacients/${id}`, 
+            { 
+                name, 
+                email
+            },
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+        const mensagem = response.data.msg || "Dados editados com sucesso!";
+        setMensagem(mensagem);
+        alert(mensagem);
+
+        // Atualiza o estado currentPaciente
+        setCurrentPaciente({ name, email });
+
+        setModalEdt(false);
     } catch (error) {
-      handleErrorResponse(error);
+        handleErrorResponse(error);
     }
-  };
+};
 
   async function deletar() {
     try {
@@ -104,7 +121,7 @@ function PrincipalPsico() {
   function openEditModal(paciente) {
     if (paciente) {
       setCurrentPaciente(paciente);
-      setNome(paciente.name);
+      setName(paciente.name);
       setEmail(paciente.email);
       setModalEdt(true);
     }
@@ -139,8 +156,8 @@ function PrincipalPsico() {
             <form className="edtDadosForm" onSubmit={edtDadosSubmit}>
               <input
                 placeholder="Nome:"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 type="text"
                 required
               />
@@ -193,24 +210,25 @@ function PrincipalPsico() {
           </div>
           <nav>
             <a href="/">Início</a>
+        
           </nav>
         </header>
         <section className="acesso-rapido">
           <h2>Acesso Rápido</h2>
           <div className="icones">
-            <div className="botao">
+            <div className="botao" onClick={handleDiario}>
               <div className="icone">
                 <img src={diaryicon} alt="Diário" />
                 <p>Diário</p>
               </div>
             </div>
-            <div className="botao" onClick={() => navigate("/principalCliente/cronometro")}>
+            <div className="botao" onClick={handleCronometro}>
               <div className="icone">
                 <img src={breathingicon} alt="Respiração" />
                 <p>Respiração Guiada</p>
               </div>
             </div>
-            <div className="botao">
+            <div className="botao" onClick={handleRegistroEmocoes}>
               <div className="icone">
                 <img src={registericon} alt="Registro" />
                 <p>Registro Emoções</p>
@@ -260,4 +278,4 @@ function PrincipalPsico() {
   );
 }
 
-export default PrincipalPsico;
+export default PrincipalCliente;

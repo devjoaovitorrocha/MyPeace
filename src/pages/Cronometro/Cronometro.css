@@ -40,14 +40,9 @@
 
 .right-section a {
     text-decoration: none;
-    color: #007bff;
+    color: black;
     padding: 10px;
-    border-radius: 5px;
     font-size: 22px;
-}
-
-.right-section a:hover {
-    background-color: #e9ecef;
 }
 
 .bottom-bar {
@@ -80,15 +75,14 @@
   .button-group {
     display: flex;
     justify-content: center;
-  
   }
   
   .button {
     margin: 0 10px;
     padding: 10px 20px;
-    font-size: 1em;
+    font-size: 1.2em;
     background-color: #fff;
-    color: black;
+    
     border: 2px solid black;
     border-radius: 10px;
     width: 130px;
@@ -97,6 +91,11 @@
   }
   
   .button:hover {
-    background-color: #f2f2f2;
+    background-color: #3C5454;
+    color: #e9ecef;
+  }
+
+  .phase{
+    font-size: 24px;
   }
   

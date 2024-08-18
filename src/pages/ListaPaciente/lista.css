@@ -82,19 +82,26 @@
 }
 
 .dados1 {
-    padding-left: 140px;
+    padding-left: 150px;
+    position: relative;
 }
 
 .dados2 {
-    padding-left: 310px;
+    padding-left: 320px;
+    position: relative;
 }
 
 .dados3 {
-    padding-left: 260px;
+    padding-left: 270px;
+    
 }
 
-.dados4 {
-    margin-left: 250px;
+.verificarbtn {
+    margin-left: 255px;
+}
+
+.imgs{
+    text-align: right
 }
 
 .telaverdecontainer {
