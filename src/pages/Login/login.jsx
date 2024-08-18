@@ -3,6 +3,8 @@ import './Login.css';
 import Logo from '../../assets/logo.png';
 import { http } from "../../App";
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from "lucide-react";
+
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -11,6 +13,7 @@ const Login = () => {
     const [token, setToken] = useState('');
     const [id, setId] = useState('');
     const [type, setType] = useState('');
+    const [eye, setEye] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -60,7 +63,20 @@ const Login = () => {
                     <form className="signup-form" onSubmit={handleSubmit}>
                         <h2>Faça seu Login!</h2>
                         <input type="email" name="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-                        <input type="password" name="password" placeholder="Senha" value={password} onChange={e => setPassword(e.target.value)} required />
+                        <div className="input-password-eye">
+                                {!eye ? (
+                                    <Eye onClick={() => setEye(true)} className="eyeIcon" />
+                                ) : (
+                                    <EyeOff onClick={() => setEye(false)} className="eyeIcon" />
+                                )}
+                                <input
+                                    placeholder="Senha:"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    type={!eye ? "password" : "text"}
+                                    required
+                                />
+                            </div>
                         <button type="submit">Entrar</button>
                         {mensagem && <p>{mensagem}</p>}
                     </form>

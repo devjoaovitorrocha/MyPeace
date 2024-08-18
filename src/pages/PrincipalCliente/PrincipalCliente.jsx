@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { Eye, EyeOff, XCircle, Trash2 } from "lucide-react";
+import { XCircle, Trash2 } from "lucide-react";
 import "./PrincipalCliente.css";
 import diaryicon from "../../assets/diary-icon.png";
 import breathingicon from "../../assets/breathing-icon.png";
@@ -13,6 +13,7 @@ function PrincipalPsico() {
   const { state } = useLocation();
   const [modalEdt, setModalEdt] = useState(false);
   const [modalDel, setModalDel] = useState(false);
+  const [modalDelSuccess, setModalDelSuccess] = useState(false);
   const [eye, setEye] = useState(false);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -41,8 +42,7 @@ function PrincipalPsico() {
         `https://api-mypeace.vercel.app/update/pacients/${id}`,
         {
           name: nome,
-          email: email,
-          password: senha,
+          email: email
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -58,20 +58,27 @@ function PrincipalPsico() {
 
   async function deletar() {
     try {
-      const response = await axios.post(
-        `https://api-mypeace.vercel.app/delete/pacients/${id}`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setMensagem(response.data.msg || "Paciente deletado com sucesso!");
-      alert(mensagem)
-      setModalDel(false);
+        const response = await axios.post(
+            `https://api-mypeace.vercel.app/delete/pacients/${id}`,
+            {},
+            {
+                headers: { Authorization: `Bearer ${token}` },
+            }
+        );
+        setMensagem(response.data.msg || "Sua conta foi deletado com sucesso!");
+        setModalDel(false);
+        setModalDelSuccess(true);
+
+
+        setTimeout(() => {
+            setModalDelSuccess(false);
+            navigate('/');
+        }, 2000);
     } catch (error) {
-      handleErrorResponse(error);
+        handleErrorResponse(error);
     }
-  }
+}
+
 
   function handleErrorResponse(error) {
     if (error.response) {
@@ -112,6 +119,16 @@ function PrincipalPsico() {
 
   return (
     <>
+      {modalDelSuccess && (
+          <div className="telaverdecontainer">
+            <div className="modal1">
+              <h1>Sucesso</h1>
+              <p>{mensagem}</p>
+              <button onClick={() => setModalDelSuccess(false)}>Fechar</button>
+          </div>
+        </div>
+      )}
+
       {modalEdt && (
         <div className="modal">
           <div className="modal-content">
@@ -134,20 +151,6 @@ function PrincipalPsico() {
                 type="email"
                 required
               />
-              <div className="input-password-eye">
-                {!eye ? (
-                  <Eye onClick={() => setEye(true)} className="eyeIcon" />
-                ) : (
-                  <EyeOff onClick={() => setEye(false)} className="eyeIcon" />
-                )}
-                <input
-                  placeholder="Senha:"
-                  value={senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                  type={!eye ? "password" : "text"}
-                  required
-                />
-              </div>
               <button>Salvar</button>
             </form>
           </div>
