@@ -1,0 +1,132 @@
+.form-container {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  max-width: 400px;
+  margin: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 50px;
+}
+
+.logo span {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-left: 0.5rem;
+}
+
+.back-button {
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+}
+
+.signup-form h2 {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.signup-form input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #00bfa6;
+  border-radius: 25px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.signup-form input::placeholder {
+  color: #bbb;
+}
+
+.signup-form button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #00bfa6;
+  border-radius: 25px;
+  background-color: #ffffff;
+  color: #00bfa6;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-size: 1rem;
+}
+
+.signup-form button:hover {
+  background-color: #2d3e3f;
+  color: #ffffff;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 400px;
+  border: 2px solid #00bfa6;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.modal-content .header {
+  margin-bottom: 1rem;
+}
+
+.verification-form p {
+  text-align: center;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.back-button {
+  text-align: right;
+  margin-top: 1rem;
+}
+
+.mensagem {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.mensagem.erro {
+  background-color: #f44336;
+}
