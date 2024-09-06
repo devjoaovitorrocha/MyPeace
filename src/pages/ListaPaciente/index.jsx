@@ -35,6 +35,11 @@ export default function ListaPaciente() {
           setId(state.id);
           fetchPacientes(state.token, state.id);
       }
+
+      if (state?.openModal) {
+        setModalAdd(true);
+    }
+    console.log(token,state)
   }, [navigate, state]);
 
   async function fetchPacientes(token, idUser) {
@@ -82,7 +87,7 @@ export default function ListaPaciente() {
   }
 
   async function editar(event) {
-    event.preventDefault();
+    event.preventDefault(); // o psicologo nao edita as informacoes do paciente 
     if (!currentPaciente) return;
 
     try {
@@ -151,6 +156,10 @@ export default function ListaPaciente() {
     setCurrentPaciente(paciente);
     setModalDel(true);
   }
+
+  const handleReturn = () => {
+    navigate('/principalPsico', { state: { token, id } });
+  };
   return (
     <div className="bg-[#3c5454] h-screen p-6">
       <Toaster
@@ -248,15 +257,15 @@ export default function ListaPaciente() {
         <h1 className="text-4xl py-6 md:py-12 text-white text-center font-semibold">
           Lista de Pacientes
         </h1>
-        <Link
+        <span
+          onClick={handleReturn}
           className="cursor-pointer hover:opacity-95 relative w-fit hidden md:block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
-          to="/principalPsico"
         >
           <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all text-white font-light">
             <ArrowLeft weight="bold" />
             Voltar
           </div>
-        </Link>
+        </span>
       </header>
       <main className="max-w-[1440px] mx-auto bg-white shadow-3D rounded-xl p-6">
         <header className="flex flex-col md:flex-row items-center justify-between gap-5 border-b border-gray-300 pb-6">
@@ -329,7 +338,7 @@ export default function ListaPaciente() {
 
       <Link
           className="mb-6 cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
-          to="/principalPsico"
+          to="/principalPsico" state={{ token, id }}
         >
           <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all text-white font-light">
             <ArrowLeft weight="bold" />

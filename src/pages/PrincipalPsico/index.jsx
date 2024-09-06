@@ -8,17 +8,17 @@ import {
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
 import React from "react";
 import HoverForCards from "../../components/HoverForCards";
 
-const HoverDevCards = ({ onVerPacientes }) => {
+const HoverDevCards = ({ onVerPacientes, onAddPacientes }) => {
   return (
-    <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4">
+    <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4 py-11" >
       <HoverForCards
         title="Adicionar Pacientes"
         subtitle={<ArrowUpRight />}
         Icon={UserCirclePlus}
+        onClick={onAddPacientes}
       />
       <HoverForCards
         title="Registro dos Pacientes"
@@ -47,11 +47,16 @@ export default function PrincipalPsico() {
     } else {
       setToken(state.token);
       setId(state.id);
-    }
+    } 
+    console.log(token,state)
   }, [navigate, state]);
 
   const handleVerPacientes = () => {
     navigate("/principalPsico/listapaciente", { state: { token, id } });
+  };
+
+  const handleAddPaciente = () => {
+    navigate('/principalPsico/listapaciente', { state: { token, id, openModal: true } });
   };
 
   return (
@@ -80,14 +85,16 @@ export default function PrincipalPsico() {
       </header>
       <main className="max-w-[1440px] mx-auto 2xl:p-0 py-3 px-6">
         <h1 className="py-7 text-2xl font-bold">Acesso Rápido</h1>
-        <HoverDevCards onVerPacientes={handleVerPacientes} />
-        <h1 className="py-11 text-2xl font-bold">Adicionar Pacientes</h1>
+        <HoverDevCards 
+          onVerPacientes={handleVerPacientes} 
+          onAddPacientes={handleAddPaciente} 
+        />
         <section className="flex flex-col gap-10">
           <div className="w-full h-72 sm:h-56 md:h-40 bg-green-800 rounded-2xl transition-all shadow-xl hover:shadow-2xl text-white p-6 text-2xl relative">
             <h1 className="font-light leading-9">
               Adicione pacientes para ter melhores resultados em suas consultas!
             </h1>
-            <button className="absolute bottom-0 right-0 p-5 bg-pink-500 shadow-3D rounded-tl-2xl rounded-br-xl hover:pb-6 transition-all flex items-center gap-2">
+            <button onClick={handleAddPaciente} className="absolute bottom-0 right-0 p-5 bg-pink-500 shadow-3D rounded-tl-2xl rounded-br-xl hover:pb-6 transition-all flex items-center gap-2">
               <h6 className="text-sm">Acessar</h6>
               <ArrowUpRight weight="bold" />
             </button>

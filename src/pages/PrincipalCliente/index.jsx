@@ -49,7 +49,7 @@ export default function PrincipalCliente() {
         {
           name: nome,
           email: email,
-          password: senha,
+          
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -60,6 +60,9 @@ export default function PrincipalCliente() {
     } catch (error) {
       handleErrorResponse(error);
     }
+
+
+    
   };
 
   async function deletar() {
