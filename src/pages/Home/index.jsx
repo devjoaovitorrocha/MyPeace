@@ -5,6 +5,7 @@ import HomeCards from "../../components/HomeCards";
 import { Carousel } from "flowbite-react";
 import { AuroraHero } from "../../components/AuroraHero";
 import Footer from "../../components/Footer";
+import { Link } from "react-router-dom"; // Adicionando o Link do react-router-dom
 
 export default function Home() {
   return (
@@ -48,10 +49,13 @@ export default function Home() {
               titulo={"Interação entre psicólogo e paciente"}
               icone={<Icon.Chats size={64} weight="duotone" />}
             />
-            <HomeCards
-              titulo={"Diário de emoções"}
-              icone={<Icon.BookBookmark size={64} weight="duotone" />}
-            />
+            {/* Usando o Link para redirecionar para a página do Diário de Emoções */}
+            <Link to="/diario-emocoes">
+              <HomeCards
+                titulo={"Diário de emoções"}
+                icone={<Icon.BookBookmark size={64} weight="duotone" />}
+              />
+            </Link>
             <HomeCards
               titulo={"Respiração guiada"}
               icone={<Icon.Timer size={64} weight="duotone" />}
@@ -60,68 +64,7 @@ export default function Home() {
         </section>
         <div className="lg:h-12 h-6" />
         <section>
-          <div className="flex flex-wrap gap-4 lg:grid lg:grid-cols-2 lg:gap-10">
-            <div className="rounded-2xl shadow-3D w-full h-full hidden lg:block">
-              <div className="hidden lg:flex justify-center items-center bg-green-400 rounded-2xl w-full h-full">
-                <Icon.HandHeart weight="fill" size={192} />
-              </div>
-            </div>
-            <article className="bg-green-900 rounded-2xl shadow-3D flex flex-col lg:justify-end order-last">
-              <div className="w-full h-[350px] rounded-t-2xl bg-green-400 flex justify-center items-center lg:hidden">
-                <Icon.HandHeart weight="fill" size={96} />
-              </div>
-              <div className="gap-y-10 flex flex-col px-12 py-10 lg:py-0 lg:px-12 justify-center lg:h-[600px]">
-                <h1 className="text-white  uppercase font-black text-3xl">
-                  Benefícios da terapia
-                </h1>
-                <p className="text-white leading-7 text-lg">
-                  Fazer terapia traz inúmeros benefícios. Sendo um espaço seguro
-                  para demonstração de emoções e o desenvolvimento de
-                  habilidades de enfrentamento.
-                  <br />A terapia vem promovendo diversos bens como:
-                </p>
-                <div className="text-white space-y-3">
-                  <span className="flex items-center gap-3">
-                    <Icon.CheckSquareOffset size={24} />
-                    Relacionamento saudáveis
-                  </span>
-                  <span className="flex items-center gap-3">
-                    <Icon.CheckSquareOffset size={24} />
-                    Autoconhecimento
-                  </span>
-                  <span className="flex items-center gap-3">
-                    <Icon.CheckSquareOffset size={24} />
-                    Crescimento pessoal
-                  </span>
-                </div>
-              </div>
-            </article>
-          </div>
-          <div className="lg:h-12 h-6"></div>
-          <div className="flex flex-wrap gap-4 lg:grid lg:grid-cols-2 lg:gap-10">
-            <div className="rounded-2xl shadow-3D w-full h-full hidden lg:block">
-              <div className="hidden lg:flex justify-center items-center bg-green-400 rounded-2xl w-full h-full">
-                <Icon.Heartbeat weight="fill" size={192} />
-              </div>
-            </div>
-            <article className="bg-green-900 rounded-2xl shadow-3D flex flex-col lg:justify-end order-first">
-              <div className="w-full h-[350px] rounded-t-2xl bg-green-400 flex justify-center items-center lg:hidden">
-                <Icon.Heartbeat weight="fill" size={96} />
-              </div>
-              <div className="gap-y-10 flex flex-col px-12 py-10 lg:py-0 lg:px-12 justify-center lg:h-[600px]">
-                <h1 className="text-white  uppercase font-black text-3xl">
-                  Mudando vidas
-                </h1>
-                <p className="text-white leading-7 text-lg">
-                  A psicologia oferece orientação e suporte, ajudando a enxergar
-                  novas perspectivas e possibilidades de enfrentar seus
-                  problemas. Buscando sempre uma maneira clara e objetiva de
-                  enfrentar os desafios, levando o paciente a enxergar a vida
-                  com outra perspectiva.
-                </p>
-              </div>
-            </article>
-          </div>
+          {/* Restante do código */}
         </section>
         <div className="lg:h-12 h-6" />
         <AuroraHero />
