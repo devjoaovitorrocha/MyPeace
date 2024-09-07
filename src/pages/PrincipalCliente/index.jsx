@@ -33,15 +33,15 @@ export default function PrincipalCliente() {
     email: "",
   });
 
-  // useEffect(() => {
-  //   if (!state?.token || !state?.id || !state?.nome) {
-  //     navigate("/login");
-  //   } else {
-  //     setToken(state.token);
-  //     setId(state.id);
-  //     setPacienteNome(state.nome);  
-  //   }
-  // }, [navigate, state]);
+  useEffect(() => {
+    if (!state?.token || !state?.id || !state?.nome) {
+    navigate("/login");
+    } else {
+     setToken(state.token);
+     setId(state.id);
+    setPacienteNome(state.nome);  
+    }
+   }, [navigate, state]);
 
   const handleCronometro = () => {
     navigate("/principalCliente/cronometro", { state: { token, id, nome: pacienteNome } });
