@@ -50,12 +50,12 @@ export default function Home() {
               icone={<Icon.Chats size={64} weight="duotone" />}
             />
             {/* Usando o Link para redirecionar para a página do Diário de Emoções */}
-            <Link to="/diario-emocoes">
+          
               <HomeCards
                 titulo={"Diário de emoções"}
                 icone={<Icon.BookBookmark size={64} weight="duotone" />}
               />
-            </Link>
+          
             <HomeCards
               titulo={"Respiração guiada"}
               icone={<Icon.Timer size={64} weight="duotone" />}

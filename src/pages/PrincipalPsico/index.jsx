@@ -11,7 +11,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import React from "react";
 import HoverForCards from "../../components/HoverForCards";
 
-const HoverDevCards = ({ onVerPacientes, onAddPacientes }) => {
+const HoverDevCards = ({ onVerPacientes, onAddPacientes, onRegistroPacientes }) => {
   return (
     <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4 py-11">
       <HoverForCards
@@ -24,6 +24,7 @@ const HoverDevCards = ({ onVerPacientes, onAddPacientes }) => {
         title="Registro dos Pacientes"
         subtitle={<ArrowUpRight />}
         Icon={Database}
+        onClick={onRegistroPacientes}
       />
       <HoverForCards
         title="Ver Pacientes"
@@ -59,6 +60,9 @@ export default function PrincipalPsico() {
   const handleAddPaciente = () => {
     navigate('/principalPsico/listapaciente', { state: { token, id, nome: psicologoNome, openModal: true } });
   };
+  const handleRegistroPacientes = () => {
+    navigate('/principalPsico/RegistroPacientes', { state: { token, id, nome: psicologoNome, openModal: true } });
+  };
 
   return (
     <>
@@ -89,6 +93,7 @@ export default function PrincipalPsico() {
         <HoverDevCards 
           onVerPacientes={handleVerPacientes} 
           onAddPacientes={handleAddPaciente} 
+          onRegistroPacientes={handleRegistroPacientes}
         />
         <section className="flex flex-col gap-10">
         <h1 className="text-2xl font-bold">Adicionar Pacientes</h1>
@@ -106,7 +111,7 @@ export default function PrincipalPsico() {
             <h1 className="font-light leading-9">
               Veja como seu paciente anda se sentindo durante a semana
             </h1>
-            <button className="absolute bottom-0 right-0 p-5 bg-pink-500 shadow-3D rounded-tl-2xl rounded-br-xl hover:pb-6 transition-all flex items-center gap-2">
+            <button  onClick={handleRegistroPacientes} className="absolute bottom-0 right-0 p-5 bg-pink-500 shadow-3D rounded-tl-2xl rounded-br-xl hover:pb-6 transition-all flex items-center gap-2">
               <h6 className="text-sm">Acessar</h6>
               <ArrowUpRight weight="bold" />
             </button>

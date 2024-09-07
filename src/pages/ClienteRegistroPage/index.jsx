@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
 import { ArrowLeft } from '@phosphor-icons/react';
 import axios from 'axios';
 
-const RegistroPage = () => {
+const ClienteRegistroPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  
+
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
-  const [pacientes, setPacientes] = useState([]);
+  const [clienteNome, setClienteNome] = useState("");
+  const [registros, setRegistros] = useState([]);
   const [filter, setFilter] = useState({
     name: '',
+    date: '',
     status: '',
     type: ''
   });
-  const [psicologoNome, setPsicologoNome] = useState("");
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
@@ -24,23 +25,23 @@ const RegistroPage = () => {
     } else {
       setToken(state.token);
       setId(state.id);
-      setPsicologoNome(state.nome);
-      fetchPacientes(state.token, state.id);  // Busca os pacientes da API
+      setClienteNome(state.nome);
+      fetchRegistros(state.token, state.id);  // Busca os registros do cliente da API
     }
   }, [navigate, state]);
 
-  // Função para buscar pacientes da API
-  async function fetchPacientes(token, idUser) {
+  // Função para buscar registros do cliente da API
+  async function fetchRegistros(token, idUser) {
     try {
       const response = await axios.get(
-        `https://api-mypeace.vercel.app/getAll/pacients/${idUser}`,
+        `https://api-mypeace.vercel.app/getAll/records/${idUser}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setPacientes(response.data.allPacients);
+      setRegistros(response.data.allRecords);
     } catch (error) {
-      toast.error("Erro ao buscar pacientes. Por favor, tente novamente mais tarde.");
+      toast.error("Erro ao buscar registros. Por favor, tente novamente mais tarde.");
     }
   }
 
@@ -54,16 +55,17 @@ const RegistroPage = () => {
   };
 
   // Filtrar os registros conforme os filtros são aplicados
-  const filteredData = pacientes.filter((paciente) => {
+  const filteredData = registros.filter((registro) => {
     return (
-      (filter.name === '' || paciente.name.toLowerCase().includes(filter.name.toLowerCase())) &&
-      (filter.status === '' || paciente.status === filter.status) &&
-      (filter.type === '' || paciente.type === filter.type)
+      (filter.name === '' || registro.name.toLowerCase().includes(filter.name.toLowerCase())) &&
+      (filter.date === '' || registro.date === filter.date) &&
+      (filter.status === '' || registro.status === filter.status) &&
+      (filter.type === '' || registro.type === filter.type)
     );
   });
 
   const handleReturn = () => {
-    navigate("/principalPsico", { state: { token, id, nome: psicologoNome } });
+    navigate("/clienteDashboard", { state: { token, id, nome: clienteNome } });
   };
 
   return (
@@ -85,7 +87,7 @@ const RegistroPage = () => {
       />
       <header className="flex flex-col md:flex-row items-center justify-between max-w-[1440px] mx-auto">
         <h1 className="text-4xl py-6 md:py-12 text-white text-center font-semibold">
-          Lista de Registros
+          Seus Registros
         </h1>
         <span
           onClick={handleReturn}
@@ -106,6 +108,13 @@ const RegistroPage = () => {
             name="name"
             placeholder="Buscar por nome"
             value={filter.name}
+            onChange={handleFilterChange}
+            className="md:w-auto w-full p-2 border border-gray-300 rounded-lg"
+          />
+          <input
+            type="date"
+            name="date"
+            value={filter.date}
             onChange={handleFilterChange}
             className="md:w-auto w-full p-2 border border-gray-300 rounded-lg"
           />
@@ -143,12 +152,12 @@ const RegistroPage = () => {
           </thead>
           <tbody>
             {filteredData.length > 0 ? (
-              filteredData.map((paciente) => (
-                <tr key={paciente._id}>
-                  <td className="border px-4 py-2">{paciente.name}</td>
-                  <td className="border px-4 py-2">{paciente.date}</td>
-                  <td className="border px-4 py-2">{paciente.status}</td>
-                  <td className="border px-4 py-2">{paciente.type}</td>
+              filteredData.map((registro) => (
+                <tr key={registro._id}>
+                  <td className="border px-4 py-2">{registro.name}</td>
+                  <td className="border px-4 py-2">{registro.date}</td>
+                  <td className="border px-4 py-2">{registro.status}</td>
+                  <td className="border px-4 py-2">{registro.type}</td>
                 </tr>
               ))
             ) : (
@@ -163,18 +172,18 @@ const RegistroPage = () => {
       </main>
 
       <div className="flex justify-center md:hidden py-6">
-        <Link
+        <button
+          onClick={handleReturn}
           className="mb-6 cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
-          to="/principalPsico"
         >
           <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all text-white font-light">
             <ArrowLeft weight="bold" />
             Voltar
           </div>
-        </Link>
+        </button>
       </div>
     </div>
   );
 };
 
-export default RegistroPage;
+export default ClienteRegistroPage;

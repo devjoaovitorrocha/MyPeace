@@ -9,6 +9,9 @@ import PrincipalPsico from "./pages/PrincipalPsico";
 import ListaPaciente from "./pages/ListaPaciente";
 import CadastroPaciente from "./pages/CadastroCliente";
 import Cronometro from "./pages/Cronometro";
+import RegistroPage from "./pages/RegistroPacientes/RegistroPacientes";
+import EmotionRegister from "./pages/EmotionRegister";
+
 
 export const http = axios.create({
   baseURL: 'https://api-mypeace.vercel.app'
@@ -27,6 +30,8 @@ function App() {
         <Route path="/cadastroPsicologo" element={<CadastroPsicologo />} />
         <Route path="/principalCliente/cronometro" element={<Cronometro />} />
         <Route path="/principalPsico/listapaciente" element={<ListaPaciente />} />
+        <Route path="/principalPsico/RegistroPacientes" element={<RegistroPage/>} />
+        <Route path="/principalCliente/EmotionRegister" element={<EmotionRegister/>} />
       </Routes>
     </BrowserRouter>
   )
