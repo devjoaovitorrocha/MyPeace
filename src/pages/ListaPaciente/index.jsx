@@ -3,7 +3,6 @@ import {
   CalendarDots,
   UserPlus,
   ArrowLeft,
-  NotePencil,
   Trash,
 } from "@phosphor-icons/react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
@@ -23,23 +22,24 @@ export default function ListaPaciente() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [modalDel, setModalDel] = useState(false);
-  const [modalEdt, setModalEdt] = useState(false);
   const [modalAdd, setModalAdd] = useState(false);
   const [currentPaciente, setCurrentPaciente] = useState(null);
+  const [psicologoNome, setPsicologoNome] = useState("");
 
   useEffect(() => {
-      if (!state?.token || !state?.id) {
-          navigate("/login");
-      } else {
-          setToken(state.token);
-          setId(state.id);
-          fetchPacientes(state.token, state.id);
-      }
+    console.log("Token:", state.token); 
+    if (!state?.token || !state?.id || !state?.nome) {
+      navigate("/login");
+    } else {
+      setToken(state.token);
+      setId(state.id);
+      setPsicologoNome(state.nome);
+      fetchPacientes(state.token, state.id);  
 
       if (state?.openModal) {
         setModalAdd(true);
     }
-    console.log(token,state)
+    }
   }, [navigate, state]);
 
   async function fetchPacientes(token, idUser) {
@@ -47,14 +47,12 @@ export default function ListaPaciente() {
       const response = await axios.get(
         `https://api-mypeace.vercel.app/getAll/pacients/${idUser}`,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}` }, // Fixed header typo
         }
       );
       setPacientes(response.data.allPacients);
     } catch (error) {
-      toast.error(
-        "Erro ao buscar pacientes. Por favor, tente novamente mais tarde."
-      );
+      toast.error("Erro ao buscar pacientes. Por favor, tente novamente mais tarde.");
     }
   }
 
@@ -63,44 +61,11 @@ export default function ListaPaciente() {
     try {
       const response = await axios.post(
         `https://api-mypeace.vercel.app/register/pacient/${id}`,
-        {
-          name,
-          email,
-          idPsychologist: id,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { name, email, idPsychologist: id },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success(
-        `Senha do usuáio: ${response.data.password}` ||
-          "Paciente cadastrado com sucesso!"
-      );
-      console.log(response.data.password)
+      toast.success(`Senha do usuário: ${response.data.password}`);
       setModalAdd(false);
-      fetchPacientes(token, id);
-    } catch (error) {
-      handleErrorResponse(error);
-    }
-  }
-
-  async function editar(event) {
-    event.preventDefault(); // o psicologo nao edita as informacoes do paciente 
-    if (!currentPaciente) return;
-
-    try {
-      const response = await axios.post(
-        `https://api-mypeace.vercel.app/update/pacients/${currentPaciente._id}`,
-        {
-          name,
-          email,
-          idPsychologist: id,
-        }
-      );
-      toast.success(`${response.data.msg}` || "Paciente editado com sucesso!");
-      setModalEdt(false);
       fetchPacientes(token, id);
     } catch (error) {
       handleErrorResponse(error);
@@ -109,23 +74,26 @@ export default function ListaPaciente() {
 
   async function deletar() {
     if (!currentPaciente) return;
-
+  
     try {
       const response = await axios.post(
-        `https://api-mypeace.vercel.app/delete/pacients/${currentPaciente._id}`,
+        `https://api-mypeace.vercel.app/delete/pacients/${currentPaciente._id}`, 
+        {},  
         {
-          headers: {
-            Autorizado: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` }  //
         }
       );
-      toast.success(`${response.data.msg}` || "Paciente deletado com sucesso!");
+      toast.success(response.data.msg || "Paciente deletado com sucesso!");
       setModalDel(false);
       fetchPacientes(token, id);
     } catch (error) {
       handleErrorResponse(error);
     }
   }
+  
+
+  
+  
 
   function handleErrorResponse(error) {
     if (error.response) {
@@ -134,32 +102,24 @@ export default function ListaPaciente() {
         navigate("/login");
       } else {
         toast.error(
-          `${error.response.data.msg}` ||
-            "Erro ao processar a solicitação. Por favor, tente novamente mais tarde."
+          error.response.data.msg || "Erro ao processar a solicitação. Tente novamente."
         );
       }
     } else {
-      toast.error(
-        "Erro ao processar a solicitação. Por favor, tente novamente mais tarde."
-      );
+      toast.error("Erro ao processar a solicitação. Tente novamente.");
     }
-  }
-
-  function openEditModal(paciente) {
-    setCurrentPaciente(paciente);
-    setName(paciente.name);
-    setEmail(paciente.email);
-    setModalEdt(true);
   }
 
   function openDeleteModal(paciente) {
     setCurrentPaciente(paciente);
+    console.log("Paciente para deletar:", paciente);  // Verifique o paciente
     setModalDel(true);
   }
-
+  
   const handleReturn = () => {
-    navigate('/principalPsico', { state: { token, id } });
+    navigate("/principalPsico", { state: { token, id, nome: psicologoNome } });
   };
+
   return (
     <div className="bg-[#3c5454] h-screen p-6">
       <Toaster
@@ -220,39 +180,6 @@ export default function ListaPaciente() {
           </form>
         </Modal>
       )}
-      {modalEdt && (
-        <Modal
-          isOpen={modalEdt}
-          setIsOpen={setModalEdt}
-          titulo={`Editar Conta`}
-          form
-        >
-          <form className="mt-5 space-y-8" onSubmit={editar}>
-            <div className="relative z-0">
-              <Inputs
-                label={"Nome:"}
-                type={"text"}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            </div>
-            <div className="relative z-0">
-              <Inputs
-                label={"Email:"}
-                type={"email"}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-[#00bfa6] rounded-lg hover:opacity-90 transition-opacity text-white font-semibold w-full py-2"
-            >
-              Confirmar
-            </button>
-          </form>
-        </Modal>
-      )}
       <header className="flex flex-col md:flex-row items-center justify-between max-w-[1440px] mx-auto">
         <h1 className="text-4xl py-6 md:py-12 text-white text-center font-semibold">
           Lista de Pacientes
@@ -275,14 +202,9 @@ export default function ListaPaciente() {
           >
             <span className="animate-ping absolute inline-flex w-3 h-3 left-[10px] rounded-full bg-slate-900 group-hover:hidden" />
             <span className="rounded-full bg-black p-1 text-sm transition-colors duration-300 group-hover:bg-white">
-              <UserPlus
-                weight="bold"
-                className="-translate-x-[200%] text-[0px] transition-all duration-300 group-hover:translate-x-0 group-hover:text-lg group-hover:text-black group-active:-rotate-45"
-              />
+              <UserPlus weight="bold" className="-translate-x-[200%] text-[0px] transition-all duration-300 group-hover:translate-x-0 group-hover:text-lg group-hover:text-black group-active:-rotate-45" />
             </span>
-            <span className="group-hover:italic font-medium">
-              Adicionar Paciente
-            </span>
+            <span className="group-hover:italic font-medium">Adicionar Paciente</span>
           </button>
           <div className="p-4 bg-indigo-500 rounded-full text-xs text-white font-semibold hidden md:flex items-center gap-x-2 shadow-md">
             <CalendarDots weight="fill" size={18} />
@@ -291,54 +213,48 @@ export default function ListaPaciente() {
           </div>
         </header>
         <Table>
-           {pacientes.length > 0 ? (
+          {pacientes.length > 0 ? (
             pacientes.map((paciente, index) => (
               <tr key={paciente._id}>
-            <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-              {index + 1}
-            </td>
-            <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-              {paciente.name}
-            </td>
-            <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-              {paciente.email}
-            </td>
-            <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-              <Button>Verificar</Button>
-            </td>
-            <td className="whitespace-nowrap px-4 py-2 text-gray-700 flex items-center gap-2 flex-wrap">
-              <button
-                onClick={() => openDeleteModal(paciente)}
-                className="p-2 bg-[#bf0047] rounded-md shadow-3D transition-all hover:opacity-90"
-              >
-                <Trash weight="fill" color="white" />
-              </button>
-              <button
-                onClick={() => openEditModal(paciente)}
-                className="p-2 bg-[#00bfa6] rounded-md shadow-3D transition-all hover:opacity-90"
-              >
-                <NotePencil weight="fill" color="white" />
-              </button>
-            </td>
-          </tr>
+                <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                  {index + 1}
+                </td>
+                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                  {paciente.name}
+                </td>
+                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                  {paciente.email}
+                </td>
+                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                  <Button>Verificar</Button>
+                </td>
+                <td className="whitespace-nowrap px-6 py-2 text-gray-700 flex items-center gap-2 flex-wrap">
+                  <button
+                    onClick={() => openDeleteModal(paciente)}
+                    className="p-2 bg-[#bf0047] rounded-md shadow-3D transition-all hover:opacity-90"
+                  >
+                    <Trash weight="fill" color="white" />
+                  </button>
+                </td>
+              </tr>
             ))
           ) : (
             <tr>
               <td className="py-2 italic">Nenhum paciente encontrado</td>
             </tr>
-          )} 
+          )}
         </Table>
         <div className="mt-6 p-4 bg-indigo-500 rounded-full text-xs text-white font-semibold flex md:hidden justify-center items-center gap-x-2 shadow-md">
-            <CalendarDots weight="fill" size={18} />
-            <span className="font-medium">•</span>
-            {new Date().toLocaleDateString()}
-          </div>
+          <CalendarDots weight="fill" size={18} />
+          <span className="font-medium">•</span>
+          {new Date().toLocaleDateString()}
+        </div>
       </main>
       <div className="flex justify-center md:hidden py-6">
-
-      <Link
+        <Link
           className="mb-6 cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
-          to="/principalPsico" state={{ token, id }}
+          to="/principalPsico"
+          state={{ token, id, nome: psicologoNome }}
         >
           <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all text-white font-light">
             <ArrowLeft weight="bold" />

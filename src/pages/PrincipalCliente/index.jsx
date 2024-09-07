@@ -27,19 +27,25 @@ export default function PrincipalCliente() {
   const [senha, setSenha] = useState("");
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
+  const [pacienteNome, setPacienteNome] = useState("");
   const [currentPaciente, setCurrentPaciente] = useState({
     name: "",
     email: "",
   });
 
   useEffect(() => {
-    if (!state?.token || !state?.id) {
+    if (!state?.token || !state?.id || !state?.nome) {
       navigate("/login");
     } else {
       setToken(state.token);
       setId(state.id);
+      setPacienteNome(state.nome);  
     }
   }, [navigate, state]);
+
+  const handleCronometro = () => {
+    navigate("/principalCliente/cronometro", { state: { token, id, nome: pacienteNome } });
+  };
 
   const edtDadosSubmit = async (e) => {
     e.preventDefault();
@@ -177,7 +183,7 @@ export default function PrincipalCliente() {
             </div>
             <div className="md:text-start text-center text-lg">
               <h1 className="font-bold">Olá, </h1>
-              <h2 className="italic">Nome do Cliente</h2>
+              <h2 className="italic">{pacienteNome}</h2>
             </div>
           </div>
           <div className="h-px w-full bg-white md:hidden block my-3" />
@@ -216,7 +222,7 @@ export default function PrincipalCliente() {
               <br />
               Acesse nossa respiração guiada.
             </h1>
-            <button className="absolute bottom-0 right-0 p-5 bg-pink-500 shadow-3D rounded-tl-2xl rounded-br-xl hover:pb-6 transition-all flex items-center gap-2">
+            <button onClick={handleCronometro} className="absolute bottom-0 right-0 p-5 bg-pink-500 shadow-3D rounded-tl-2xl rounded-br-xl hover:pb-6 transition-all flex items-center gap-2">
               <h6 className="text-sm">Acessar</h6>
               <ArrowUpRight weight="bold" />
             </button>

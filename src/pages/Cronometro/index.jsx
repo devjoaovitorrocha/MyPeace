@@ -54,9 +54,7 @@ export default function Cronometro() {
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (progress / 100) * circumference;
 
-  const handleReturn = () => {
-    navigate('/principalPsico', { state: { token, id } });
-  };
+ 
 
   return (
     <div className="flex flex-col min-h-screen">

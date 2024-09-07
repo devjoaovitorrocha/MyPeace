@@ -13,7 +13,7 @@ import HoverForCards from "../../components/HoverForCards";
 
 const HoverDevCards = ({ onVerPacientes, onAddPacientes }) => {
   return (
-    <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4 py-11" >
+    <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4 py-11">
       <HoverForCards
         title="Adicionar Pacientes"
         subtitle={<ArrowUpRight />}
@@ -29,7 +29,7 @@ const HoverDevCards = ({ onVerPacientes, onAddPacientes }) => {
         title="Ver Pacientes"
         subtitle={<ArrowUpRight />}
         Icon={UserList}
-        onClick={onVerPacientes} 
+        onClick={onVerPacientes}
       />
     </div>
   );
@@ -40,23 +40,24 @@ export default function PrincipalPsico() {
   const { state } = useLocation();
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
+  const [psicologoNome, setPsicologoNome] = useState("");
 
   useEffect(() => {
-    if (!state?.token || !state?.id) {
+    if (!state?.token || !state?.id || !state?.nome) {
       navigate("/login");
     } else {
       setToken(state.token);
       setId(state.id);
-    } 
-    console.log(token,state)
+      setPsicologoNome(state.nome);  
+    }
   }, [navigate, state]);
 
   const handleVerPacientes = () => {
-    navigate("/principalPsico/listapaciente", { state: { token, id } });
+    navigate("/principalPsico/listapaciente", { state: { token, id, nome: psicologoNome } });
   };
 
   const handleAddPaciente = () => {
-    navigate('/principalPsico/listapaciente', { state: { token, id, openModal: true } });
+    navigate('/principalPsico/listapaciente', { state: { token, id, nome: psicologoNome, openModal: true } });
   };
 
   return (
@@ -69,7 +70,7 @@ export default function PrincipalPsico() {
             </div>
             <div className="md:text-start text-center text-lg">
               <h1 className="font-bold">Olá, </h1>
-              <h2 className="italic">Nome do Psicólogo</h2>
+              <h2 className="italic">{psicologoNome}</h2> 
             </div>
           </div>
           <div className="h-px w-full bg-white md:hidden block my-3" />
@@ -90,6 +91,7 @@ export default function PrincipalPsico() {
           onAddPacientes={handleAddPaciente} 
         />
         <section className="flex flex-col gap-10">
+        <h1 className="text-2xl font-bold">Adicionar Pacientes</h1>
           <div className="w-full h-72 sm:h-56 md:h-40 bg-green-800 rounded-2xl transition-all shadow-xl hover:shadow-2xl text-white p-6 text-2xl relative">
             <h1 className="font-light leading-9">
               Adicione pacientes para ter melhores resultados em suas consultas!
