@@ -38,7 +38,7 @@ export default function ListaPaciente() {
 
       if (state?.openModal) {
         setModalAdd(true);
-    }
+      }
     }
   }, [navigate, state]);
 
@@ -90,10 +90,6 @@ export default function ListaPaciente() {
       handleErrorResponse(error);
     }
   }
-  
-
-  
-  
 
   function handleErrorResponse(error) {
     if (error.response) {
@@ -115,7 +111,11 @@ export default function ListaPaciente() {
     console.log("Paciente para deletar:", paciente);  // Verifique o paciente
     setModalDel(true);
   }
-  
+
+  function handleVerificar(paciente) {
+    navigate('/principalPsico/RegistroPacientes', { state: { token, id, nome: psicologoNome, paciente } });
+  }
+
   const handleReturn = () => {
     navigate("/principalPsico", { state: { token, id, nome: psicologoNome } });
   };
@@ -226,7 +226,7 @@ export default function ListaPaciente() {
                   {paciente.email}
                 </td>
                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                  <Button>Verificar</Button>
+                  <Button onClick={() => handleVerificar(paciente)}>Verificar</Button>
                 </td>
                 <td className="whitespace-nowrap px-6 py-2 text-gray-700 flex items-center gap-2 flex-wrap">
                   <button
@@ -244,24 +244,7 @@ export default function ListaPaciente() {
             </tr>
           )}
         </Table>
-        <div className="mt-6 p-4 bg-indigo-500 rounded-full text-xs text-white font-semibold flex md:hidden justify-center items-center gap-x-2 shadow-md">
-          <CalendarDots weight="fill" size={18} />
-          <span className="font-medium">•</span>
-          {new Date().toLocaleDateString()}
-        </div>
       </main>
-      <div className="flex justify-center md:hidden py-6">
-        <Link
-          className="mb-6 cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
-          to="/principalPsico"
-          state={{ token, id, nome: psicologoNome }}
-        >
-          <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all text-white font-light">
-            <ArrowLeft weight="bold" />
-            Voltar
-          </div>
-        </Link>
-      </div>
     </div>
   );
 }

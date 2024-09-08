@@ -160,6 +160,9 @@ const RegistroPage = () => {
             )}
           </tbody>
         </table>
+        <div className="mt-4 text-gray-500">
+          Data de hoje: {new Date().toLocaleDateString()}
+        </div>
       </main>
 
       <div className="flex justify-center md:hidden py-6">

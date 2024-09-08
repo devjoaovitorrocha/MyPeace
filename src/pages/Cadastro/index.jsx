@@ -15,12 +15,17 @@ export default function CadastroPsicologo() {
   const [registroNumero, setRegistroNumero] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [isEmailVerificationVisible, setEmailVerificationVisible] =
-    useState(false);
-  const [codigo, setCodigo] = useState("");
+  const [isEmailVerificationVisible, setEmailVerificationVisible] = useState(false);
+  const [codigo, setCodigo] = useState(""); // Código inserido pelo usuário
 
   const cadastrar = (event) => {
     event.preventDefault();
+
+    // Verifica se as senhas coincidem
+    if (senha !== confirmarSenha) {
+      toast.error("As senhas não coincidem.");
+      return;
+    }
 
     http
       .post(`/register/psychologist`, {
@@ -32,24 +37,38 @@ export default function CadastroPsicologo() {
         confirmPassword: confirmarSenha,
       })
       .then((resp) => {
-        setEmailVerificationVisible(true);
+        setEmailVerificationVisible(true); // Mostra modal de verificação de e-mail
+        toast.success("Cadastro realizado com sucesso. Verifique seu e-mail!");
       })
       .catch((error) => {
         if (error.response) {
           toast.error(`${error.response.data.msg}`);
         } else {
-          toast.error(
-            "Erro ao cadastrar psicólogo. Por favor, tente novamente mais tarde."
-          );
+          toast.error("Erro ao cadastrar psicólogo. Por favor, tente novamente mais tarde.");
         }
       });
   };
 
   const handleEmailVerification = (e) => {
     e.preventDefault();
-    console.log("Verificação de e-mail enviada");
-    toast.info("Verificação de e-mail enviada");
-    window.location.href = "/login";
+
+    // Chamada à API para verificar o código
+    http
+      .post("/verify-email", {
+        email: email,
+        code: codigo, // código inserido pelo usuário
+      })
+      .then((resp) => {
+        toast.success("E-mail verificado com sucesso!");
+        window.location.href = "/login"; // Redireciona para login após sucesso
+      })
+      .catch((error) => {
+        if (error.response) {
+          toast.error(`${error.response.data.msg}`);
+        } else {
+          toast.error("Erro ao verificar e-mail. Por favor, tente novamente mais tarde.");
+        }
+      });
   };
 
   const handleCpfChange = (e) => {
@@ -110,8 +129,9 @@ export default function CadastroPsicologo() {
             </h1>
 
             <p className="mt-4 leading-relaxed text-gray-500">
-            Bem-Vindo ao MyPeace!<br/>
-            Preencha os campos abaixo para criar sua conta como psicólogo e ter acesso à nossa plataforma.
+              Bem-Vindo ao MyPeace!<br />
+              Preencha os campos abaixo para criar sua conta como psicólogo e ter
+              acesso à nossa plataforma.
             </p>
 
             <form onSubmit={cadastrar} className="mt-8 grid grid-cols-6 gap-5">
@@ -179,9 +199,7 @@ export default function CadastroPsicologo() {
                   Cadastrar
                 </button>
 
-                <p
-                  className="mt-4 text-sm text-gray-500 sm:mt-0"
-                >
+                <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                   Já tem uma conta?
                   <Link to={"/login"} className="text-gray-700 underline ml-2">
                     Login
