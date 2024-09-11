@@ -29,7 +29,6 @@ const RegistroPage = () => {
     }
   }, [navigate, state]);
 
-  // Função para buscar pacientes da API
   async function fetchPacientes(token, idUser) {
     try {
       const response = await axios.get(
@@ -44,7 +43,6 @@ const RegistroPage = () => {
     }
   }
 
-  // Função para lidar com mudanças nos filtros
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilter((prevFilter) => ({
@@ -53,7 +51,6 @@ const RegistroPage = () => {
     }));
   };
 
-  // Filtrar os registros conforme os filtros são aplicados
   const filteredData = pacientes.filter((paciente) => {
     return (
       (filter.name === '' || paciente.name.toLowerCase().includes(filter.name.toLowerCase())) &&
@@ -67,7 +64,7 @@ const RegistroPage = () => {
   };
 
   return (
-    <div className="bg-[#3c5454] h-screen p-6">
+    <div className="bg-[#3c5454] h-full min-h-screen p-4 md:p-6">
       <Toaster
         expand
         position="top-center"
@@ -84,7 +81,7 @@ const RegistroPage = () => {
         }}
       />
       <header className="flex flex-col md:flex-row items-center justify-between max-w-[1440px] mx-auto">
-        <h1 className="text-4xl py-6 md:py-12 text-white text-center font-semibold">
+        <h1 className="text-3xl md:text-4xl py-4 md:py-8 text-white text-center font-semibold">
           Lista de Registros
         </h1>
         <span
@@ -98,22 +95,22 @@ const RegistroPage = () => {
         </span>
       </header>
 
-      <main className="max-w-[1440px] mx-auto bg-white shadow-3D rounded-xl p-6">
+      <main className="max-w-[1440px] mx-auto bg-white shadow-3D rounded-xl p-4 md:p-6">
         {/* Filtros */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-5 border-b border-gray-300 pb-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-3 md:gap-5 border-b border-gray-300 pb-4 md:pb-6">
           <input
             type="text"
             name="name"
             placeholder="Buscar por nome"
             value={filter.name}
             onChange={handleFilterChange}
-            className="md:w-auto w-full p-2 border border-gray-300 rounded-lg"
+            className="w-full md:w-auto p-2 border border-gray-300 rounded-lg"
           />
           <select
             name="status"
             value={filter.status}
             onChange={handleFilterChange}
-            className="md:w-auto w-full p-2 border border-gray-300 rounded-lg"
+            className="w-full md:w-auto p-2 border border-gray-300 rounded-lg"
           >
             <option value="">Todos os status</option>
             <option value="Ativo">Ativo</option>
@@ -123,7 +120,7 @@ const RegistroPage = () => {
             name="type"
             value={filter.type}
             onChange={handleFilterChange}
-            className="md:w-auto w-full p-2 border border-gray-300 rounded-lg"
+            className="w-full md:w-auto p-2 border border-gray-300 rounded-lg"
           >
             <option value="">Todos os tipos</option>
             <option value="Presencial">Presencial</option>
@@ -131,41 +128,43 @@ const RegistroPage = () => {
           </select>
         </div>
 
-        {/* Tabela */}
-        <table className="min-w-full table-auto mt-6">
-          <thead>
-            <tr className="bg-gray-200 text-left">
-              <th className="px-4 py-2">Nome</th>
-              <th className="px-4 py-2">Data</th>
-              <th className="px-4 py-2">Status</th>
-              <th className="px-4 py-2">Tipo</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.length > 0 ? (
-              filteredData.map((paciente) => (
-                <tr key={paciente._id}>
-                  <td className="border px-4 py-2">{paciente.name}</td>
-                  <td className="border px-4 py-2">{paciente.date}</td>
-                  <td className="border px-4 py-2">{paciente.status}</td>
-                  <td className="border px-4 py-2">{paciente.type}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="border px-4 py-2 text-center">
-                  Nenhum registro encontrado
-                </td>
+        {/* Tabela Responsiva */}
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-auto mt-4 md:mt-6">
+            <thead>
+              <tr className="bg-gray-200 text-left">
+                <th className="px-4 py-2">Nome</th>
+                <th className="px-4 py-2">Data</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2">Tipo</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredData.length > 0 ? (
+                filteredData.map((paciente) => (
+                  <tr key={paciente._id}>
+                    <td className="border px-4 py-2">{paciente.name}</td>
+                    <td className="border px-4 py-2">{paciente.date}</td>
+                    <td className="border px-4 py-2">{paciente.status}</td>
+                    <td className="border px-4 py-2">{paciente.type}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="border px-4 py-2 text-center">
+                    Nenhum registro encontrado
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
         <div className="mt-4 text-gray-500">
           Data de hoje: {new Date().toLocaleDateString()}
         </div>
       </main>
 
-      <div className="flex justify-center md:hidden py-6">
+      <div className="flex justify-center md:hidden py-4 md:py-6">
         <Link
           className="mb-6 cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
           to="/principalPsico"

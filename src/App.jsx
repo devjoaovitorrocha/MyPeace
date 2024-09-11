@@ -31,7 +31,7 @@ function App() {
         <Route path="/principalCliente/cronometro" element={<Cronometro />} />
         <Route path="/principalPsico/listapaciente" element={<ListaPaciente />} />
         <Route path="/principalPsico/RegistroPacientes" element={<RegistroPage/>} />
-        <Route path="/principalCliente/EmotionRegister" element={<EmotionRegister/>} />
+        <Route path="/principalCliente/RegistroEmocao" element={<EmotionRegister/>} />
       </Routes>
     </BrowserRouter>
   )
