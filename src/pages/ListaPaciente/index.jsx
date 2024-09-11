@@ -27,14 +27,14 @@ export default function ListaPaciente() {
   const [psicologoNome, setPsicologoNome] = useState("");
 
   useEffect(() => {
-    console.log("Token:", state.token); 
+    console.log("Token:", state.token);
     if (!state?.token || !state?.id || !state?.nome) {
       navigate("/login");
     } else {
       setToken(state.token);
       setId(state.id);
       setPsicologoNome(state.nome);
-      fetchPacientes(state.token, state.id);  
+      fetchPacientes(state.token, state.id);
 
       if (state?.openModal) {
         setModalAdd(true);
@@ -47,7 +47,7 @@ export default function ListaPaciente() {
       const response = await axios.get(
         `https://api-mypeace.vercel.app/getAll/pacients/${idUser}`,
         {
-          headers: { Authorization: `Bearer ${token}` }, // Fixed header typo
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       setPacientes(response.data.allPacients);
@@ -74,22 +74,22 @@ export default function ListaPaciente() {
 
   async function deletar() {
     if (!currentPaciente) return;
-  
+
     try {
-      const response = await axios.post(
-        `https://api-mypeace.vercel.app/delete/pacients/${currentPaciente._id}`, 
-        {},  
-        {
-          headers: { Authorization: `Bearer ${token}` }  //
-        }
-      );
-      toast.success(response.data.msg || "Paciente deletado com sucesso!");
-      setModalDel(false);
-      fetchPacientes(token, id);
+        const response = await axios.post(
+            `https://api-mypeace.vercel.app/delete/pacients/${currentPaciente._id}`,
+            {
+                headers: { Authorization: `Bearer ${token}` } 
+            }
+        );
+        toast.success(response.data.msg || "Paciente deletado com sucesso!");
+        setModalDel(false);
+        fetchPacientes(token, id); 
     } catch (error) {
-      handleErrorResponse(error);
+        handleErrorResponse(error);
     }
-  }
+}
+
 
   function handleErrorResponse(error) {
     if (error.response) {
@@ -108,12 +108,8 @@ export default function ListaPaciente() {
 
   function openDeleteModal(paciente) {
     setCurrentPaciente(paciente);
-    console.log("Paciente para deletar:", paciente);  // Verifique o paciente
+    console.log("Paciente para deletar:", paciente);  
     setModalDel(true);
-  }
-
-  function handleVerificar(paciente) {
-    navigate('/principalPsico/RegistroPacientes', { state: { token, id, nome: psicologoNome, paciente } });
   }
 
   const handleReturn = () => {
@@ -226,7 +222,7 @@ export default function ListaPaciente() {
                   {paciente.email}
                 </td>
                 <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                  <Button onClick={() => handleVerificar(paciente)}>Verificar</Button>
+                  <Button>Verificar</Button>
                 </td>
                 <td className="whitespace-nowrap px-6 py-2 text-gray-700 flex items-center gap-2 flex-wrap">
                   <button
@@ -244,7 +240,24 @@ export default function ListaPaciente() {
             </tr>
           )}
         </Table>
+        <div className="mt-6 p-4 bg-indigo-500 rounded-full text-xs text-white font-semibold flex md:hidden justify-center items-center gap-x-2 shadow-md">
+          <CalendarDots weight="fill" size={18} />
+          <span className="font-medium">•</span>
+          {new Date().toLocaleDateString()}
+        </div>
       </main>
+      <div className="flex justify-center md:hidden py-6">
+        <Link
+          className="mb-6 cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
+          to="/principalPsico"
+          state={{ token, id, nome: psicologoNome }}
+        >
+          <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all text-white font-light">
+            <ArrowLeft weight="bold" />
+            Voltar
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }

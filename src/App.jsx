@@ -9,9 +9,7 @@ import PrincipalPsico from "./pages/PrincipalPsico";
 import ListaPaciente from "./pages/ListaPaciente";
 import CadastroPaciente from "./pages/CadastroCliente";
 import Cronometro from "./pages/Cronometro";
-import RegistroPage from "./pages/RegistroPacientes/RegistroPacientes";
-import EmotionRegister from "./pages/EmotionRegister";
-
+import RegistroEmocoes from "./pages/RegistroEmocoes";
 
 export const http = axios.create({
   baseURL: 'https://api-mypeace.vercel.app'
@@ -20,20 +18,26 @@ export const http = axios.create({
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />}/>
-        <Route path="*" element={<Pagina404 />}/>
-        <Route path="/login" element={<Login />} />
-        <Route path="/principalPsico" element={<PrincipalPsico />} />
-        <Route path="/cadastroCliente" element={<CadastroPaciente />} />
-        <Route path='/principalCliente' element={<PrincipalCliente />} />
-        <Route path="/cadastroPsicologo" element={<CadastroPsicologo />} />
-        <Route path="/principalCliente/cronometro" element={<Cronometro />} />
-        <Route path="/principalPsico/listapaciente" element={<ListaPaciente />} />
-        <Route path="/principalPsico/RegistroPacientes" element={<RegistroPage/>} />
-        <Route path="/principalCliente/RegistroEmocao" element={<EmotionRegister/>} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      {/* Home routes*/}
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="*" element={<Pagina404 />} />
+  
+      {/* Psicologo routes */}
+      <Route path="/principalPsico" element={<PrincipalPsico />} />
+      <Route path="/principalPsico/listapaciente" element={<ListaPaciente />} />
+      <Route path="/cadastroPsicologo" element={<CadastroPsicologo />} />
+  
+      {/* Cliente routes */}
+      <Route path="/principalCliente" element={<PrincipalCliente />} />
+      <Route path="/principalCliente/cronometro" element={<Cronometro />} />
+      <Route path="/principalCliente/registroemocoes" element={<RegistroEmocoes />} />
+      {/*<Route path="/principalCliente/diario" element={<Diario />} />*/}
+      <Route path="/cadastroCliente" element={<CadastroPaciente />} />
+    </Routes>
+  </BrowserRouter>
+  
   )
 }
 

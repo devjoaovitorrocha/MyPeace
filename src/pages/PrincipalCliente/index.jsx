@@ -21,10 +21,8 @@ export default function PrincipalCliente() {
   const { state } = useLocation();
   const [modalEdt, setModalEdt] = useState(false);
   const [modalDel, setModalDel] = useState(false);
-  const [eye, setEye] = useState(false);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
   const [pacienteNome, setPacienteNome] = useState("");
@@ -33,46 +31,91 @@ export default function PrincipalCliente() {
     email: "",
   });
 
+  
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
-    navigate("/login");
+      navigate("/login");
     } else {
-     setToken(state.token);
-     setId(state.id);
-    setPacienteNome(state.nome);  
+      setToken(state.token);
+      setId(state.id);
+      setPacienteNome(state.nome);
     }
-   }, [navigate, state]);
+  }, [navigate, state]);
 
   const handleCronometro = () => {
-    navigate("/principalCliente/cronometro", { state: { token, id, nome: pacienteNome } });
+    navigate("/principalCliente/cronometro", {
+      state: { token, id, nome: pacienteNome },
+    });
   };
-  const RegistroEmocao = () => {
-    navigate("/principalCliente/RegistroEmocao", { state: { token, id, nome: pacienteNome } });
+
+  const handleRegistroEmocoes = () => {
+    navigate("/principalCliente/registroemocoes", {
+      state: { token, id, nome: pacienteNome },
+    });
+  };
+
+  const handleDiario = () => {
+    navigate("/principalCliente/diario", {
+      state: { token, id, nome: pacienteNome },
+    });
   };
 
   const edtDadosSubmit = async (e) => {
     e.preventDefault();
     try {
+
       const response = await axios.post(
         `https://api-mypeace.vercel.app/update/pacients/${id}`,
         {
           name: nome,
           email: email,
-          
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      toast.success(`${response.data.msg}` || "Dados editados com sucesso!")
+      toast.success(`${response.data.msg}` || "Dados editados com sucesso!");
+
+
+      setPacienteNome(nome);
+
+
+      if (currentPassword && newPassword && confirmPassword) {
+        if (newPassword !== confirmPassword) {
+          toast.error("As novas senhas não coincidem!");
+          return;
+        }
+
+        const senhaResponse = await axios.post(
+          `https://api-mypeace.vercel.app/update/password/pacients/${id}`,
+          {
+            currentPassword,
+            newPassword,
+            confirmPassword,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (senhaResponse.status === 200) {
+          toast.success(`${senhaResponse.data.msg}` || "Senha atualizada com sucesso!");
+          setCurrentPassword("");
+          setNewPassword("");
+          setConfirmPassword("");
+        }
+      }
+
       setModalEdt(false);
     } catch (error) {
       handleErrorResponse(error);
     }
-
-
-    
   };
+
 
   async function deletar() {
     try {
@@ -85,27 +128,21 @@ export default function PrincipalCliente() {
       );
       toast.success(`${response.data.msg}` || "Paciente deletado com sucesso!");
       setModalDel(false);
-
       setTimeout(() => {
-        navigate('/');
-      }, 2000);
-
+        navigate("/");
+      }, 1000);
     } catch (error) {
       handleErrorResponse(error);
     }
   }
 
   function handleErrorResponse(error) {
-    if (error.response) {
-      console.error("Detalhes do erro:", error.response.data);
-      if (error.response.status === 401) {
-        alert("Sessão expirada");
-        navigate("/login");
-      } else {
-        toast.error(`${error.response.data.msg}` || "Erro ao processar a solicitação. Por favor, tente novamente mais tarde.")
-      }
+    const errorMsg = error.response?.data?.msg || "Erro ao processar a solicitação. Por favor, tente novamente mais tarde.";
+    if (error.response?.status === 401) {
+      alert("Sessão expirada");
+      navigate("/login");
     } else {
-      toast.error("Erro ao processar a solicitação. Por favor, tente novamente mais tarde.")
+      toast.error(errorMsg);
     }
   }
 
@@ -124,6 +161,7 @@ export default function PrincipalCliente() {
       setModalDel(true);
     }
   }
+
   return (
     <>
       {modalEdt && (
@@ -134,23 +172,47 @@ export default function PrincipalCliente() {
           form
         >
           <form className="mt-5 space-y-8" onSubmit={edtDadosSubmit}>
-            {" "}
             <div className="relative z-0">
-              {" "}
-              <Inputs label={"Nome:"} />{" "}
-            </div>{" "}
+              <Inputs
+                label={"Nome:"}
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+              />
+            </div>
             <div className="relative z-0">
-              {" "}
-              <Inputs label={"Email:"} />{" "}
-            </div>{" "}
+              <Inputs
+                label={"Email:"}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
             <div className="relative z-0">
-              {" "}
-              <Inputs label={"Senha:"} isSenha />{" "}
-            </div>{" "}
+              <Inputs
+                label={"Senha Atual:"}
+                isSenha
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+            </div>
+            <div className="relative z-0">
+              <Inputs
+                label={"Nova Senha:"}
+                isSenha
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+            <div className="relative z-0">
+              <Inputs
+                label={"Confirmar Nova Senha:"}
+                isSenha
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </div>
             <button className="bg-[#00bfa6] rounded-lg hover:opacity-90 transition-opacity text-white font-semibold w-full py-2">
-              {" "}
-              Salvar{" "}
-            </button>{" "}
+              Salvar
+            </button>
           </form>
         </Modal>
       )}
@@ -179,7 +241,7 @@ export default function PrincipalCliente() {
         }}
       />
       <header className="p-3 z-50 w-full text-white">
-        <div className=" bg-green-900 rounded-2xl px-6 py-4 shadow-xl flex items-center justify-center md:justify-between md:flex-row flex-col border-b-4 border-green-400">
+        <div className="bg-green-900 rounded-2xl px-6 py-4 shadow-xl flex items-center justify-center md:justify-between md:flex-row flex-col border-b-4 border-green-400">
           <div className="flex md:flex-row flex-col items-center gap-4">
             <div className="rounded-full border-2 border-green-500 w-16 h-16 flex items-center justify-center">
               <User fill="white" size={24} />
@@ -205,6 +267,7 @@ export default function PrincipalCliente() {
         <HoverDevCards
           onClickEdt={() => openEditModal(currentPaciente)}
           onClickDel={() => openDeleteModal(currentPaciente)}
+          onClickRegistroEmocoes={handleRegistroEmocoes}
         />
         <h1 className="py-11 text-2xl font-bold">Guias</h1>
         <section className="flex items-center flex-col gap-10">
@@ -214,7 +277,10 @@ export default function PrincipalCliente() {
               <br />
               expressão de sentimentos.
             </h1>
-            <button onClick={RegistroEmocao} className="absolute bottom-0 right-0 p-5 bg-pink-500 shadow-3D rounded-tl-2xl rounded-br-xl hover:pb-6 transition-all flex items-center gap-2">
+            <button
+              onClick={handleDiario}
+              className="absolute bottom-0 right-0 p-5 bg-pink-500 shadow-3D rounded-tl-2xl rounded-br-xl hover:pb-6 transition-all flex items-center gap-2"
+            >
               <h6 className="text-sm">Acessar</h6>
               <ArrowUpRight weight="bold" />
             </button>
@@ -225,7 +291,10 @@ export default function PrincipalCliente() {
               <br />
               Acesse nossa respiração guiada.
             </h1>
-            <button onClick={handleCronometro} className="absolute bottom-0 right-0 p-5 bg-pink-500 shadow-3D rounded-tl-2xl rounded-br-xl hover:pb-6 transition-all flex items-center gap-2">
+            <button
+              onClick={handleCronometro}
+              className="absolute bottom-0 right-0 p-5 bg-pink-500 shadow-3D rounded-tl-2xl rounded-br-xl hover:pb-6 transition-all flex items-center gap-2"
+            >
               <h6 className="text-sm">Acessar</h6>
               <ArrowUpRight weight="bold" />
             </button>
@@ -236,7 +305,7 @@ export default function PrincipalCliente() {
   );
 }
 
-const HoverDevCards = ({ onClickEdt, onClickDel }) => {
+const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes }) => {
   return (
     <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4">
       <HoverForCards
@@ -254,9 +323,8 @@ const HoverDevCards = ({ onClickEdt, onClickDel }) => {
       <HoverForCards
         title="Registro Emoções"
         subtitle={<ArrowUpRight />}
-        link={"/principalCliente/RegistroEmocao"}
-        isLink
         Icon={Database}
+        onClick={onClickRegistroEmocoes}
       />
       <HoverForCards
         title="Editar Dados"
