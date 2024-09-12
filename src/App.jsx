@@ -12,7 +12,7 @@ import Cronometro from "./pages/Cronometro";
 import RegistroEmocoes from "./pages/RegistroEmocoes";
 
 export const http = axios.create({
-  baseURL: 'https://mypeace.vercel.app/'
+  baseURL: 'https://api-mypeace.vercel.app/'
 });
 
 function App() {

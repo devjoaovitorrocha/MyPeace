@@ -45,7 +45,7 @@ export default function ListaPaciente() {
   async function fetchPacientes(token, idUser) {
     try {
       const response = await axios.get(
-        `https://mypeace.vercel.app/getAll/pacients/${idUser}`,
+        `https://api-mypeace.vercel.app/getAll/pacients/${idUser}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -60,7 +60,7 @@ export default function ListaPaciente() {
     event.preventDefault();
     try {
       const response = await axios.post(
-        `https://mypeace.vercel.app/register/pacient/${id}`,
+        `https://api-mypeace.vercel.app/register/pacient/${id}`,
         { name, email, idPsychologist: id },{headers: {Authorization: `Bearer ${token}`}}
       ).then((res) => console.log(res));
       console.log(response)
@@ -80,7 +80,7 @@ export default function ListaPaciente() {
 
     try {
         const response = await axios.post(
-            `https://mypeace.vercel.app/delete/pacients/${currentPaciente._id}`, {} ,
+            `https://api-mypeace.vercel.app/delete/pacients/${currentPaciente._id}`, {} ,
             {headers: {Authorization : `Bearer ${token}`}}
         );
         toast.success(response.data.msg || "Paciente deletado com sucesso!");
