@@ -285,6 +285,7 @@ export default function PrincipalCliente() {
           onClickDel={() => openDeleteModal(currentPaciente)}
           onClickRegistroEmocoes={handleRegistroEmocoes}
           onClickCronometro={handleCronometro}
+          onClickDiario={handleDiario}
         />
         <h1 className="py-11 text-2xl font-bold">Guias</h1>
         <section className="flex items-center flex-col gap-10">
@@ -322,13 +323,14 @@ export default function PrincipalCliente() {
   );
 }
 
-const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClickCronometro }) => {
+const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClickCronometro, onClickDiario }) => {
   return (
     <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4">
       <HoverForCards
         title="Diário"
         subtitle={<ArrowUpRight />}
         Icon={BookBookmark}
+        onClick={onClickDiario}
       />
       <HoverForCards
         title="Respiração Guiada"

@@ -2,12 +2,11 @@ import { useState } from "react";
 import { ArrowLeft } from "@phosphor-icons/react";
 import Logo from "../../assets/images/logo.svg";
 import Inputs from "../../components/Inputs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import { http } from "../../App";
 import Modal from "../../components/Modal";
 import FloatingPhone from "../../components/FloatingPhone";
-
 
 export default function CadastroPsicologo() {
   const [nome, setNome] = useState("");
@@ -19,10 +18,26 @@ export default function CadastroPsicologo() {
   const [isEmailVerificationVisible, setEmailVerificationVisible] =
     useState(false);
   const [codigo, setCodigo] = useState("");
-  const [idUsuario, setIdUsuario] = useState(""); 
+  const [idUsuario, setIdUsuario] = useState("");
+  const navigate = useNavigate();
 
   const cadastrar = (event) => {
     event.preventDefault();
+
+    if (senha !== confirmarSenha) {
+      toast.error("As senhas não coincidem.");
+      return;
+    }
+
+    if (cpf.replace(/\D/g, "").length !== 11) {
+      toast.error("CPF inválido. Verifique o número.");
+      return;
+    }
+
+    if (registroNumero.replace(/\D/g, "").length !== 7) {
+      toast.error("CRP inválido. Verifique o número.");
+      return;
+    }
 
     http
       .post(`/register/psychologist`, {
@@ -35,9 +50,10 @@ export default function CadastroPsicologo() {
       })
       .then((resp) => {
         setIdUsuario(resp.data.idUser);
-        setEmailVerificationVisible(true); 
+        setEmailVerificationVisible(true);
       })
       .catch((error) => {
+        console.error(error);
         if (error.response) {
           toast.error(`${error.response.data.msg}`);
         } else {
@@ -48,33 +64,40 @@ export default function CadastroPsicologo() {
       });
   };
 
-  const handleEmailVerification = (e) => {
+  const handleEmailVerification = async (e) => {
     e.preventDefault();
-  
-    http
-      .post(
-        `/auth/verifyEmail/${idUsuario}`, 
+
+    const token = localStorage.getItem("token");
+
+    if (!codigo || !idUsuario || !token) {
+      toast.error("Dados faltando. Verifique o código e tente novamente.");
+      return;
+    }
+
+    try {
+      const resp = await http.post(
+        `/auth/verifyEmail/${idUsuario}`,
         { verifyCode: codigo },
         {
           headers: {
-            Authorization: `Bearer ${token}`, 
+            Authorization: `Bearer ${token}`,
           },
         }
-      )
-      .then((resp) => {
-        toast.success("Verificação de e-mail concluída com sucesso");
-        navigate("/login");
-      })
-      .catch((error) => {
-        if (error.response) {
-          toast.error(error.response.data.msg);
-        } else {
-          toast.error("Erro ao verificar o código. Por favor, tente novamente mais tarde.");
-        }
-      });
+      );
+      toast.success("Verificação de e-mail concluída com sucesso");
+      setEmailVerificationVisible(false);
+      setTimeout(() => navigate("/login"), 1000);
+    } catch (error) {
+      console.error(error);
+      if (error.response) {
+        toast.error(error.response.data.msg);
+      } else {
+        toast.error(
+          "Erro ao verificar o código. Por favor, tente novamente mais tarde."
+        );
+      }
+    }
   };
-  
-  
 
   const handleCpfChange = (e) => {
     const formattedCpf = e.target.value
@@ -134,8 +157,10 @@ export default function CadastroPsicologo() {
             </h1>
 
             <p className="mt-4 leading-relaxed text-gray-500">
-            Bem-Vindo ao MyPeace!<br/>
-            Preencha os campos abaixo para criar sua conta como psicólogo e ter acesso à nossa plataforma.
+              Bem-Vindo ao MyPeace!
+              <br />
+              Preencha os campos abaixo para criar sua conta como psicólogo e
+              ter acesso à nossa plataforma.
             </p>
 
             <form onSubmit={cadastrar} className="mt-8 grid grid-cols-6 gap-5">
@@ -203,9 +228,7 @@ export default function CadastroPsicologo() {
                   Cadastrar
                 </button>
 
-                <p
-                  className="mt-4 text-sm text-gray-500 sm:mt-0"
-                >
+                <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                   Já tem uma conta?
                   <Link to={"/login"} className="text-gray-700 underline ml-2">
                     Login

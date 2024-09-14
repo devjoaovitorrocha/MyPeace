@@ -112,8 +112,8 @@ const Header = () => {
     <header>
       <nav className="max-w-[1440px] mx-auto flex items-center justify-between px-6 py-2">
         <div className="flex items-center gap-x-8">
-          <img src={Logo} alt="Logo" />
-          <h1 className="hidden sm:block text-xl">MyPeace</h1>
+          <img src={Logo} alt="Logo" width={40} height={40} />
+          <h1 className="hidden sm:block text-xl  font-semibold" >MyPeace.</h1>
         </div>
         <div className="relative">
           <AnimatedHamburgerButton active={menuOpen} setActive={setMenuOpen} />

@@ -17,7 +17,7 @@ import HoverForCards from "../../components/HoverForCards";
 import axios from "axios";
 import Inputs from "../../components/Inputs";
 
-const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel, onClickEdt }) => (
+const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel, onClickEdt, onClickRegistro }) => (
   <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4 py-11">
     <HoverForCards
       title="Adicionar Pacientes"
@@ -29,6 +29,7 @@ const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel, onClickEdt 
       title="Registro dos Pacientes"
       subtitle={<ArrowUpRight />}
       Icon={AddressBook}
+      onClick={onClickRegistro}
     />
     <HoverForCards
       title="Ver Pacientes"
@@ -101,6 +102,10 @@ export default function PrincipalPsico() {
 
   const handleAddPaciente = () => {
     navigate('/principalPsico/listapaciente', { state: { token, id, nome: psicologoNome, openModal: true } });
+  };
+
+  const handleRegistroPacientes = () => {
+    navigate('/principalPsico/registropaciente', { state: { token, id, nome: psicologoNome} });
   };
 
   
@@ -349,6 +354,7 @@ export default function PrincipalPsico() {
           onVerPacientes={handleVerPacientes}
           onAddPacientes={handleAddPaciente}
           onClickEdt={openEditModal}
+          onClickRegistro={handleRegistroPacientes}
         />
         <section className="flex flex-col gap-10">
           <h1 className="text-2xl font-bold">Adicionar Pacientes</h1>

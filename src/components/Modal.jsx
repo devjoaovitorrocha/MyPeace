@@ -1,6 +1,6 @@
 import { EnvelopeSimple, Warning, X } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "framer-motion";
-import Inputs from "./Inputs";
+
 
 export default function Modal({
   isOpen,
@@ -15,9 +15,9 @@ export default function Modal({
   valueEmailV,
   onChangeEmailV,
   onClickEmailV,
-  redWarning, // Novo: para o modal de aviso vermelho
-  onContinue, // Novo: função chamada quando "Continuar" for clicado
-  onExit, // Novo: função chamada quando "Sair" for clicado
+  redWarning, 
+  onContinue,
+  onExit, 
   children
 }) {
   return (

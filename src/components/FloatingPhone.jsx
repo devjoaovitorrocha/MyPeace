@@ -51,7 +51,7 @@ const Screen = () => {
       <img src={Logo} />
 
       <button className="cursor-default absolute bottom-4 left-4 right-4 z-10 rounded-lg border-[1px] bg-white py-2 text-sm font-medium text-[#00bfa6] backdrop-blur">
-        Cadastrar
+       Cadastre-se
       </button>
 
       <div className="absolute -bottom-72 left-[50%] h-96 w-96 -translate-x-[50%] rounded-full bg-[#00bfa6]" />
