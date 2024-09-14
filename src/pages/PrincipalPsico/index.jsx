@@ -3,15 +3,19 @@ import {
   ArrowUpRight,
   Database,
   User,
+  Trash,
   UserCirclePlus,
   UserList,
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import Modal from "../../components/Modal";
+import { Toaster, toast } from "sonner";
 import React from "react";
 import HoverForCards from "../../components/HoverForCards";
+import axios from "axios";
 
-const HoverDevCards = ({ onVerPacientes, onAddPacientes }) => {
+const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel }) => {
   return (
     <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4 py-11">
       <HoverForCards
@@ -31,6 +35,12 @@ const HoverDevCards = ({ onVerPacientes, onAddPacientes }) => {
         Icon={UserList}
         onClick={onVerPacientes}
       />
+      <HoverForCards
+        title="Deletar Conta"
+        subtitle={<ArrowUpRight />}
+        Icon={Trash}
+        onClick={onClickDel} 
+      />
     </div>
   );
 };
@@ -41,6 +51,13 @@ export default function PrincipalPsico() {
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
   const [psicologoNome, setPsicologoNome] = useState("");
+  const [modalEdt, setModalEdt] = useState(false);
+  const [modalDel, setModalDel] = useState(false);
+  const [modalAvisoDel, setModalAvisoDel] = useState(false); 
+  const [currentPsicologo, setCurrentPsicologo] = useState({
+    name: "",
+    email: "",
+  });
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
@@ -60,8 +77,80 @@ export default function PrincipalPsico() {
     navigate('/principalPsico/listapaciente', { state: { token, id, nome: psicologoNome, openModal: true } });
   };
 
+  
+  async function deletar() {
+    if (!id || !token) {
+      toast.error("ID ou token inválidos. Faça login novamente.");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `https://api-mypeace.vercel.app/delete/psychologists/${id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      toast.success(response.data.msg || "Conta deletada com sucesso!");
+      setModalDel(false);
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error) {
+      handleErrorResponse(error);
+    }
+  }
+
+
+  function openWarningModal() {
+    setModalAvisoDel(true);
+  }
+
+  
+  function confirmDeletion() {
+    setModalAvisoDel(false);
+    setModalDel(true); 
+  }
+
+  function handleErrorResponse(error) {
+    const errorMsg = error.response?.data?.msg || "Erro ao processar a solicitação. Por favor, tente novamente mais tarde.";
+    if (error.response?.status === 401) {
+      alert("Sessão expirada");
+      navigate("/login");
+    } else {
+      toast.error(errorMsg);
+    }
+  }
+
   return (
     <>
+      
+      {modalAvisoDel && (
+        <Modal
+          isOpen={modalAvisoDel}
+          setIsOpen={setModalAvisoDel}
+          titulo="Aviso Importante"
+          conteudo={`${psicologoNome} antes de deletar sua conta delete seus pacientes. Deseja continuar ou sair?`}
+          redWarning
+          onContinue={confirmDeletion} 
+          onExit={() => setModalAvisoDel(false)} 
+        />
+      )}
+
+    
+      {modalDel && (
+        <Modal
+          isOpen={modalDel}
+          setIsOpen={setModalDel}
+          titulo={`Excluir Conta`}
+
+          del
+          delOnClick={deletar} 
+        />
+      )}
+      
       <header className="p-3 z-50 w-full text-white">
         <div className=" bg-green-900 rounded-2xl px-6 py-4 shadow-xl flex items-center justify-center md:justify-between md:flex-row flex-col border-b-4 border-green-400">
           <div className="flex md:flex-row flex-col items-center gap-4">
@@ -87,11 +176,12 @@ export default function PrincipalPsico() {
       <main className="max-w-[1440px] mx-auto 2xl:p-0 py-3 px-6">
         <h1 className="py-7 text-2xl font-bold">Acesso Rápido</h1>
         <HoverDevCards 
+          onClickDel={openWarningModal}  // Abre o modal de aviso primeiro
           onVerPacientes={handleVerPacientes} 
           onAddPacientes={handleAddPaciente} 
         />
         <section className="flex flex-col gap-10">
-        <h1 className="text-2xl font-bold">Adicionar Pacientes</h1>
+          <h1 className="text-2xl font-bold">Adicionar Pacientes</h1>
           <div className="w-full h-72 sm:h-56 md:h-40 bg-green-800 rounded-2xl transition-all shadow-xl hover:shadow-2xl text-white p-6 text-2xl relative">
             <h1 className="font-light leading-9">
               Adicione pacientes para ter melhores resultados em suas consultas!

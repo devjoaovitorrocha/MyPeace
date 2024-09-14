@@ -15,6 +15,9 @@ export default function Modal({
   valueEmailV,
   onChangeEmailV,
   onClickEmailV,
+  redWarning, // Novo: para o modal de aviso vermelho
+  onContinue, // Novo: função chamada quando "Continuar" for clicado
+  onExit, // Novo: função chamada quando "Sair" for clicado
   children
 }) {
   return (
@@ -162,7 +165,7 @@ export default function Modal({
             </motion.div>
           )}
         </>
-      ) : (
+      ) : redWarning ? (
         <>
           {isOpen && (
             <motion.div
@@ -170,39 +173,36 @@ export default function Modal({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="bg-slate-900/20 backdrop-blur p-8 fixed inset-0 z-50 grid place-items-center overflow-y-scroll cursor-pointer"
+              className="bg-red-900/30 backdrop-blur p-8 fixed inset-0 z-50 grid place-items-center overflow-y-scroll cursor-pointer"
             >
               <motion.div
                 initial={{ scale: 0, rotate: "12.5deg" }}
                 animate={{ scale: 1, rotate: "0deg" }}
                 exit={{ scale: 0, rotate: "0deg" }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-gradient-to-br from-violet-600 to-indigo-600 text-white p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden"
+                className="bg-red-500 text-white p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden"
               >
-                <FiAlertCircle className="text-white/10 rotate-12 text-[250px] absolute z-0 -top-24 -left-24" />
+                <Warning className="text-white/10 rotate-12 text-[250px] absolute z-0 -top-24 -left-24" />
                 <div className="relative z-10">
-                  <div className="bg-white w-16 h-16 mb-2 rounded-full text-3xl text-indigo-600 grid place-items-center mx-auto">
-                    <FiAlertCircle />
+                  <div className="bg-white w-16 h-16 mb-2 rounded-full text-3xl text-red-500 grid place-items-center mx-auto">
+                    <Warning />
                   </div>
                   <h3 className="text-3xl font-bold text-center mb-2">
-                    One more thing!
+                    {titulo}
                   </h3>
-                  <p className="text-center mb-6">
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Id
-                    aperiam vitae, sapiente ducimus eveniet in velit.
-                  </p>
+                  <p className="text-center mb-6">{conteudo}</p>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => setIsOpen(false)}
-                      className="bg-transparent hover:bg-white/10 transition-colors text-white font-semibold w-full py-2 rounded"
+                      onClick={onExit}
+                      className="bg-red-700 text-white transition-colors border-2 border-red-700  font-semibold w-full py-2 rounded"
                     >
-                      Nah, go back
+                      Sair
                     </button>
                     <button
-                      onClick={() => setIsOpen(false)}
-                      className="bg-white hover:opacity-90 transition-opacity text-indigo-600 font-semibold w-full py-2 rounded"
+                      onClick={onContinue}
+                      className="bg-[#00bfa6] text-white transition-colors border-2 border-[#00bfa6] hover:text-white font-semibold w-full py-2 rounded"
                     >
-                      Understood!
+                      Continuar
                     </button>
                   </div>
                 </div>
@@ -210,6 +210,8 @@ export default function Modal({
             </motion.div>
           )}
         </>
+      ) : (
+        <></>
       )}
     </AnimatePresence>
   );
