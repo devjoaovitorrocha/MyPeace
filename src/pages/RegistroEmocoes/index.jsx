@@ -119,7 +119,7 @@ export default function RegistroEmocao() {
             <div className="mt-4 text-lg text-center font-medium">{phase}</div>
 
             {mensagem && (
-              <div className={`font-bold mt-2 ${mensagemTipo === "success" ? "bg-[#00bfa6]" : "text-red-500"}`}>
+              <div className={`font-bold mt-2 ${mensagemTipo === "success" ? "text-[#00bfa6]" : "text-red-500"}`}>
                 {mensagem}
               </div>
             )}

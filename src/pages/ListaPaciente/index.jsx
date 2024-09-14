@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import {
-  CalendarDots,
+ 
   UserPlus,
   ArrowLeft,
   Trash,
+  MagnifyingGlass,
 } from "@phosphor-icons/react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-import Table from "../../components/Table";
-import Modal from "../../components/Modal";
 import { Toaster, toast } from "sonner";
 import Inputs from "../../components/Inputs";
-import { Button } from "flowbite-react";
+import Modal from "../../components/Modal";
 
 export default function ListaPaciente() {
   const { state } = useLocation();
@@ -19,12 +18,14 @@ export default function ListaPaciente() {
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
   const [pacientes, setPacientes] = useState([]);
+  const [filteredPacientes, setFilteredPacientes] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [modalDel, setModalDel] = useState(false);
   const [modalAdd, setModalAdd] = useState(false);
   const [currentPaciente, setCurrentPaciente] = useState(null);
   const [psicologoNome, setPsicologoNome] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
@@ -40,6 +41,14 @@ export default function ListaPaciente() {
       }
     }
   }, [navigate, state]);
+
+  useEffect(() => {
+    setFilteredPacientes(
+      pacientes.filter(paciente =>
+        paciente.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm, pacientes]);
 
   async function fetchPacientes(token, idUser) {
     try {
@@ -175,7 +184,7 @@ export default function ListaPaciente() {
           </form>
         </Modal>
       )}
-      <header className="flex flex-col md:flex-row items-center justify-between max-w-[1440px] mx-auto">
+      <header className="flex flex-col md:flex-row items-center justify-between max-w-[1440px] mx-auto mb-6">
         <h1 className="text-4xl py-6 md:py-12 text-white text-center font-semibold">
           Lista de Pacientes
         </h1>
@@ -201,49 +210,57 @@ export default function ListaPaciente() {
             </span>
             <span className="group-hover:italic font-medium">Adicionar Paciente</span>
           </button>
-          <div className="p-4 bg-indigo-500 rounded-full text-xs text-white font-semibold hidden md:flex items-center gap-x-2 shadow-md">
-            <CalendarDots weight="fill" size={18} />
-            <span className="font-medium">•</span>
-            {new Date().toLocaleDateString()}
+          <div className="flex items-center mb-4">
+              <MagnifyingGlass size={24} className="mr-2 text-gray-400" />
+              <input
+              type="text"
+              placeholder="Buscar por nome..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="block w-full px-4 py-2 rounded-full bg-gray-100 text-gray-700 border border-green-300 focus:outline-none focus:border-green-500"
+            />
           </div>
         </header>
-        <Table>
-          {pacientes.length > 0 ? (
-            pacientes.map((paciente, index) => (
-              <tr key={paciente._id}>
-                <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                  {index + 1}
-                </td>
-                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                  {paciente.name}
-                </td>
-                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                  {paciente.email}
-                </td>
-                <td className="whitespace-nowrap px-4 py-2 text-gray-700">
-                  <Button>Verificar</Button>
-                </td>
-                <td className="whitespace-nowrap px-6 py-2 text-gray-700 flex items-center gap-2 flex-wrap">
-                  <button
-                    onClick={() => openDeleteModal(paciente)}
-                    className="p-2 bg-[#bf0047] rounded-md shadow-3D transition-all hover:opacity-90"
-                  >
-                    <Trash weight="fill" color="white" />
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
+        <table className="w-full text-left">
+          <thead>
             <tr>
-              <td className="py-2 italic">Nenhum paciente encontrado</td>
+              <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">#</th>
+              <th className="whitespace-nowrap px-4 py-2 text-gray-700">Nome</th>
+              <th className="whitespace-nowrap px-4 py-2 text-gray-700">Email</th>
+              <th className="whitespace-nowrap px-6 py-2 text-gray-700">Excluir</th>
             </tr>
-          )}
-        </Table>
-        <div className="mt-6 p-4 bg-indigo-500 rounded-full text-xs text-white font-semibold flex md:hidden justify-center items-center gap-x-2 shadow-md">
-          <CalendarDots weight="fill" size={18} />
-          <span className="font-medium">•</span>
-          {new Date().toLocaleDateString()}
-        </div>
+          </thead>
+          <tbody>
+            {filteredPacientes.length > 0 ? (
+              filteredPacientes.map((paciente, index) => (
+                <tr key={paciente._id}>
+                  <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
+                    {index + 1}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                    {paciente.name}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2 text-gray-700">
+                    {paciente.email}
+                  </td>
+                  <td className="white space-nowrap px-6 py-2 text-gray-700 flex items-center gap-2 flex-wrap">
+                    <button
+                      onClick={() => openDeleteModal(paciente)}
+                      className="p-2 bg-[#bf0047] rounded-md shadow-3D transition-all hover:opacity-90"
+                    >
+                      <Trash weight="fill" color="white" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td className="py-2 italic" colSpan="5">Nenhum paciente encontrado</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+        
       </main>
       <div className="flex justify-center md:hidden py-6">
         <Link

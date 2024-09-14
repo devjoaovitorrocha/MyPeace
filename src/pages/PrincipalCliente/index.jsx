@@ -21,6 +21,7 @@ export default function PrincipalCliente() {
   const { state } = useLocation();
   const [modalEdt, setModalEdt] = useState(false);
   const [modalDel, setModalDel] = useState(false);
+  const [modalAvisoDel, setModalAvisoDel] = useState(false); 
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
@@ -31,7 +32,6 @@ export default function PrincipalCliente() {
     email: "",
   });
 
-  
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -64,17 +64,19 @@ export default function PrincipalCliente() {
     });
   };
 
-
   const fetchPacientInfo = async () => {
     try {
-      const response = await axios.get(`https://api-mypeace.vercel.app/get/pacientInfo/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(
+        `https://api-mypeace.vercel.app/get/pacientInfo/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const { name, email } = response.data;
       setNome(name);
       setEmail(email);
     } catch (error) {
-      toast.error("Erro ao buscar informações do psicólogo.");
+      toast.error("Erro ao buscar informações do paciente.");
       console.error(error);
     }
   };
@@ -82,7 +84,7 @@ export default function PrincipalCliente() {
   const edtDadosSubmit = async (e) => {
     e.preventDefault();
     try {
-
+      // Atualiza dados do paciente
       const response = await axios.post(
         `https://api-mypeace.vercel.app/update/pacients/${id}`,
         {
@@ -95,10 +97,9 @@ export default function PrincipalCliente() {
       );
       toast.success(`${response.data.msg}` || "Dados editados com sucesso!");
 
-
       setPacienteNome(nome);
 
-
+      // Atualiza senha, se fornecida
       if (currentPassword && newPassword && confirmPassword) {
         if (newPassword !== confirmPassword) {
           toast.error("As novas senhas não coincidem!");
@@ -131,8 +132,7 @@ export default function PrincipalCliente() {
     }
   };
 
-
-  async function deletar() {
+  const deletar = async () => {
     try {
       const response = await axios.post(
         `https://api-mypeace.vercel.app/delete/pacients/${id}`,
@@ -149,9 +149,9 @@ export default function PrincipalCliente() {
     } catch (error) {
       handleErrorResponse(error);
     }
-  }
+  };
 
-  function handleErrorResponse(error) {
+  const handleErrorResponse = (error) => {
     const errorMsg = error.response?.data?.msg || "Erro ao processar a solicitação. Por favor, tente novamente mais tarde.";
     if (error.response?.status === 401) {
       alert("Sessão expirada");
@@ -159,9 +159,9 @@ export default function PrincipalCliente() {
     } else {
       toast.error(errorMsg);
     }
-  }
+  };
 
-  function openEditModal(paciente) {
+  const openEditModal = (paciente) => {
     if (paciente) {
       fetchPacientInfo();
       setCurrentPaciente(paciente);
@@ -169,42 +169,58 @@ export default function PrincipalCliente() {
       setEmail(paciente.email);
       setModalEdt(true);
     }
-  }
+  };
 
-  function openDeleteModal(paciente) {
+  const openDeleteModal = (paciente) => {
     if (paciente) {
       setCurrentPaciente(paciente);
-      setModalDel(true);
+      setModalAvisoDel(true);
     }
-  }
+  };
+
+  const handleWarningConfirm = () => {
+    setModalAvisoDel(false);
+    setModalDel(true); 
+  };
 
   return (
     <>
+      {modalAvisoDel && (
+        <Modal
+          isOpen={modalAvisoDel}
+          setIsOpen={setModalAvisoDel}
+          titulo="Aviso Importante"
+          conteudo={`Tem certeza que deseja excluir?`}
+          redWarning
+          onContinue={handleWarningConfirm}
+          onExit={() => setModalAvisoDel(false)}
+        />
+      )}
       {modalEdt && (
         <Modal
           isOpen={modalEdt}
           setIsOpen={setModalEdt}
-          titulo={`Editar Dados`}
+          titulo="Editar Dados"
           form
         >
           <form className="mt-5 space-y-8" onSubmit={edtDadosSubmit}>
             <div className="relative z-0">
               <Inputs
-                label={"Nome:"}
+                label="Nome:"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
               />
             </div>
             <div className="relative z-0">
               <Inputs
-                label={"Email:"}
+                label="Email:"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div className="relative z-0">
               <Inputs
-                label={"Senha Atual:"}
+                label="Senha Atual:"
                 isSenha
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
@@ -212,7 +228,7 @@ export default function PrincipalCliente() {
             </div>
             <div className="relative z-0">
               <Inputs
-                label={"Nova Senha:"}
+                label="Nova Senha:"
                 isSenha
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
@@ -220,7 +236,7 @@ export default function PrincipalCliente() {
             </div>
             <div className="relative z-0">
               <Inputs
-                label={"Confirmar Nova Senha:"}
+                label="Confirmar Nova Senha:"
                 isSenha
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -236,7 +252,7 @@ export default function PrincipalCliente() {
         <Modal
           isOpen={modalDel}
           setIsOpen={setModalDel}
-          titulo={`Excluir Conta`}
+          titulo="Excluir Conta"
           del
           delOnClick={deletar}
         />
@@ -263,7 +279,7 @@ export default function PrincipalCliente() {
               <User fill="white" size={24} />
             </div>
             <div className="md:text-start text-center text-lg">
-              <h1 className="font-bold">Olá, </h1>
+              <h1 className="font-bold">Olá,</h1>
               <h2 className="italic">{pacienteNome}</h2>
             </div>
           </div>
@@ -337,7 +353,6 @@ const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClick
         subtitle={<ArrowUpRight />}
         Icon={Wind}
         onClick={onClickCronometro}
-
       />
       <HoverForCards
         title="Registro Emoções"

@@ -372,7 +372,7 @@ export default function PrincipalPsico() {
             <h1 className="font-light leading-9">
               Veja como seu paciente anda se sentindo durante a semana
             </h1>
-            <button className="absolute bottom-0 right-0 p-5 bg-pink-500 shadow-3D rounded-tl-2xl rounded-br-xl hover:pb-6 transition-all flex items-center gap-2">
+            <button onClick={handleRegistroPacientes} className="absolute bottom-0 right-0 p-5 bg-pink-500 shadow-3D rounded-tl-2xl rounded-br-xl hover:pb-6 transition-all flex items-center gap-2">
               <h6 className="text-sm">Acessar</h6>
               <ArrowUpRight weight="bold" />
             </button>
