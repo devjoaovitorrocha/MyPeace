@@ -2,11 +2,30 @@ import { useState, useEffect } from "react";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import Container from "../../components/Container";
+import { ArrowLeft } from "@phosphor-icons/react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+
 
 export default function Cronometro() {
   const [time, setTime] = useState(0);
   const [running, setRunning] = useState(false);
   const [phase, setPhase] = useState("Clique em iniciar para começarmos");
+  const [pacienteNome, setPacienteNome] = useState("");
+  const [token, setToken] = useState();
+  const [id, setId] = useState();
+  const navigate = useNavigate();
+  const { state } = useLocation();
+
+
+  useEffect(() => {
+    if (!state?.token || !state?.id || !state?.nome) {
+      navigate("/login");
+    } else {
+      setToken(state.token);
+      setId(state.id);
+      setPacienteNome(state.nome);
+    }
+  }, [navigate, state]);
 
   useEffect(() => {
     let timer;
@@ -54,7 +73,7 @@ export default function Cronometro() {
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (progress / 100) * circumference;
 
- 
+
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -113,6 +132,22 @@ export default function Cronometro() {
                 Reiniciar
               </button>
             </div>
+
+            <div className="mt-4 flex justify-center">
+              <Link
+                className="cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] 
+            after:absolute after:h-[2px] after:bg-black text-black after:w-full after:scale-x-0 
+            after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
+                to="/principalCliente"
+                state={{ token, id, nome: pacienteNome }}
+              >
+                <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all">
+                  <ArrowLeft />
+                  Voltar
+                </div>
+              </Link>
+            </div>
+
           </div>
         </div>
       </Container>

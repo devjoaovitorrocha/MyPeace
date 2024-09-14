@@ -268,6 +268,7 @@ export default function PrincipalCliente() {
           onClickEdt={() => openEditModal(currentPaciente)}
           onClickDel={() => openDeleteModal(currentPaciente)}
           onClickRegistroEmocoes={handleRegistroEmocoes}
+          onClickCronometro={handleCronometro}
         />
         <h1 className="py-11 text-2xl font-bold">Guias</h1>
         <section className="flex items-center flex-col gap-10">
@@ -305,7 +306,7 @@ export default function PrincipalCliente() {
   );
 }
 
-const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes }) => {
+const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClickCronometro }) => {
   return (
     <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4">
       <HoverForCards
@@ -317,8 +318,8 @@ const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes }) => {
         title="Respiração Guiada"
         subtitle={<ArrowUpRight />}
         Icon={Wind}
-        link={"/principalCliente/cronometro"}
-        isLink
+        onClick={onClickCronometro}
+
       />
       <HoverForCards
         title="Registro Emoções"

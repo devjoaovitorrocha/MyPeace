@@ -27,7 +27,6 @@ export default function ListaPaciente() {
   const [psicologoNome, setPsicologoNome] = useState("");
 
   useEffect(() => {
-    console.log("Token:", state.token);
     if (!state?.token || !state?.id || !state?.nome) {
       navigate("/login");
     } else {
@@ -61,36 +60,36 @@ export default function ListaPaciente() {
     try {
       const response = await axios.post(
         `https://api-mypeace.vercel.app/register/pacient/${id}`,
-        { name, email, idPsychologist: id },{headers: {Authorization: `Bearer ${token}`}}
-      ).then((res) => console.log(res));
-      console.log(response)
-      console.log('oi')
+        { name, email, idPsychologist: id },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
       toast.success(`Senha do usuário: ${response.data.password}`);
       setModalAdd(false);
-      fetchPacientes(token, id);
+      await fetchPacientes(token, id);
     } catch (error) {
       handleErrorResponse(error);
     }
   }
 
   async function deletar() {
-    console.log(token)
-    console.log(`Bearer ${token}`)
     if (!currentPaciente) return;
 
     try {
-        const response = await axios.post(
-            `https://api-mypeace.vercel.app/delete/pacients/${currentPaciente._id}`, {} ,
-            {headers: {Authorization : `Bearer ${token}`}}
-        );
-        toast.success(response.data.msg || "Paciente deletado com sucesso!");
-        setModalDel(false);
-        fetchPacientes(token, id); 
+      const response = await axios.post(
+        `https://api-mypeace.vercel.app/delete/pacients/${currentPaciente._id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      toast.success(response.data.msg || "Paciente deletado com sucesso!");
+      setModalDel(false);
+      await fetchPacientes(token, id);
     } catch (error) {
-        handleErrorResponse(error);
+      handleErrorResponse(error);
     }
-}
-
+  }
 
   function handleErrorResponse(error) {
     if (error.response) {
@@ -109,7 +108,6 @@ export default function ListaPaciente() {
 
   function openDeleteModal(paciente) {
     setCurrentPaciente(paciente);
-    console.log("Paciente para deletar:", paciente);  
     setModalDel(true);
   }
 

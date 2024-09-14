@@ -2,29 +2,39 @@ import { useState, useEffect } from "react";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import Container from "../../components/Container";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { http } from "../../App";
+import { ArrowLeft } from "@phosphor-icons/react";
 
-const emojis = ["😀", "😊", "😢", "😠", "😱", "😔"];
+const emojis = {
+  feliz: '😊',
+  contente: '🙂',
+  neutro: '😐',
+  triste: '🙁',
+  raiva: '😠',
+};
 
 export default function RegistroEmocao() {
   const { state } = useLocation();
-  const [selectedEmoji, setSelectedEmoji] = useState("");
+  const [selectedFeeling, setSelectedFeeling] = useState("");
   const [description, setDescription] = useState("");
   const [phase, setPhase] = useState("Insira suas emoções do dia!");
   const [dataAtual, setDataAtual] = useState("");
   const [mensagem, setMensagem] = useState("");
+  const [mensagemTipo, setMensagemTipo] = useState("");
   const [savedFeelings, setSavedFeelings] = useState([]);
   const [token, setToken] = useState();
   const [id, setId] = useState();
   const navigate = useNavigate();
+  const [pacienteNome, setPacienteNome] = useState("");
 
   useEffect(() => {
-    if (!state?.token || !state?.id) {
+    if (!state?.token || !state?.id || !state?.nome) {
       navigate("/login");
     } else {
       setToken(state.token);
       setId(state.id);
+      setPacienteNome(state.nome);
     }
   }, [navigate, state]);
 
@@ -36,43 +46,64 @@ export default function RegistroEmocao() {
     setDataAtual(`${dia}/${mes}/${ano}`);
   }, []);
 
-  const handleEmojiClick = (emoji) => {
-    setSelectedEmoji(emoji);
+  const handleEmojiClick = (feeling) => {
+    setSelectedFeeling(feeling);
   };
 
   const handleSave = () => {
-    if (description === "" || selectedEmoji === "") {
-      setMensagem("Por favor, preencha a descrição e selecione um emoji.");
+    if (!token || !id) {
+      setMensagem("Erro: Token ou ID ausente. Por favor, faça login novamente.");
+      setMensagemTipo("error");
+      LimparMensagem();
+      return;
+    }
+
+    if (description === "" || selectedFeeling === "") {
+      setMensagem("Por favor, preencha a descrição e selecione uma emoção.");
+      setMensagemTipo("error");
+      LimparMensagem();
     } else {
       const newEntry = {
         id: Date.now(),
-        feeling: selectedEmoji,
+        feeling: selectedFeeling,
         description: description,
         dataAtual: new Date().toLocaleDateString("pt-BR"),
       };
       setSavedFeelings([...savedFeelings, newEntry]);
 
       http.post(`/register/report/${id}`,
-          {
-            feeling: selectedEmoji,
-            description: description,
+        {
+          feeling: selectedFeeling,
+          description: description,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        )
+        }
+      )
         .then((response) => {
           setMensagem("Salvo com sucesso!");
-          setTimeout(() => setMensagem(""), 2000);
+          setMensagemTipo("success");
           setDescription("");
-          setSelectedEmoji("");
+          setSelectedFeeling("");
+          LimparMensagem();
         })
         .catch((error) => {
-          setMensagem(error.response?.data?.msg || "Erro ao salvar os dados.");
+          const errorMsg = error.response?.data?.msg || "Erro ao salvar os dados.";
+          setMensagem(errorMsg);
+          setMensagemTipo("error");
+          LimparMensagem();
         });
     }
+  };
+
+
+  const LimparMensagem = () => {
+    setTimeout(() => {
+      setMensagem("");
+      setMensagemTipo("");
+    }, 1000);
   };
 
   return (
@@ -88,17 +119,20 @@ export default function RegistroEmocao() {
             <div className="mt-4 text-lg text-center font-medium">{phase}</div>
 
             {mensagem && (
-              <div className="text-red-500 font-bold mt-2">
+              <div className={`font-bold mt-2 ${mensagemTipo === "success" ? "bg-[#00bfa6]" : "text-red-500"}`}>
                 {mensagem}
               </div>
             )}
 
-            <div className="mt-4 flex flex-nowrap justify-center space-x-2">
-              {emojis.map((emoji, index) => (
+            <div className="mt-4 flex flex-nowrap justify-center space-x-0">
+              {Object.entries(emojis).map(([feeling, emoji], index) => (
                 <button
                   key={index}
-                  onClick={() => handleEmojiClick(emoji)}
-                  className={`text-3xl ${selectedEmoji === emoji ? "border-2 border-green-500" : ""}`}
+                  onClick={() => handleEmojiClick(feeling)}
+                  className={`text-3xl p-2 transition-all ${selectedFeeling === feeling
+                    ? "border-2 bg-[#00bfa6] rounded-full"
+                    : ""
+                    }`}
                 >
                   {emoji}
                 </button>
@@ -106,12 +140,13 @@ export default function RegistroEmocao() {
             </div>
 
             <textarea
-              className="mt-4 p-2 w-full border rounded-lg resize-none"
+              className="mt-4 p-2 w-full border border-[#00bfa6]-300 focus:border-[#008f7a] focus:ring-[#00bfa6] rounded-lg resize-none"
               rows="4"
               placeholder="Escreva sobre como você está se sentindo..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+
 
             <div className="mt-6">
               <button
@@ -120,6 +155,21 @@ export default function RegistroEmocao() {
               >
                 Salvar
               </button>
+            </div>
+            <div className="mt-4 flex justify-center">
+
+              <Link
+                className="cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] 
+            after:absolute after:h-[2px] after:bg-black text-black after:w-full after:scale-x-0 
+            after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
+                to="/principalCliente"
+                state={{ token, id, nome: pacienteNome }}
+              >
+                <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all">
+                  <ArrowLeft />
+                  Voltar
+                </div>
+              </Link>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { ArrowLeft, SignIn } from "@phosphor-icons/react";
 import { Toaster, toast } from "sonner";
 import { http } from "../../App"; 
 import Inputs from "../../components/Inputs"; 
+import { Spinner } from "flowbite-react";
 
 export default function Login() {
   const [email, setEmail] = useState("");  
@@ -12,10 +13,12 @@ export default function Login() {
   const [id, setId] = useState("");        
   const [type, setType] = useState("");     
   const [nome, setNome] = useState("");     
+  const [isLoading, setIsLoading] = useState(false);  
   const navigate = useNavigate();        
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setIsLoading(true);  
 
     try {
       const response = await http.post("/auth/login", { 
@@ -23,7 +26,6 @@ export default function Login() {
         password: senha,
       });
 
-      
       setId(response.data.id);
       setToken(response.data.token);
       setType(response.data.type);
@@ -41,6 +43,8 @@ export default function Login() {
     } catch (e) {
       toast.error(`${e.response.data.msg}`);
       console.log(e);
+    } finally {
+      setIsLoading(false);  
     }
   };
 
@@ -89,14 +93,22 @@ export default function Login() {
             <div className="col-span-6 flex flex-col items-center justify-center sm:gap-4">
               <button
                 type="submit"
-                className="relative z-0 flex items-center justify-center gap-2 overflow-hidden rounded-lg border-[1px] 
+                disabled={isLoading}  
+                className={`relative z-0 flex items-center justify-center gap-2 overflow-hidden rounded-lg border-[1px] 
                 border-[#00bfa6] px-4 py-2 font-semibold uppercase text-[#00bfa6] transition-all duration-300 
                 before:absolute before:inset-0 before:-z-10 before:translate-x-[150%] before:translate-y-[150%] before:scale-[2.5] 
                 before:rounded-[100%] before:bg-[#00bfa6] before:transition-transform before:duration-1000 before:content-[''] 
-                w-full hover:scale-105 hover:text-white hover:before:translate-x-[0%] hover:before:translate-y-[0%] active:scale-95"
+                w-full hover:scale-105 hover:text-white hover:before:translate-x-[0%] hover:before:translate-y-[0%] active:scale-95
+                ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}  
               >
-                <SignIn />
-                <span>Entrar</span>
+                {isLoading ? (
+                  <Spinner color="white"aria-label="Extra large spinner example" size="lg" />
+                ) : (
+                  <>
+                    <SignIn />
+                    <span>Entrar</span>
+                  </>
+                )}
               </button>
               <p
                 className="mt-4 text-sm text-gray-500 sm:mt-0"

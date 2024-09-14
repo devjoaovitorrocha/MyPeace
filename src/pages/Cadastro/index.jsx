@@ -8,6 +8,7 @@ import { http } from "../../App";
 import Modal from "../../components/Modal";
 import FloatingPhone from "../../components/FloatingPhone";
 
+
 export default function CadastroPsicologo() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -51,7 +52,15 @@ export default function CadastroPsicologo() {
     e.preventDefault();
   
     http
-      .post(`/auth/verifyEmail/${idUsuario}`, { verifyCode: codigo })
+      .post(
+        `/auth/verifyEmail/${idUsuario}`, 
+        { verifyCode: codigo },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+        }
+      )
       .then((resp) => {
         toast.success("Verificação de e-mail concluída com sucesso");
         navigate("/login");
@@ -64,6 +73,7 @@ export default function CadastroPsicologo() {
         }
       });
   };
+  
   
 
   const handleCpfChange = (e) => {
