@@ -39,7 +39,7 @@ const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel }) => {
         title="Deletar Conta"
         subtitle={<ArrowUpRight />}
         Icon={Trash}
-        onClick={onClickDel} 
+        onClick={onClickDel}
       />
     </div>
   );
@@ -53,11 +53,7 @@ export default function PrincipalPsico() {
   const [psicologoNome, setPsicologoNome] = useState("");
   const [modalEdt, setModalEdt] = useState(false);
   const [modalDel, setModalDel] = useState(false);
-  const [modalAvisoDel, setModalAvisoDel] = useState(false); 
-  const [currentPsicologo, setCurrentPsicologo] = useState({
-    name: "",
-    email: "",
-  });
+  const [modalAvisoDel, setModalAvisoDel] = useState(false);
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
@@ -65,7 +61,7 @@ export default function PrincipalPsico() {
     } else {
       setToken(state.token);
       setId(state.id);
-      setPsicologoNome(state.nome);  
+      setPsicologoNome(state.nome);
     }
   }, [navigate, state]);
 
@@ -77,7 +73,7 @@ export default function PrincipalPsico() {
     navigate('/principalPsico/listapaciente', { state: { token, id, nome: psicologoNome, openModal: true } });
   };
 
-  
+
   async function deletar() {
     if (!id || !token) {
       toast.error("ID ou token inválidos. Faça login novamente.");
@@ -104,14 +100,14 @@ export default function PrincipalPsico() {
   }
 
 
-  function openWarningModal() {
+  function openAvisoModal() {
     setModalAvisoDel(true);
   }
 
-  
-  function confirmDeletion() {
+
+  function confirmaDelete() {
     setModalAvisoDel(false);
-    setModalDel(true); 
+    setModalDel(true);
   }
 
   function handleErrorResponse(error) {
@@ -126,7 +122,7 @@ export default function PrincipalPsico() {
 
   return (
     <>
-      
+
       {modalAvisoDel && (
         <Modal
           isOpen={modalAvisoDel}
@@ -134,12 +130,12 @@ export default function PrincipalPsico() {
           titulo="Aviso Importante"
           conteudo={`${psicologoNome} antes de deletar sua conta delete seus pacientes. Deseja continuar ou sair?`}
           redWarning
-          onContinue={confirmDeletion} 
-          onExit={() => setModalAvisoDel(false)} 
+          onContinue={confirmaDelete}
+          onExit={() => setModalAvisoDel(false)}
         />
       )}
 
-    
+
       {modalDel && (
         <Modal
           isOpen={modalDel}
@@ -147,10 +143,25 @@ export default function PrincipalPsico() {
           titulo={`Excluir Conta`}
 
           del
-          delOnClick={deletar} 
+          delOnClick={deletar}
         />
       )}
-      
+      <Toaster
+        expand
+        position="top-center"
+        richColors
+        toastOptions={{
+          style: {
+            margin: "10px",
+            padding: "15px",
+            maxWidth: "400px",
+            borderRadius: "8px",
+            gap: "10px",
+            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+          },
+        }}
+      />
+
       <header className="p-3 z-50 w-full text-white">
         <div className=" bg-green-900 rounded-2xl px-6 py-4 shadow-xl flex items-center justify-center md:justify-between md:flex-row flex-col border-b-4 border-green-400">
           <div className="flex md:flex-row flex-col items-center gap-4">
@@ -159,7 +170,7 @@ export default function PrincipalPsico() {
             </div>
             <div className="md:text-start text-center text-lg">
               <h1 className="font-bold">Olá, </h1>
-              <h2 className="italic">{psicologoNome}</h2> 
+              <h2 className="italic">{psicologoNome}</h2>
             </div>
           </div>
           <div className="h-px w-full bg-white md:hidden block my-3" />
@@ -175,10 +186,10 @@ export default function PrincipalPsico() {
       </header>
       <main className="max-w-[1440px] mx-auto 2xl:p-0 py-3 px-6">
         <h1 className="py-7 text-2xl font-bold">Acesso Rápido</h1>
-        <HoverDevCards 
-          onClickDel={openWarningModal}  // Abre o modal de aviso primeiro
-          onVerPacientes={handleVerPacientes} 
-          onAddPacientes={handleAddPaciente} 
+        <HoverDevCards
+          onClickDel={openAvisoModal}
+          onVerPacientes={handleVerPacientes}
+          onAddPacientes={handleAddPaciente}
         />
         <section className="flex flex-col gap-10">
           <h1 className="text-2xl font-bold">Adicionar Pacientes</h1>
