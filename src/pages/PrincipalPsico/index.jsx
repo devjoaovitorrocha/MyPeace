@@ -1,11 +1,12 @@
 import {
   ArrowLeft,
   ArrowUpRight,
-  Database,
   User,
   Trash,
   UserCirclePlus,
   UserList,
+  AddressBook,
+  NotePencil,
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -14,36 +15,41 @@ import { Toaster, toast } from "sonner";
 import React from "react";
 import HoverForCards from "../../components/HoverForCards";
 import axios from "axios";
+import Inputs from "../../components/Inputs";
 
-const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel }) => {
-  return (
-    <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4 py-11">
-      <HoverForCards
-        title="Adicionar Pacientes"
-        subtitle={<ArrowUpRight />}
-        Icon={UserCirclePlus}
-        onClick={onAddPacientes}
-      />
-      <HoverForCards
-        title="Registro dos Pacientes"
-        subtitle={<ArrowUpRight />}
-        Icon={Database}
-      />
-      <HoverForCards
-        title="Ver Pacientes"
-        subtitle={<ArrowUpRight />}
-        Icon={UserList}
-        onClick={onVerPacientes}
-      />
-      <HoverForCards
-        title="Deletar Conta"
-        subtitle={<ArrowUpRight />}
-        Icon={Trash}
-        onClick={onClickDel}
-      />
-    </div>
-  );
-};
+const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel, onClickEdt }) => (
+  <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4 py-11">
+    <HoverForCards
+      title="Adicionar Pacientes"
+      subtitle={<ArrowUpRight />}
+      Icon={UserCirclePlus}
+      onClick={onAddPacientes}
+    />
+    <HoverForCards
+      title="Registro dos Pacientes"
+      subtitle={<ArrowUpRight />}
+      Icon={AddressBook}
+    />
+    <HoverForCards
+      title="Ver Pacientes"
+      subtitle={<ArrowUpRight />}
+      Icon={UserList}
+      onClick={onVerPacientes}
+    />
+    <HoverForCards
+      title="Deletar Conta"
+      subtitle={<ArrowUpRight />}
+      Icon={Trash}
+      onClick={onClickDel}
+    />
+    <HoverForCards
+      title="Editar Dados"
+      subtitle={<ArrowUpRight />}
+      Icon={NotePencil}
+      onClick={onClickEdt}
+    />
+  </div>
+);
 
 export default function PrincipalPsico() {
   const navigate = useNavigate();
@@ -54,6 +60,13 @@ export default function PrincipalPsico() {
   const [modalEdt, setModalEdt] = useState(false);
   const [modalDel, setModalDel] = useState(false);
   const [modalAvisoDel, setModalAvisoDel] = useState(false);
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [registerNumber, setRegisterNumber] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
@@ -65,6 +78,23 @@ export default function PrincipalPsico() {
     }
   }, [navigate, state]);
 
+
+  const fetchPsychologistInfo = async () => {
+    try {
+      const response = await axios.get(`https://api-mypeace.vercel.app/get/psychologistInfo/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const { name, email, cpf, registerNumber } = response.data;
+      setNome(name);
+      setEmail(email);
+      setCpf(cpf);
+      setRegisterNumber(registerNumber);
+    } catch (error) {
+      toast.error("Erro ao buscar informações do psicólogo.");
+      console.error(error);
+    }
+  };
+
   const handleVerPacientes = () => {
     navigate("/principalPsico/listapaciente", { state: { token, id, nome: psicologoNome } });
   };
@@ -73,14 +103,86 @@ export default function PrincipalPsico() {
     navigate('/principalPsico/listapaciente', { state: { token, id, nome: psicologoNome, openModal: true } });
   };
 
+  
+  const handleCpfChange = (e) => {
+    const formattedCpf = e.target.value
+      .replace(/\D/g, "")
+      .replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+    setCpf(formattedCpf);
+  };
 
-  async function deletar() {
-    if (!id || !token) {
-      toast.error("ID ou token inválidos. Faça login novamente.");
-      navigate("/login");
-      return;
+  const handleCrpChange = (e) => {
+    const formattedCrp = e.target.value
+      .replace(/\D/g, "")
+      .replace(/(\d{2})(\d{4})(\d{1})/, "$1/$2-$3");
+    setRegisterNumber(formattedCrp);
+  };
+
+  const edtDadosSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      
+      const dadosResponse = await axios.post(
+        `https://api-mypeace.vercel.app/update/psychologists/${id}`,
+        {
+          name: nome,
+          email: email,
+          cpf: cpf,
+          registerNumber: registerNumber,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      toast.success(dadosResponse.data.msg || "Dados editados com sucesso!");
+
+      
+      if (currentPassword && newPassword && confirmPassword) {
+        if (newPassword !== confirmPassword) {
+          toast.error("As novas senhas não coincidem!");
+          return;
+        }
+
+        const senhaResponse = await axios.post(
+          `https://api-mypeace.vercel.app/update/password/psychologist/${id}`,
+          {
+            currentPassword,
+            newPassword,
+            confirmPassword,
+          },
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        toast.success(senhaResponse.data.msg || "Senha atualizada com sucesso!");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      }
+
+      setModalEdt(false);
+    } catch (error) {
+      handleErrorResponse(error);
     }
+  };
 
+  const openAvisoModal = () => {
+    setModalAvisoDel(true);
+  };
+
+  const confirmaDelete = () => {
+    setModalAvisoDel(false);
+    setModalDel(true);
+  };
+
+  const openEditModal = () => {
+    setModalEdt(true);
+    fetchPsychologistInfo();  
+  };
+
+  const deletar = async () => {
     try {
       const response = await axios.post(
         `https://api-mypeace.vercel.app/delete/psychologists/${id}`,
@@ -97,20 +199,9 @@ export default function PrincipalPsico() {
     } catch (error) {
       handleErrorResponse(error);
     }
-  }
+  };
 
-
-  function openAvisoModal() {
-    setModalAvisoDel(true);
-  }
-
-
-  function confirmaDelete() {
-    setModalAvisoDel(false);
-    setModalDel(true);
-  }
-
-  function handleErrorResponse(error) {
+  const handleErrorResponse = (error) => {
     const errorMsg = error.response?.data?.msg || "Erro ao processar a solicitação. Por favor, tente novamente mais tarde.";
     if (error.response?.status === 401) {
       alert("Sessão expirada");
@@ -118,17 +209,83 @@ export default function PrincipalPsico() {
     } else {
       toast.error(errorMsg);
     }
-  }
+  };
 
   return (
     <>
+        {modalEdt && (
+        <Modal
+          isOpen={modalEdt}
+          setIsOpen={setModalEdt}
+          titulo="Editar Dados"
+          form
+        >
+          <form className="mt-5 space-y-8" onSubmit={edtDadosSubmit}>
+            <div className="relative  z-0">
+            <Inputs
+              label="Nome:"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+            />
+            </div>
+            <div className="relative z-0">
+            <Inputs
+              label="Email:"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            </div>
+            <div className="relative z-0">
+            <Inputs
+              label="CPF:"
+              value={cpf}
+              onChange={handleCpfChange}
+            />
+            </div>
+            <div className="relative z-0">
+            <Inputs
+              label="Número de Registro:"
+              value={registerNumber}
+              onChange={handleCrpChange}
+            />
+            </div>
+            <div className="relative z-0">
+            <Inputs
+              label="Senha Atual:"
+              isSenha
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+            </div>
+            <div className="relative z-0">
+            <Inputs
+              label="Nova Senha:"
+              isSenha
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+            </div>
+            <div className="relative z-0">
+            <Inputs
+              label="Confirmar Nova Senha:"
+              isSenha
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            </div>
+            <button className="bg-[#00bfa6] rounded-lg hover:opacity-90 transition-opacity text-white font-semibold w-full py-2">
+              Salvar
+            </button>
+          </form>
+        </Modal>
+      )}
 
       {modalAvisoDel && (
         <Modal
           isOpen={modalAvisoDel}
           setIsOpen={setModalAvisoDel}
           titulo="Aviso Importante"
-          conteudo={`${psicologoNome} antes de deletar sua conta delete seus pacientes. Deseja continuar ou sair?`}
+          conteudo={`${psicologoNome}, antes de deletar sua conta, delete seus pacientes. Deseja continuar ou sair?`}
           redWarning
           onContinue={confirmaDelete}
           onExit={() => setModalAvisoDel(false)}
@@ -140,12 +297,12 @@ export default function PrincipalPsico() {
         <Modal
           isOpen={modalDel}
           setIsOpen={setModalDel}
-          titulo={`Excluir Conta`}
-
+          titulo="Excluir Conta"
           del
           delOnClick={deletar}
         />
       )}
+
       <Toaster
         expand
         position="top-center"
@@ -184,12 +341,14 @@ export default function PrincipalPsico() {
           </Link>
         </div>
       </header>
+
       <main className="max-w-[1440px] mx-auto 2xl:p-0 py-3 px-6">
         <h1 className="py-7 text-2xl font-bold">Acesso Rápido</h1>
         <HoverDevCards
           onClickDel={openAvisoModal}
           onVerPacientes={handleVerPacientes}
           onAddPacientes={handleAddPaciente}
+          onClickEdt={openEditModal}
         />
         <section className="flex flex-col gap-10">
           <h1 className="text-2xl font-bold">Adicionar Pacientes</h1>

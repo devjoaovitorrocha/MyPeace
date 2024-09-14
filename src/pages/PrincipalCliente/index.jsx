@@ -64,6 +64,21 @@ export default function PrincipalCliente() {
     });
   };
 
+
+  const fetchPacientInfo = async () => {
+    try {
+      const response = await axios.get(`https://api-mypeace.vercel.app/get/pacientInfo/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const { name, email } = response.data;
+      setNome(name);
+      setEmail(email);
+    } catch (error) {
+      toast.error("Erro ao buscar informações do psicólogo.");
+      console.error(error);
+    }
+  };
+
   const edtDadosSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -148,6 +163,7 @@ export default function PrincipalCliente() {
 
   function openEditModal(paciente) {
     if (paciente) {
+      fetchPacientInfo();
       setCurrentPaciente(paciente);
       setNome(paciente.name);
       setEmail(paciente.email);
