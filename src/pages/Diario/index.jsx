@@ -5,6 +5,15 @@ import { ArrowLeft, Trash, Pencil, CheckFat } from '@phosphor-icons/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import Modal from '../../components/Modal';
+import { Spinner } from 'flowbite-react'; 
+
+const emojis = {
+  feliz: '😊',
+  contente: '🙂',
+  neutro: '😐',
+  triste: '🙁',
+  raiva: '😠',
+};
 
 export default function Diario() {
   const { state } = useLocation();
@@ -13,6 +22,7 @@ export default function Diario() {
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
   const [emociones, setEmociones] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); 
   const [showModal, setShowModal] = useState(false);
   const [selectedEmotion, setSelectedEmotion] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -31,6 +41,7 @@ export default function Diario() {
   }, [navigate, state]);
 
   async function fetchEmociones(token, idUser) {
+    setIsLoading(true); 
     try {
       const response = await axios.get(
         `https://api-mypeace.vercel.app/getAll/reports/${idUser}`,
@@ -41,6 +52,8 @@ export default function Diario() {
       setEmociones(response.data.reports);
     } catch (error) {
       toast.error("Erro ao buscar emoções. Por favor, tente novamente.");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -108,6 +121,10 @@ export default function Diario() {
     navigate("/principalCliente", { state: { token, id, nome: state.nome } });
   };
 
+  const handleEmojiClick = (feeling) => {
+    setSelectedEmotion({ ...selectedEmotion, feeling });
+  };
+
   return (
     <div className="bg-[#3c5454] h-screen p-6">
       <Toaster
@@ -140,61 +157,81 @@ export default function Diario() {
         </span>
       </header>
 
-      <main className="max-w-[1440px] mx-auto bg-white shadow-3D rounded-xl p-6">
-        <table className="min-w-full table-auto mt-6">
-          <thead>
-            <tr className="bg-gray-200 text-left">
-              <th className="px-4 py-2">Data</th>
-              <th className="px-4 py-2">Emoção</th>
-              <th className="px-4 py-2">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Array.isArray(emociones) && emociones.length > 0 ? (
-              emociones.map((emocion) => (
-                <tr key={emocion._id}>
-                  <td className="border px-4 py-2">
-                    {new Date(emocion.date).toLocaleDateString()}
-                  </td>
-                  <td className="border px-4 py-2">{emocion.feeling}</td>
-                  <td className="border px-4 py-2 flex space-x-4">
-                    <button
-                      onClick={() => handleVerificarClick(emocion)}
-                      className="p-2 bg-green-500 rounded-md shadow-3D transition-all hover:opacity-90"
-                      title="Verificar Emoção"
-                    >
-                      <CheckFat weight='fill' color="white" />
-                    </button>
-                    <button
-                      onClick={() => handleEditarClick(emocion)}
-                      className="p-2 bg-blue-500 rounded-md shadow-3D transition-all hover:opacity-90"
-                      title="Editar Emoção"
-                    >
-                      <Pencil weight="fill" color="white" />
-                    </button>
-                    <button
-                      onClick={() => handleExcluirClick(emocion)}
-                      className="p-2 bg-red-500 rounded-md shadow-3D transition-all hover:opacity-90"
-                      title="Excluir Emoção"
-                    >
-                      <Trash weight="fill" color="white" />
-                    </button>
+      <main className="max-w-[1440px] mx-auto bg-white shadow-3D rounded-xl p-4 md:p-6 overflow-x-auto">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <Spinner color="indigo" size="xl" /> 
+          </div>
+        ) : (
+          <table className="min-w-full table-auto mt-6">
+            <thead>
+              <tr className="bg-gray-200 text-left">
+                <th className="px-4 py-2">Data</th>
+                <th className="px-4 py-2">Emoção</th>
+                <th className="px-4 py-2">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.isArray(emociones) && emociones.length > 0 ? (
+                emociones.map((emocion) => (
+                  <tr key={emocion._id}>
+                    <td className="border px-4 py-2">
+                      {new Date(emocion.date).toLocaleDateString()}
+                    </td>
+                    <td className="border px-4 py-2">
+                      {emojis[emocion.feeling] || emocion.feeling}
+                    </td>
+                    <td className="border px-4 py-2 flex space-x-4">
+                      <button
+                        onClick={() => handleVerificarClick(emocion)}
+                        className="p-2 bg-green-500 rounded-md shadow-3D transition-all hover:opacity-90"
+                        title="Verificar Emoção"
+                      >
+                        <CheckFat weight='fill' color="white" />
+                      </button>
+                      <button
+                        onClick={() => handleEditarClick(emocion)}
+                        className="p-2 bg-blue-500 rounded-md shadow-3D transition-all hover:opacity-90"
+                        title="Editar Emoção"
+                      >
+                        <Pencil weight="fill" color="white" />
+                      </button>
+                      <button
+                        onClick={() => handleExcluirClick(emocion)}
+                        className="p-2 bg-red-500 rounded-md shadow-3D transition-all hover:opacity-90"
+                        title="Excluir Emoção"
+                      >
+                        <Trash weight="fill" color="white" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="border px-4 py-2 text-center">
+                    Nenhuma emoção registrada
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" className="border px-4 py-2 text-center">
-                  Nenhuma emoção registrada
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        )}
         <div className="mt-4 text-gray-500">
           Data de hoje: {new Date().toLocaleDateString()}
         </div>
       </main>
+
+      <div className="flex justify-center md:hidden py-6">
+        <span
+          onClick={handleReturn}
+          className="cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
+        >
+          <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all text-white font-light">
+            <ArrowLeft weight="bold" />
+            Voltar
+          </div>
+        </span>
+      </div>
 
       <AnimatePresence>
         {showModal && (
@@ -203,7 +240,7 @@ export default function Diario() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowModal(false)}
-            className={`bg-black/30 backdrop-blur fixed inset-0 z-50 flex items-center justify-center overflow-y-scroll cursor-pointer`}
+            className="bg-black/30 backdrop-blur fixed inset-0 z-50 flex items-center justify-center overflow-y-scroll cursor-pointer p-4"
           >
             <motion.div
               initial={{ scale: 0, rotate: "12.5deg" }}
@@ -217,24 +254,28 @@ export default function Diario() {
                   {isEditing ? "Editar Emoção" : "Visualizar Emoção"}
                 </h3>
               </header>
+
               {isEditing ? (
                 <div>
-                  <label className="block mb-2">Tipo de Emoção</label>
-                  <input
-                    type="text"
-                    value={selectedEmotion?.feeling}
-                    onChange={(e) =>
-                      setSelectedEmotion({ ...selectedEmotion, feeling: e.target.value })
-                    }
-                    className="w-full p-2 border border-gray-300 rounded-lg mb-4"
-                  />
-                  <label className="block mb-2">Descrição</label>
+                  <label className="block mb-2">Selecione sua Emoção</label>
+                  <div className="flex flex-wrap justify-center space-x-2 space-y-2">
+                    {Object.entries(emojis).map(([feeling, emoji], index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleEmojiClick(feeling)}
+                        className={`text-3xl p-2 transition-all ${selectedEmotion?.feeling === feeling ? "border-2 bg-[#00bfa6] rounded-full" : ""}`}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                  <label className="block mb-2 mt-4">Descrição</label>
                   <textarea
                     value={selectedEmotion?.description}
                     onChange={(e) =>
                       setSelectedEmotion({ ...selectedEmotion, description: e.target.value })
                     }
-                    className="w-full p-2 border border-gray-300 rounded-lg"
+                    className="w-full p-2 border border-gray-300 rounded-lg resize-none"
                   />
                   <div className="flex justify-center mt-4">
                     <button
@@ -248,12 +289,11 @@ export default function Diario() {
               ) : (
                 <div>
                   <p className="mb-2 font-medium">Tipo de Emoção:</p>
-                  <p className="mb-4">{selectedEmotion?.feeling}</p>
+                  <p className="mb-4">{emojis[selectedEmotion?.feeling] || selectedEmotion?.feeling}</p>
                   <p className="mb-2 font-medium">Descrição:</p>
                   <p>{selectedEmotion?.description}</p>
                 </div>
               )}
-              
             </motion.div>
           </motion.div>
         )}

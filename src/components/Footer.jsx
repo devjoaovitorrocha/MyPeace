@@ -1,5 +1,5 @@
 import WavesFooter from "./WavesFooter";
-import Logo from "../assets/images/logo.svg"
+import Logo from "../assets/images/logo.svg";
 
 export default function Footer() {
   return (

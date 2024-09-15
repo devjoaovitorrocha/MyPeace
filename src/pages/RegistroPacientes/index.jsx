@@ -4,7 +4,6 @@ import { Toaster, toast } from 'sonner';
 import { ArrowLeft, MagnifyingGlass } from '@phosphor-icons/react';
 import axios from 'axios';
 import { Spinner } from 'flowbite-react';
-import { Button } from "flowbite-react";
 
 export default function RegistroPacientes() {
   const { state } = useLocation();
@@ -16,7 +15,7 @@ export default function RegistroPacientes() {
   const [currentPage, setCurrentPage] = useState(1);
   const [patientsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState({ pacientes: true, emociones: false });
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
@@ -29,6 +28,7 @@ export default function RegistroPacientes() {
   }, [navigate, state]);
 
   async function fetchPacientesAndEmotions(token, idUser) {
+    setLoading({ ...loading, pacientes: true });
     try {
       const response = await axios.get(
         `https://api-mypeace.vercel.app/getAll/pacients/${idUser}`,
@@ -38,6 +38,7 @@ export default function RegistroPacientes() {
       );
       const pacientesData = response.data.allPacients;
 
+      setLoading({ ...loading, emociones: true }); 
       const updatedPacientes = await Promise.all(
         pacientesData.map(async (paciente) => {
           const emotions = await fetchEmociones(token, paciente._id);
@@ -54,7 +55,7 @@ export default function RegistroPacientes() {
         toast.error("Erro ao buscar pacientes ou emoções. Por favor, tente novamente mais tarde.");
       }
     } finally {
-      setLoading(false);
+      setLoading({ pacientes: false, emociones: false });
     }
   }
 
@@ -84,19 +85,13 @@ export default function RegistroPacientes() {
   });
 
   const handleVerificarClick = (paciente) => {
-    console.log("Navegando para detalhes com:", { paciente, token, idUser: id, nome: state.nome });
-    navigate("/principalPsico/registropaciente/detalhesPaciente", { state: { paciente, token, idUser: id, nome: state.nome } });
+    navigate("/principalPsico/registropaciente/detalhesPaciente", {
+      state: { paciente, token, idUser: id, nome: state.nome },
+    });
   };
 
   const handleReturn = () => {
-    console.log("Redirecionando com o estado:", { token, id, nome: state?.nome });
-
-    if (!state?.nome) {
-      toast.error("Erro: Nome não encontrado. Redirecionando para a página principal.");
-      navigate("/principalPsico");
-    } else {
-      navigate("/principalPsico", { state: { token, id, nome: state.nome } });
-    }
+    navigate("/principalPsico", { state: { token, id, nome: state?.nome } });
   };
 
   return (
@@ -132,7 +127,7 @@ export default function RegistroPacientes() {
       </header>
 
       <main className="max-w-[1440px] mx-auto bg-white shadow-3D rounded-xl p-6">
-        {loading ? (
+        {loading.pacientes ? (
           <div className="flex justify-center items-center h-64">
             <Spinner color="indigo" size="xl" />
           </div>
@@ -145,54 +140,60 @@ export default function RegistroPacientes() {
                 placeholder="Buscar por nome"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full px-4 py-2 rounded-full bg-gray-100 text-gray-700 border border-green-300 focus:outline-none focus:border-green-500"
+                className="w-full px-4 py-2 rounded-full bg-gray-100 text-gray-700 border border-green-300 focus:outline-none focus:border-green-500"
               />
             </div>
 
-            <table className="min-w-full table-auto mt-6">
-              <thead>
-                <tr className="bg-gray-200 text-left">
-                  <th className="px-4 py-2">Nome</th>
-                  <th className="px-4 py-2">Data</th>
-                  <th className="px-4 py-2">Última Emoção e Descrição</th>
-                  <th className="px-4 py-2">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredPacientes.length > 0 ? (
-                  filteredPacientes.map((paciente) => (
-                    <tr key={paciente._id}>
-                      <td className="border px-4 py-2">{paciente.name}</td>
-                      <td className="border px-4 py-2">
-                        {paciente.emotions.length > 0
-                          ? new Date(paciente.emotions[paciente.emotions.length - 1].date).toLocaleDateString()
-                          : 'N/A'}
-                      </td>
-                      <td className="border px-4 py-2">
-                        {paciente.emotions.length > 0 ? (
-                          <span>
-                            <strong>Emoção:</strong> {paciente.emotions[paciente.emotions.length - 1].feeling} <br />
-                            <strong>Descrição:</strong> {paciente.emotions[paciente.emotions.length - 1].description}
-                          </span>
-                        ) : (
-                          'Nenhuma emoção'
-                        )}
-                      </td>
-                      <td className="border whitespace-nowrap px-4 py-2 text-gray-700">
-                        <Button onClick={() => handleVerificarClick(paciente)}>Verificar</Button>
-                      </td>
-
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="4" className="border px-4 py-2 text-center">
-                      Nenhum registro encontrado
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm md:text-base">
+                <thead>
+                  <tr className="bg-gray-200 text-left">
+                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Nome</th>
+                    <th className="whitespace-nowrap px-4 py-2 text-gray-700">Data</th>
+                    <th className="whitespace-nowrap px-4 py-2 text-gray-700">Última Emoção e Descrição</th>
+                    <th className="whitespace-nowrap px-4 py-2 text-gray-700">Ações</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {filteredPacientes.length > 0 ? (
+                    filteredPacientes.map((paciente) => (
+                      <tr key={paciente._id}>
+                        <td className="border px-4 py-2">{paciente.name}</td>
+                        <td className="border px-4 py-2">
+                          {paciente.emotions.length > 0
+                            ? new Date(paciente.emotions[paciente.emotions.length - 1].date).toLocaleDateString()
+                            : 'N/A'}
+                        </td>
+                        <td className="border px-4 py-2">
+                          {paciente.emotions.length > 0 ? (
+                            <span>
+                              <strong>Emoção:</strong> {paciente.emotions[paciente.emotions.length - 1].feeling} <br />
+                              <strong>Descrição:</strong> {paciente.emotions[paciente.emotions.length - 1].description}
+                            </span>
+                          ) : (
+                            'Nenhuma emoção'
+                          )}
+                        </td>
+                        <td className="border whitespace-nowrap px-4 py-2 text-gray-700">
+                          <button
+                            className="bg-[#00bfa6] rounded-lg hover:opacity-90 transition-opacity text-white font-semibold py-2 px-4"
+                            onClick={() => handleVerificarClick(paciente)}
+                          >
+                            Verificar
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="border px-4 py-2 text-center">
+                        Nenhum registro encontrado
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
 
             {pacientes.length > patientsPerPage && (
               <div className="flex justify-center mt-4">
@@ -211,6 +212,19 @@ export default function RegistroPacientes() {
           </>
         )}
       </main>
+
+      <div className="flex justify-center md:hidden py-6">
+        <Link
+          className="mb-6 cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
+          to="/principalPsico"
+          state={{ token, id, nome: state.nome }}
+        >
+          <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all text-white font-light">
+            <ArrowLeft weight="bold" />
+            Voltar
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }
