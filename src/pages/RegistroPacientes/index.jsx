@@ -144,27 +144,27 @@ export default function RegistroPacientes() {
               />
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm md:text-base">
+            <div className="overflow-x-auto mt-4">
+              <table className="min-w-full text-left text-sm md:text-base">
                 <thead>
-                  <tr className="bg-gray-200 text-left">
-                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Nome</th>
-                    <th className="whitespace-nowrap px-4 py-2 text-gray-700">Data</th>
-                    <th className="whitespace-nowrap px-4 py-2 text-gray-700">Última Emoção e Descrição</th>
-                    <th className="whitespace-nowrap px-4 py-2 text-gray-700">Ações</th>
+                  <tr className="text-left">
+                    <th className="whitespace-nowrap px-4 py-2 ">Nome</th>
+                    <th className="whitespace-nowrap px-4 py-2 ">Data</th>
+                    <th className="whitespace-nowrap px-4 py-2 ">Última Emoção e Descrição</th>
+                    <th className="whitespace-nowrap px-4 py-2 ">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredPacientes.length > 0 ? (
                     filteredPacientes.map((paciente) => (
                       <tr key={paciente._id}>
-                        <td className="border px-4 py-2">{paciente.name}</td>
-                        <td className="border px-4 py-2">
+                        <td className=" px-4 py-2">{paciente.name}</td>
+                        <td className=" px-4 py-2">
                           {paciente.emotions.length > 0
                             ? new Date(paciente.emotions[paciente.emotions.length - 1].date).toLocaleDateString()
                             : 'N/A'}
                         </td>
-                        <td className="border px-4 py-2">
+                        <td className="px-4 py-2">
                           {paciente.emotions.length > 0 ? (
                             <span>
                               <strong>Emoção:</strong> {paciente.emotions[paciente.emotions.length - 1].feeling} <br />
@@ -174,7 +174,7 @@ export default function RegistroPacientes() {
                             'Nenhuma emoção'
                           )}
                         </td>
-                        <td className="border whitespace-nowrap px-4 py-2 text-gray-700">
+                        <td className="px-4 py-2">
                           <button
                             className="bg-[#00bfa6] rounded-lg hover:opacity-90 transition-opacity text-white font-semibold py-2 px-4"
                             onClick={() => handleVerificarClick(paciente)}

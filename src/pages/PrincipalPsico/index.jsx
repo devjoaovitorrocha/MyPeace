@@ -38,17 +38,18 @@ const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel, onClickEdt,
       onClick={onVerPacientes}
     />
     <HoverForCards
-      title="Deletar Conta"
-      subtitle={<ArrowUpRight />}
-      Icon={Trash}
-      onClick={onClickDel}
-    />
-    <HoverForCards
       title="Editar Dados"
       subtitle={<ArrowUpRight />}
       Icon={NotePencil}
       onClick={onClickEdt}
     />
+    <HoverForCards
+      title="Deletar Conta"
+      subtitle={<ArrowUpRight />}
+      Icon={Trash}
+      onClick={onClickDel}
+    />
+    
   </div>
 );
 

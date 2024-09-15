@@ -202,7 +202,7 @@ export default function ListaPaciente() {
         </Modal>
       )}
 
-      {/* Main content */}
+      
       <header className="flex flex-col md:flex-row items-center justify-between max-w-[1440px] mx-auto mb-4 md:mb-6">
         <h1 className="text-2xl md:text-4xl py-4 text-white text-center font-semibold">
           Lista de Pacientes
@@ -282,7 +282,7 @@ export default function ListaPaciente() {
                   ))
                 ) : (
                   <tr>
-                    <td className="py-2 italic" colSpan="5">Nenhum paciente encontrado</td>
+                    <td className="py-2 italic " colSpan="5">Nenhum paciente encontrado</td>
                   </tr>
                 )}
               </tbody>

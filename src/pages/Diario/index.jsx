@@ -165,7 +165,7 @@ export default function Diario() {
         ) : (
           <table className="min-w-full table-auto mt-6">
             <thead>
-              <tr className="bg-gray-200 text-left">
+              <tr className="text-left">
                 <th className="px-4 py-2">Data</th>
                 <th className="px-4 py-2">Emoção</th>
                 <th className="px-4 py-2">Ações</th>
@@ -175,13 +175,13 @@ export default function Diario() {
               {Array.isArray(emociones) && emociones.length > 0 ? (
                 emociones.map((emocion) => (
                   <tr key={emocion._id}>
-                    <td className="border px-4 py-2">
+                    <td className=" px-4 py-2">
                       {new Date(emocion.date).toLocaleDateString()}
                     </td>
-                    <td className="border px-4 py-2">
+                    <td className="px-4 py-2">
                       {emojis[emocion.feeling] || emocion.feeling}
                     </td>
-                    <td className="border px-4 py-2 flex space-x-4">
+                    <td className=" px-4 py-2 flex space-x-4">
                       <button
                         onClick={() => handleVerificarClick(emocion)}
                         className="p-2 bg-green-500 rounded-md shadow-3D transition-all hover:opacity-90"

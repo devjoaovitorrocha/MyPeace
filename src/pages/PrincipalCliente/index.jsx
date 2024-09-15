@@ -190,7 +190,7 @@ export default function PrincipalCliente() {
           isOpen={modalAvisoDel}
           setIsOpen={setModalAvisoDel}
           titulo="Aviso Importante"
-          conteudo={`Tem certeza que deseja excluir?`}
+          conteudo={`Tem certeza que deseja apagar sua conta?`}
           redWarning
           onContinue={handleWarningConfirm}
           onExit={() => setModalAvisoDel(false)}
