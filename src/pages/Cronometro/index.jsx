@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import Container from "../../components/Container";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-
 
 export default function Cronometro() {
   const [time, setTime] = useState(0);
@@ -15,7 +14,7 @@ export default function Cronometro() {
   const [id, setId] = useState();
   const navigate = useNavigate();
   const { state } = useLocation();
-
+  const phaseRef = useRef("");
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
@@ -27,18 +26,32 @@ export default function Cronometro() {
     }
   }, [navigate, state]);
 
+  const falarTexto = (texto) => {
+    if (window.speechSynthesis.speaking) return;
+    const utterance = new SpeechSynthesisUtterance(texto);
+    utterance.lang = "pt-BR";
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const updatePhase = (newPhase) => {
+    if (phaseRef.current !== newPhase) {
+      setPhase(newPhase);
+      phaseRef.current = newPhase;
+      falarTexto(newPhase);
+    }
+  };
+
   useEffect(() => {
     let timer;
-
     if (running) {
       if (time < 4) {
-        setPhase("Inspire o Ar");
+        updatePhase("Puxe o Ar");
       } else if (time < 11) {
-        setPhase("Segure o Ar");
+        updatePhase("Segure o Ar");
       } else if (time < 19) {
-        setPhase("Expire o Ar");
+        updatePhase("Solte o Ar");
       } else {
-        setPhase("Concluído");
+        updatePhase("Concluído");
         setRunning(false);
       }
 
@@ -55,6 +68,7 @@ export default function Cronometro() {
   const startTimer = () => {
     setTime(0);
     setRunning(true);
+    phaseRef.current = "";
   };
 
   const pauseTimer = () => {
@@ -65,11 +79,12 @@ export default function Cronometro() {
     setTime(0);
     setRunning(false);
     setPhase("Clique em iniciar para começarmos");
+    phaseRef.current = "";
   };
 
   const progress = (time / 19) * 100;
   const strokeWidth = 20;
-  const radius = 90 - strokeWidth / 2;
+  const radius = 90;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (progress / 100) * circumference;
 
@@ -106,7 +121,7 @@ export default function Cronometro() {
                 {time}
               </text>
             </svg>
-            <div className="mt-4 text-lg text-center font-medium">{phase}</div>
+            <div className="mt-4 text-center font-medium">{phase}</div>
             <div className="flex space-x-4 mt-6">
               {!running ? (
                 <button
