@@ -6,7 +6,9 @@ import {
   NotePencil,
   Trash,
   User,
+  UserPlus,
   Wind,
+  BookOpenText,
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -19,6 +21,7 @@ import axios from "axios";
 export default function PrincipalCliente() {
   const navigate = useNavigate();
   const { state } = useLocation();
+  const [modalPhoto, setModalPhoto] = useState(false);
   const [modalEdt, setModalEdt] = useState(false);
   const [modalDel, setModalDel] = useState(false);
   const [modalAvisoDel, setModalAvisoDel] = useState(false); 
@@ -64,6 +67,12 @@ export default function PrincipalCliente() {
     });
   };
 
+  const handleDiarioBordo = () => {
+    navigate("/principalCliente/diario", {
+      state: { token, id, nome: pacienteNome },
+    });
+  };
+
   const fetchPacientInfo = async () => {
     try {
       const response = await axios.get(
@@ -84,7 +93,7 @@ export default function PrincipalCliente() {
   const edtDadosSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Atualiza dados do paciente
+     
       const response = await axios.post(
         `https://api-mypeace.vercel.app/update/pacients/${id}`,
         {
@@ -99,7 +108,6 @@ export default function PrincipalCliente() {
 
       setPacienteNome(nome);
 
-      // Atualiza senha, se fornecida
       if (currentPassword && newPassword && confirmPassword) {
         if (newPassword !== confirmPassword) {
           toast.error("As novas senhas não coincidem!");
@@ -171,6 +179,12 @@ export default function PrincipalCliente() {
     }
   };
 
+  const openPhotoModel = (paciente) => {
+    if (paciente){
+      setModalPhoto(true)
+    }
+  }
+
   const openDeleteModal = (paciente) => {
     if (paciente) {
       setCurrentPaciente(paciente);
@@ -183,14 +197,29 @@ export default function PrincipalCliente() {
     setModalDel(true); 
   };
 
+  const handlePhotoConfirm = () => {
+    setModalPhoto(false)
+    setModalDel(true)
+  }
+
   return (
     <>
+      {modalPhoto && (
+        <Modal
+          isOpen={modalPhoto}
+          setIsOpen={setModalPhoto}
+          titulo="Deseja Adicionar uma Foto?"
+          photo
+          onContinue={handlePhotoConfirm}
+          onExit={() => setModalPhoto(false)}
+        />
+      )}
       {modalAvisoDel && (
         <Modal
           isOpen={modalAvisoDel}
           setIsOpen={setModalAvisoDel}
           titulo="Aviso Importante"
-          conteudo={`Tem certeza que deseja apagar sua conta?`}
+          conteudo={`Tem certeza que deseja excluir?`}
           redWarning
           onContinue={handleWarningConfirm}
           onExit={() => setModalAvisoDel(false)}
@@ -302,6 +331,8 @@ export default function PrincipalCliente() {
           onClickRegistroEmocoes={handleRegistroEmocoes}
           onClickCronometro={handleCronometro}
           onClickDiario={handleDiario}
+          onClickPhoto={() => openPhotoModel(currentPaciente)}
+          onClickDiarioBordo={handleDiarioBordo}
         />
         <h1 className="py-11 text-2xl font-bold">Guias</h1>
         <section className="flex items-center flex-col gap-10">
@@ -339,7 +370,7 @@ export default function PrincipalCliente() {
   );
 }
 
-const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClickCronometro, onClickDiario }) => {
+const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClickCronometro, onClickDiario, onClickPhoto, onClickDiarioBordo }) => {
   return (
     <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4">
       <HoverForCards
@@ -347,6 +378,12 @@ const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClick
         subtitle={<ArrowUpRight />}
         Icon={BookBookmark}
         onClick={onClickDiario}
+      />
+      <HoverForCards
+        title="Diário De Bordo"
+        subtitle={<ArrowUpRight />}
+        Icon={BookOpenText}
+        onClick={onClickDiarioBordo}
       />
       <HoverForCards
         title="Respiração Guiada"
@@ -361,6 +398,12 @@ const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClick
         onClick={onClickRegistroEmocoes}
       />
       <HoverForCards
+        title="Adicionar Foto"
+        subtitle={<ArrowUpRight />}
+        Icon={UserPlus}
+        onClick={onClickPhoto}
+      />
+      <HoverForCards
         title="Editar Dados"
         subtitle={<ArrowUpRight />}
         Icon={NotePencil}
@@ -372,6 +415,8 @@ const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClick
         Icon={Trash}
         onClick={onClickDel}
       />
+
+      
     </div>
   );
 };

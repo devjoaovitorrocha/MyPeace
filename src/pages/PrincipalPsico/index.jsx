@@ -7,6 +7,7 @@ import {
   UserList,
   AddressBook,
   NotePencil,
+
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -108,6 +109,8 @@ export default function PrincipalPsico() {
   const handleRegistroPacientes = () => {
     navigate('/principalPsico/registropaciente', { state: { token, id, nome: psicologoNome} });
   };
+
+  
 
   
   const handleCpfChange = (e) => {
@@ -291,13 +294,12 @@ export default function PrincipalPsico() {
           isOpen={modalAvisoDel}
           setIsOpen={setModalAvisoDel}
           titulo="Aviso Importante"
-          conteudo={`${psicologoNome}, antes de deletar sua conta, delete seus pacientes. Deseja continuar ou sair?`}
+          conteudo={`${psicologoNome} deseja deletar sua conta ?`}
           redWarning
           onContinue={confirmaDelete}
           onExit={() => setModalAvisoDel(false)}
         />
       )}
-
 
       {modalDel && (
         <Modal

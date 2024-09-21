@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
 import { ArrowLeft, ArrowCircleLeft, ArrowCircleRight } from '@phosphor-icons/react';
-import { Spinner } from 'flowbite-react'; 
+import { Spinner } from 'flowbite-react';
 
 export default function DetalhesPaciente() {
   const { state } = useLocation();
@@ -11,7 +11,7 @@ export default function DetalhesPaciente() {
   const { paciente, token, idUser, nome } = state || {};
   const id = idUser;
 
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const emotionsPerPage = 5;
   const totalPages = Math.ceil((paciente?.emotions?.length || 0) / emotionsPerPage) || 1;
@@ -26,7 +26,7 @@ export default function DetalhesPaciente() {
       toast.error("Dados insuficientes. Redirecionando para a página principal.");
       navigate("/principalPsico/registropaciente");
     } else {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   }, [token, idUser, nome, paciente, navigate]);
 
@@ -84,13 +84,18 @@ export default function DetalhesPaciente() {
       </header>
 
       <main className="max-w-[1440px] mx-auto bg-white shadow-lg rounded-xl p-6 mt-6">
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          Registros de Emoções de {paciente?.name || "Paciente não identificado"}
-        </h2>
+        <div className='flex items-center gap-2' >
+          <h2 className="text-2xl font-semibold mb-4 ">
+          Registros de Emoções 
+         </h2>
+         <h2 className="text-2xl text-gray-400 font-medium mb-4 ">
+          {paciente?.name || "Paciente não identificado"}
+         </h2>
+        </div>
 
-        {isLoading ? ( 
+        {isLoading ? (
           <div className="flex justify-center items-center h-64">
-            <Spinner color="indigo" size="xl" /> 
+            <Spinner color="indigo" size="xl" />
           </div>
         ) : (
           <>
@@ -98,7 +103,12 @@ export default function DetalhesPaciente() {
               <ul className="space-y-4">
                 {selectedEmotions.map((emotion) => (
                   <li key={emotion._id} className="bg-gray-100 p-4 rounded-lg shadow-md">
-                    <p><strong>Data:</strong> {new Date(emotion.date).toLocaleDateString()}</p>
+                    <p>
+                      <strong>Data:</strong> {new Date(emotion.date).toLocaleDateString()}
+                    </p>
+                    <p>
+                      <strong>Horário:</strong> {emotion.time || 'Horário não disponível'}
+                    </p>
                     <p><strong>Emoção:</strong> {typeof emotion.feeling === 'function' ? emotion.feeling() : emotion.feeling}</p>
                     <p><strong>Descrição:</strong> {typeof emotion.description === 'function' ? emotion.description() : emotion.description}</p>
                   </li>
@@ -107,6 +117,7 @@ export default function DetalhesPaciente() {
             ) : (
               <p className="text-center text-gray-500">Nenhum registro de emoção disponível.</p>
             )}
+
 
             <div className="flex flex-col md:flex-row justify-between items-center mt-6">
               <button

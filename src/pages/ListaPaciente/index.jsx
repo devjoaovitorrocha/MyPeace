@@ -175,7 +175,7 @@ export default function ListaPaciente() {
           isOpen={modalAdd}  
           setIsOpen={setModalAdd}  
           titulo={`Adicionar Paciente`}
-          form
+          addpacient
         >
           <form className="mt-5 space-y-8" onSubmit={cadastrar}>
             <div className="relative z-0">
@@ -209,7 +209,7 @@ export default function ListaPaciente() {
         </h1>
         <span
           onClick={handleReturn}
-          className="cursor-pointer hover:opacity-95 relative w-fit hidden md:block"
+          className="cursor-pointer hover:opacity-95 relative w-fit hidden md:block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
         >
           <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all text-white font-light">
             <ArrowLeft weight="bold" />
@@ -282,7 +282,7 @@ export default function ListaPaciente() {
                   ))
                 ) : (
                   <tr>
-                    <td className="py-2 italic " colSpan="5">Nenhum paciente encontrado</td>
+                    <td className="py-2 italic" colSpan="5">Nenhum paciente encontrado</td>
                   </tr>
                 )}
               </tbody>
