@@ -3,8 +3,10 @@ import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import Container from "../../components/Container";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { http } from "../../App";
 import { ArrowLeft } from "@phosphor-icons/react";
+import Chat from "../../components/Chat";
+import axios from "axios";  // Importando Axios para fazer requisições HTTP
+import { http } from "../../App";
 
 const emojis = {
   feliz: '😊',
@@ -13,6 +15,13 @@ const emojis = {
   triste: '🙁',
   raiva: '😠',
 };
+
+// Adicionando mais palavras sensíveis
+const sensitiveWords = [
+  "suicídio", "morte", "triste", "depressão", "acabou", "desespero", "sofrimento", "isolamento", 
+  "sem esperança", "ansiedade", "angústia", "autoagressão", "autolesão", "pânico", "medo", 
+  "dor", "perdido", "cansado", "desistir"
+];
 
 export default function RegistroEmocao() {
   const { state } = useLocation();
@@ -27,6 +36,9 @@ export default function RegistroEmocao() {
   const [id, setId] = useState();
   const navigate = useNavigate();
   const [pacienteNome, setPacienteNome] = useState("");
+
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
@@ -63,6 +75,14 @@ export default function RegistroEmocao() {
       setMensagemTipo("error");
       LimparMensagem();
     } else {
+      // Verifica se há alguma palavra sensível na descrição
+      const containsSensitiveWord = sensitiveWords.some((word) =>
+        description.toLowerCase().includes(word)
+      );
+
+      // Nova função para analisar texto usando Google Natural Language API
+      analyzeSentimentWithGoogle(description);
+
       const newEntry = {
         id: Date.now(),
         feeling: selectedFeeling,
@@ -71,6 +91,7 @@ export default function RegistroEmocao() {
       };
       setSavedFeelings([...savedFeelings, newEntry]);
 
+      // Salvar no banco de dados
       http.post(`/register/report/${id}`,
         {
           feeling: selectedFeeling,
@@ -88,15 +109,69 @@ export default function RegistroEmocao() {
           setDescription("");
           setSelectedFeeling("");
           LimparMensagem();
+
+          // Se houver uma palavra sensível, abre o chat e adiciona a mensagem do CVV
+          if (containsSensitiveWord) {
+            setIsChatOpen(true); // Abrir o chat
+            setChatMessages([{
+              text: "Percebemos que você está passando por um momento difícil. Por favor, considere entrar em contato com o Centro de Valorização da Vida (CVV): 188.",
+              sent: false,
+            }]);
+          }
         })
         .catch((error) => {
           const errorMsg = error.response?.data?.msg || "Erro ao salvar os dados.";
           setMensagem(errorMsg);
           setMensagemTipo("error");
           LimparMensagem();
+
+          if (containsSensitiveWord) {
+            setIsChatOpen(true);
+            setChatMessages([{
+              text: "Percebemos que você está passando por um momento difícil. Por favor, considere entrar em contato com o CVV: 188.",
+              sent: false,
+            }]);
+          }
         });
     }
   };
+
+ // Função para fazer a análise de sentimento usando sua API no Vercel
+const analyzeSentimentWithGoogle = async (text) => {
+  try {
+    // Altere essa URL para o endpoint da sua API hospedada no Vercel
+    const vercelApiUrl = 'https://api-verificar-sentimentos.vercel.app/api/analyze-sentiment';
+
+    const response = await axios.post(
+      vercelApiUrl,
+      { text },  // Envia o texto para ser analisado
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      }
+    );
+
+    const { documentSentiment } = response.data;
+    const { score, magnitude } = documentSentiment;
+
+    console.log(`Sentimento detectado: ${score}, Intensidade: ${magnitude}`);
+
+    // Exibir mensagem de apoio se o sentimento for negativo
+    if (score < -0.5) {
+      setIsChatOpen(true);
+      setChatMessages([{
+        text: "Identificamos que você está passando por um momento difícil. Considere falar com o CVV: 188.",
+        sent: false,
+      }]);
+    }
+  } catch (error) {
+    console.error("Erro ao chamar a API do Vercel:", error);
+    setMensagem("Erro ao analisar o sentimento. Tente novamente.");
+    setMensagemTipo("error");
+    LimparMensagem();
+  }
+};
 
 
   const LimparMensagem = () => {
@@ -147,7 +222,6 @@ export default function RegistroEmocao() {
               onChange={(e) => setDescription(e.target.value)}
             />
 
-
             <div className="mt-6">
               <button
                 onClick={handleSave}
@@ -156,12 +230,12 @@ export default function RegistroEmocao() {
                 Salvar
               </button>
             </div>
-            <div className="mt-4 flex justify-center">
 
+            <div className="mt-4 flex justify-center">
               <Link
                 className="cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] 
-            after:absolute after:h-[2px] after:bg-black text-black after:w-full after:scale-x-0 
-            after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
+                after:absolute after:h-[2px] after:bg-black text-black after:w-full after:scale-x-0 
+                after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
                 to="/principalCliente"
                 state={{ token, id, nome: pacienteNome }}
               >
@@ -175,6 +249,15 @@ export default function RegistroEmocao() {
         </div>
       </Container>
       <Footer />
+
+      {/* Chat Component */}
+      {isChatOpen && (
+        <Chat
+          titulo="Ajuda"
+          onClose={() => setIsChatOpen(false)} // Função para fechar o chat
+          initialMessages={chatMessages} // Passando as mensagens do chat
+        />
+      )}
     </div>
   );
 }
