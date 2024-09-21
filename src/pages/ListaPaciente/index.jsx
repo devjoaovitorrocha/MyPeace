@@ -175,7 +175,7 @@ export default function ListaPaciente() {
           isOpen={modalAdd}  
           setIsOpen={setModalAdd}  
           titulo={`Adicionar Paciente`}
-          form
+          addpacient
         >
           <form className="mt-5 space-y-8" onSubmit={cadastrar}>
             <div className="relative z-0">
@@ -202,14 +202,14 @@ export default function ListaPaciente() {
         </Modal>
       )}
 
-      {/* Main content */}
+      
       <header className="flex flex-col md:flex-row items-center justify-between max-w-[1440px] mx-auto mb-4 md:mb-6">
         <h1 className="text-2xl md:text-4xl py-4 text-white text-center font-semibold">
           Lista de Pacientes
         </h1>
         <span
           onClick={handleReturn}
-          className="cursor-pointer hover:opacity-95 relative w-fit hidden md:block"
+          className="cursor-pointer hover:opacity-95 relative w-fit hidden md:block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
         >
           <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all text-white font-light">
             <ArrowLeft weight="bold" />

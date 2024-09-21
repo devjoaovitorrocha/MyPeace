@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
-import { ArrowLeft, MagnifyingGlass } from '@phosphor-icons/react';
+import { ArrowLeft, Eye, MagnifyingGlass, Notepad } from '@phosphor-icons/react';
 import axios from 'axios';
 import { Spinner } from 'flowbite-react';
+import CustomDropdown from '../../components/DropDowm';
 
 export default function RegistroPacientes() {
   const { state } = useLocation();
@@ -38,7 +39,7 @@ export default function RegistroPacientes() {
       );
       const pacientesData = response.data.allPacients;
 
-      setLoading({ ...loading, emociones: true }); 
+      setLoading({ ...loading, emociones: true });
       const updatedPacientes = await Promise.all(
         pacientesData.map(async (paciente) => {
           const emotions = await fetchEmociones(token, paciente._id);
@@ -67,7 +68,7 @@ export default function RegistroPacientes() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      return response.data.reports;
+      return response.data.reports; 
     } catch (error) {
       toast.error("Erro ao buscar emoções. Por favor, tente novamente.");
       return [];
@@ -89,7 +90,11 @@ export default function RegistroPacientes() {
       state: { paciente, token, idUser: id, nome: state.nome },
     });
   };
-
+ 
+  const handleRelatorioClick = (paciente) => {
+    navigate('/principalPsico/registropaciente/relatorio', { state: { paciente, token, idUser: id, nome: state.nome },});
+  };
+  
   const handleReturn = () => {
     navigate("/principalPsico", { state: { token, id, nome: state?.nome } });
   };
@@ -144,43 +149,44 @@ export default function RegistroPacientes() {
               />
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm md:text-base">
+            <div className="overflow-x-auto mt-4">
+              <table className="min-w-full text-left text-sm md:text-base">
                 <thead>
-                  <tr className="bg-gray-200 text-left">
-                    <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">Nome</th>
-                    <th className="whitespace-nowrap px-4 py-2 text-gray-700">Data</th>
-                    <th className="whitespace-nowrap px-4 py-2 text-gray-700">Última Emoção e Descrição</th>
-                    <th className="whitespace-nowrap px-4 py-2 text-gray-700">Ações</th>
+                  <tr className="text-left">
+                    <th className="whitespace-nowrap px-4 py-2 ">Nome</th>
+                    <th className="whitespace-nowrap px-4 py-2 ">Data</th>
+                    <th className="whitespace-nowrap px-4 py-2 ">Horário</th>
+                    <th className="whitespace-nowrap px-4 py-2 ">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredPacientes.length > 0 ? (
                     filteredPacientes.map((paciente) => (
                       <tr key={paciente._id}>
-                        <td className="border px-4 py-2">{paciente.name}</td>
-                        <td className="border px-4 py-2">
+                        <td className=" px-4 py-2">{paciente.name}</td>
+                        <td className=" px-4 py-2">
                           {paciente.emotions.length > 0
                             ? new Date(paciente.emotions[paciente.emotions.length - 1].date).toLocaleDateString()
                             : 'N/A'}
                         </td>
-                        <td className="border px-4 py-2">
+                        <td className="px-4 py-2">
                           {paciente.emotions.length > 0 ? (
                             <span>
-                              <strong>Emoção:</strong> {paciente.emotions[paciente.emotions.length - 1].feeling} <br />
-                              <strong>Descrição:</strong> {paciente.emotions[paciente.emotions.length - 1].description}
+                               {paciente.emotions[paciente.emotions.length - 1].time}
                             </span>
                           ) : (
                             'Nenhuma emoção'
                           )}
                         </td>
-                        <td className="border whitespace-nowrap px-4 py-2 text-gray-700">
-                          <button
-                            className="bg-[#00bfa6] rounded-lg hover:opacity-90 transition-opacity text-white font-semibold py-2 px-4"
-                            onClick={() => handleVerificarClick(paciente)}
-                          >
-                            Verificar
-                          </button>
+                      
+                        <td className="px-6 py-2 space-x-2 relative">
+                          <CustomDropdown 
+                            buttonText="Ações" 
+                            menuItems={[
+                              { key: "Verificar", label: "Verificar", icon : <Eye className="text-[#00bfa6]" /> , onClick: () => handleVerificarClick(paciente) },
+                              { key: "Relatório", label: "Relatório", icon: <Notepad className="text-[#00bfa6]" />, onClick: () => handleRelatorioClick(paciente) }
+                            ]}
+                          />
                         </td>
                       </tr>
                     ))

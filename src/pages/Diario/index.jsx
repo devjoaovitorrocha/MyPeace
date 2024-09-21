@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
-import { ArrowLeft, Trash, Pencil, CheckFat } from '@phosphor-icons/react';
+import { ArrowLeft, Check, Checks, Eye } from '@phosphor-icons/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
-import Modal from '../../components/Modal';
-import { Spinner } from 'flowbite-react'; 
+import { Spinner } from 'flowbite-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const emojis = {
   feliz: '😊',
@@ -22,13 +22,9 @@ export default function Diario() {
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
   const [emociones, setEmociones] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedEmotion, setSelectedEmotion] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [modalAvisoDel, setModalAvisoDel] = useState(false);
-  const [modalDel, setModalDel] = useState(false);
-  const [buttonColor, setButtonColor] = useState("blue"); 
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
@@ -41,7 +37,7 @@ export default function Diario() {
   }, [navigate, state]);
 
   async function fetchEmociones(token, idUser) {
-    setIsLoading(true); 
+    setIsLoading(true);
     try {
       const response = await axios.get(
         `https://api-mypeace.vercel.app/getAll/reports/${idUser}`,
@@ -57,72 +53,13 @@ export default function Diario() {
     }
   }
 
-  const handleSaveEdit = async () => {
-    try {
-      await axios.post(
-        `https://api-mypeace.vercel.app/update/report/${id}/${selectedEmotion._id}`,
-        { feeling: selectedEmotion.feeling, description: selectedEmotion.description },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      await fetchEmociones(token, id);
-      setShowModal(false);
-      toast.success("Emoção atualizada com sucesso.");
-    } catch (error) {
-      console.error("Erro ao atualizar emoção:", error);
-      toast.error("Erro ao atualizar emoção, tente novamente.");
-    }
-  };
-
-  const handleDeleteConfirm = async () => {
-    try {
-      await axios.post(
-        `https://api-mypeace.vercel.app/delete/report/${id}/${selectedEmotion._id}`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      await fetchEmociones(token, id);
-      setModalDel(false);
-      toast.success("Emoção excluída com sucesso.");
-    } catch (error) {
-      console.error("Erro ao excluir emoção:", error);
-      toast.error("Erro ao excluir emoção.");
-    }
-  };
-
   const handleVerificarClick = (emotion) => {
     setSelectedEmotion(emotion);
-    setIsEditing(false);
-    setButtonColor("green"); 
     setShowModal(true);
-  };
-
-  const handleEditarClick = (emotion) => {
-    setSelectedEmotion(emotion);
-    setIsEditing(true);
-    setButtonColor("blue");
-    setShowModal(true);
-  };
-
-  const handleExcluirClick = (emotion) => {
-    setSelectedEmotion(emotion);
-    setModalAvisoDel(true);
-  };
-
-  const handleWarningConfirm = () => {
-    setModalAvisoDel(false);
-    setModalDel(true);
   };
 
   const handleReturn = () => {
     navigate("/principalCliente", { state: { token, id, nome: state.nome } });
-  };
-
-  const handleEmojiClick = (feeling) => {
-    setSelectedEmotion({ ...selectedEmotion, feeling });
   };
 
   return (
@@ -160,12 +97,12 @@ export default function Diario() {
       <main className="max-w-[1440px] mx-auto bg-white shadow-3D rounded-xl p-4 md:p-6 overflow-x-auto">
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
-            <Spinner color="indigo" size="xl" /> 
+            <Spinner color="indigo" size="xl" />
           </div>
         ) : (
           <table className="min-w-full table-auto mt-6">
             <thead>
-              <tr className="bg-gray-200 text-left">
+              <tr className="text-left">
                 <th className="px-4 py-2">Data</th>
                 <th className="px-4 py-2">Emoção</th>
                 <th className="px-4 py-2">Ações</th>
@@ -175,33 +112,18 @@ export default function Diario() {
               {Array.isArray(emociones) && emociones.length > 0 ? (
                 emociones.map((emocion) => (
                   <tr key={emocion._id}>
-                    <td className="border px-4 py-2">
+                    <td className=" px-4 py-2">
                       {new Date(emocion.date).toLocaleDateString()}
                     </td>
-                    <td className="border px-4 py-2">
+                    <td className="px-4 py-2 text-2xl">
                       {emojis[emocion.feeling] || emocion.feeling}
                     </td>
-                    <td className="border px-4 py-2 flex space-x-4">
+                    <td className="px-4 py-2">
                       <button
+                        className="bg-[#00bfa6] rounded-lg hover:opacity-90 transition-opacity text-white font-semibold py-2 px-4"
                         onClick={() => handleVerificarClick(emocion)}
-                        className="p-2 bg-green-500 rounded-md shadow-3D transition-all hover:opacity-90"
-                        title="Verificar Emoção"
                       >
-                        <CheckFat weight='fill' color="white" />
-                      </button>
-                      <button
-                        onClick={() => handleEditarClick(emocion)}
-                        className="p-2 bg-blue-500 rounded-md shadow-3D transition-all hover:opacity-90"
-                        title="Editar Emoção"
-                      >
-                        <Pencil weight="fill" color="white" />
-                      </button>
-                      <button
-                        onClick={() => handleExcluirClick(emocion)}
-                        className="p-2 bg-red-500 rounded-md shadow-3D transition-all hover:opacity-90"
-                        title="Excluir Emoção"
-                      >
-                        <Trash weight="fill" color="white" />
+                        Visualizar
                       </button>
                     </td>
                   </tr>
@@ -240,86 +162,35 @@ export default function Diario() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowModal(false)}
-            className="bg-black/30 backdrop-blur fixed inset-0 z-50 flex items-center justify-center overflow-y-scroll cursor-pointer p-4"
+            className="bg-green-900/30 backdrop-blur p-8 fixed inset-0 z-50 grid place-items-center overflow-y-scroll cursor-pointer"
           >
             <motion.div
               initial={{ scale: 0, rotate: "12.5deg" }}
               animate={{ scale: 1, rotate: "0deg" }}
               exit={{ scale: 0, rotate: "0deg" }}
               onClick={(e) => e.stopPropagation()}
-              className={`bg-white p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden border-2 ${buttonColor ? `border-${buttonColor}-500` : ''}`}
+              className="bg-green-500 text-white p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden"
             >
-              <header className="flex items-center justify-between mb-4">
-                <h3 className="text-3xl font-bold text-center">
-                  {isEditing ? "Editar Emoção" : "Visualizar Emoção"}
+              <Eye className="text-white/10 rotate-12 text-[250px] absolute z-0 -top-24 -left-24" />
+              <div className="relative z-10">
+                <div className="text-4xl text-white-600 grid place-items-center mx-auto">
+                  <Eye />
+                </div>
+                <h3 className="text-4xl font-bold text-center mb-2">
+                  Visualizar
                 </h3>
-              </header>
 
-              {isEditing ? (
                 <div>
-                  <label className="block mb-2">Selecione sua Emoção</label>
-                  <div className="flex flex-wrap justify-center space-x-2 space-y-2">
-                    {Object.entries(emojis).map(([feeling, emoji], index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleEmojiClick(feeling)}
-                        className={`text-3xl p-2 transition-all ${selectedEmotion?.feeling === feeling ? "border-2 bg-[#00bfa6] rounded-full" : ""}`}
-                      >
-                        {emoji}
-                      </button>
-                    ))}
-                  </div>
-                  <label className="block mb-2 mt-4">Descrição</label>
-                  <textarea
-                    value={selectedEmotion?.description}
-                    onChange={(e) =>
-                      setSelectedEmotion({ ...selectedEmotion, description: e.target.value })
-                    }
-                    className="w-full p-2 border border-gray-300 rounded-lg resize-none"
-                  />
-                  <div className="flex justify-center mt-4">
-                    <button
-                      onClick={handleSaveEdit}
-                      className={`bg-${buttonColor}-500 text-white px-4 py-2 rounded hover:bg-${buttonColor}-600 transition-colors duration-200`}
-                    >
-                      Salvar
-                    </button>
-                  </div>
+                  <p className="mb-2 text-2xl   font-bold  ">Tipo de Emoção:</p>
+                  <p className="mb-6 text-2xl">{emojis[selectedEmotion?.feeling] || selectedEmotion?.feeling}</p>
+                  <p className="mb-2 text-2xl   font-bold  ">Descrição:</p>
+                  <p className=' font-medium'>{selectedEmotion?.description}</p>
                 </div>
-              ) : (
-                <div>
-                  <p className="mb-2 font-medium">Tipo de Emoção:</p>
-                  <p className="mb-4">{emojis[selectedEmotion?.feeling] || selectedEmotion?.feeling}</p>
-                  <p className="mb-2 font-medium">Descrição:</p>
-                  <p>{selectedEmotion?.description}</p>
-                </div>
-              )}
+              </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {modalAvisoDel && (
-        <Modal
-          isOpen={modalAvisoDel}
-          setIsOpen={setModalAvisoDel}
-          titulo="Aviso Importante"
-          conteudo={`Após deletar a emoção, não será possível recuperá-la. Tem certeza que deseja excluir?`}
-          redWarning
-          onContinue={handleWarningConfirm}
-          onExit={() => setModalAvisoDel(false)}
-        />
-      )}
-
-      {modalDel && (
-        <Modal
-          isOpen={modalDel}
-          setIsOpen={setModalDel}
-          titulo="Excluir Emoção"
-          del
-          delOnClick={handleDeleteConfirm}
-        />
-      )}
     </div>
   );
 }

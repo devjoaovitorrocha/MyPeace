@@ -13,6 +13,8 @@ import RegistroEmocoes from "./pages/RegistroEmocoes";
 import Diario from "./pages/Diario";
 import RegistroPacientes from "./pages/RegistroPacientes";
 import DetalhesPaciente from "./pages/DetalhesPaciente";
+import BordoPaciente from "./pages/BordoPaciente";
+import Relatorio from "./pages/Relatorio";
 
 
 export const http = axios.create({
@@ -24,7 +26,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Rotas da Home */}
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home/>} />
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<Pagina404 />} />
 
@@ -32,7 +34,8 @@ function App() {
         <Route path="/principalPsico" element={<PrincipalPsico />} />
         <Route path="/principalPsico/listapaciente" element={<ListaPaciente />} />
         <Route path="/principalPsico/registropaciente" element={<RegistroPacientes />} />
-        <Route path="/principalPsico/registropaciente/detalhesPaciente" element={<DetalhesPaciente />} /> 
+        <Route path="/principalPsico/registropaciente/detalhesPaciente" element={<DetalhesPaciente />} />
+        <Route path="/principalPsico/registropaciente/relatorio" element={<Relatorio/>} />
         <Route path="/cadastroPsicologo" element={<CadastroPsicologo />} />
 
         {/* Rotas do Cliente */}
@@ -40,6 +43,7 @@ function App() {
         <Route path="/principalCliente/cronometro" element={<Cronometro />} />
         <Route path="/principalCliente/registroemocoes" element={<RegistroEmocoes />} />
         <Route path="/principalCliente/diario" element={<Diario />} />
+        <Route path="/principalCliente/diariobordo" element={<BordoPaciente/>} /> 
         <Route path="/cadastroCliente" element={<CadastroPaciente />} />
       </Routes>
     </BrowserRouter>
