@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
-import { ArrowLeft, Check, Checks, Eye } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowCircleLeft, ArrowCircleRight, Eye } from '@phosphor-icons/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Spinner } from 'flowbite-react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const emojis = {
   feliz: '😊',
@@ -26,6 +25,10 @@ export default function Diario() {
   const [showModal, setShowModal] = useState(false);
   const [selectedEmotion, setSelectedEmotion] = useState(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const emotionsPerPage = 5;  
+  const totalPages = Math.ceil(emociones.length / emotionsPerPage);
+
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
       navigate("/login");
@@ -45,7 +48,11 @@ export default function Diario() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setEmociones(response.data.reports);
+
+      const orderedEmotions = response.data.reports.sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      );
+      setEmociones(orderedEmotions);
     } catch (error) {
       toast.error("Erro ao buscar emoções. Por favor, tente novamente.");
     } finally {
@@ -62,8 +69,23 @@ export default function Diario() {
     navigate("/principalCliente", { state: { token, id, nome: state.nome } });
   };
 
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const startIndex = (currentPage - 1) * emotionsPerPage;
+  const selectedEmotions = emociones.slice(startIndex, startIndex + emotionsPerPage);
+
   return (
-    <div className="bg-[#3c5454] h-screen p-6">
+    <div className="bg-[#3c5454] h-screen p-6 ">
       <Toaster
         expand
         position="top-center"
@@ -94,53 +116,77 @@ export default function Diario() {
         </span>
       </header>
 
-      <main className="max-w-[1440px] mx-auto bg-white shadow-3D rounded-xl p-4 md:p-6 overflow-x-auto">
+      <main className="max-w-[1440px] mx-auto bg-white shadow-3D rounded-xl p-4 md:p-6 overflow-x-auto ">
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <Spinner color="indigo" size="xl" />
           </div>
         ) : (
-          <table className="min-w-full table-auto mt-6">
-            <thead>
-              <tr className="text-left">
-                <th className="px-4 py-2">Data</th>
-                <th className="px-4 py-2">Emoção</th>
-                <th className="px-4 py-2">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Array.isArray(emociones) && emociones.length > 0 ? (
-                emociones.map((emocion) => (
-                  <tr key={emocion._id}>
-                    <td className=" px-4 py-2">
-                      {new Date(emocion.date).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-2 text-2xl">
-                      {emojis[emocion.feeling] || emocion.feeling}
-                    </td>
-                    <td className="px-4 py-2">
-                      <button
-                        className="bg-[#00bfa6] rounded-lg hover:opacity-90 transition-opacity text-white font-semibold py-2 px-4"
-                        onClick={() => handleVerificarClick(emocion)}
-                      >
-                        Visualizar
-                      </button>
+          <>
+            <table className="min-w-full table-auto mt-6">
+              <thead>
+                <tr className="text-left">
+                  <th className="px-4 py-2">Data</th>
+                  <th className="px-4 py-2">Emoção</th>
+                  <th className="px-4 py-2">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.isArray(selectedEmotions) && selectedEmotions.length > 0 ? (
+                  selectedEmotions.map((emocion) => (
+                    <tr key={emocion._id}>
+                      <td className=" px-4 py-2">
+                        {new Date(emocion.date).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-2 text-2xl">
+                        {emojis[emocion.feeling] || emocion.feeling}
+                      </td>
+                      <td className="px-4 py-2">
+                        <button
+                          className="bg-[#00bfa6] rounded-lg hover:opacity-90 transition-opacity text-white font-semibold py-2 px-4"
+                          onClick={() => handleVerificarClick(emocion)}
+                        >
+                          Visualizar
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="3" className="border px-4 py-2 text-center">
+                      Nenhuma emoção registrada
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="3" className="border px-4 py-2 text-center">
-                    Nenhuma emoção registrada
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+
+            <div className="flex flex-col md:flex-row justify-between items-center mt-6">
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage === 1}
+                className={`bg-gray-300 text-black px-4 py-2 rounded flex items-center ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-400'}`}
+              >
+                <ArrowCircleLeft weight="bold" className="inline-block mr-2" />
+                Anterior
+              </button>
+
+              <span className="text-lg font-semibold mb-2 md:mb-0">
+                Página {currentPage} de {totalPages}
+              </span>
+
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                className={`bg-gray-300 text-black px-4 py-2 rounded flex items-center ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-400'}`}
+              >
+                Próxima
+                <ArrowCircleRight weight="bold" className="inline-block ml-2" />
+              </button>
+            </div>
+          
+          </>
         )}
-        <div className="mt-4 text-gray-500">
-          Data de hoje: {new Date().toLocaleDateString()}
-        </div>
       </main>
 
       <div className="flex justify-center md:hidden py-6">
@@ -155,6 +201,7 @@ export default function Diario() {
         </span>
       </div>
 
+    
       <AnimatePresence>
         {showModal && (
           <motion.div
@@ -185,6 +232,8 @@ export default function Diario() {
                   <p className="mb-6 text-2xl">{emojis[selectedEmotion?.feeling] || selectedEmotion?.feeling}</p>
                   <p className="mb-2 text-2xl   font-bold  ">Descrição:</p>
                   <p className=' font-medium'>{selectedEmotion?.description}</p>
+                  <p className="mb-2 text-2xl   font-bold  ">Data:</p>
+                  <p className=' font-medium'>{new Date(selectedEmotion.date).toLocaleDateString()}</p>
                 </div>
               </div>
             </motion.div>
