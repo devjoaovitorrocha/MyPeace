@@ -68,7 +68,7 @@ export default function PrincipalCliente() {
   };
 
   const handleDiarioBordo = () => {
-    navigate("/principalCliente/diario", {
+    navigate("/principalCliente/diariobordo", {
       state: { token, id, nome: pacienteNome },
     });
   };
