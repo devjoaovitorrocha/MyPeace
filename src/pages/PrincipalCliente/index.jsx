@@ -198,8 +198,7 @@ export default function PrincipalCliente() {
   };
 
   const handlePhotoConfirm = () => {
-    setModalPhoto(false)
-    setModalDel(true)
+    setModalPhoto(false);
   }
 
   return (
@@ -208,7 +207,7 @@ export default function PrincipalCliente() {
         <Modal
           isOpen={modalPhoto}
           setIsOpen={setModalPhoto}
-          titulo="Deseja Adicionar uma Foto?"
+          titulo="Adicionar Foto"
           photo
           onContinue={handlePhotoConfirm}
           onExit={() => setModalPhoto(false)}

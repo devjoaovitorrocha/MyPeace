@@ -143,7 +143,7 @@ export default function Diario() {
                       </td>
                       <td className="px-4 py-2">
                         <button
-                          className="bg-[#00bfa6] rounded-lg hover:opacity-90 transition-opacity text-white font-semibold py-2 px-4"
+                          className= "bg-[#00bfa6]  rounded-lg text-white border-[#009a87] hover:bg-white hover:text-[#00bfa6] transition-colors ease-in-out duration-300 py-2 px-4 " 
                           onClick={() => handleVerificarClick(emocion)}
                         >
                           Visualizar

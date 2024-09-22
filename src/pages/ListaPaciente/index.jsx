@@ -290,6 +290,19 @@ export default function ListaPaciente() {
           )}
         </div>
       </main>
+
+      <div className="flex justify-center md:hidden py-6">
+        <Link
+          className="mb-6 cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
+          to="/principalPsico"
+          state={{ token, id, nome: psicologoNome }}
+        >
+          <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all text-white font-light">
+            <ArrowLeft weight="bold" />
+            Voltar
+          </div>
+        </Link>
+      </div>
     </div>
   );
 }
