@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import Container from "../../components/Container";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-
 
 export default function Cronometro() {
   const [time, setTime] = useState(0);
@@ -15,8 +14,10 @@ export default function Cronometro() {
   const [id, setId] = useState();
   const navigate = useNavigate();
   const { state } = useLocation();
-
-
+  const phaseRef = useRef("");
+  const audioRef = useRef(null);
+  
+  
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
       navigate("/login");
@@ -27,18 +28,61 @@ export default function Cronometro() {
     }
   }, [navigate, state]);
 
+  const falarTexto = async (texto) => {
+    try {
+      if (audioRef.current) {
+        audioRef.current.pause(); 
+        audioRef.current = null;
+      }
+  
+      const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/oWAxZDx7w5VEj9dCyTzz`, {
+        method: "POST",
+        headers: {
+          "Accept": "audio/mpeg",
+          "Content-Type": "application/json",
+          "xi-api-key": "sk_d0b2fb07653645b9d69b6a170dc87be58e3a5df5b36f337e",
+        },
+        body: JSON.stringify({
+          text: texto,
+          model_id: "eleven_multilingual_v1",  
+          voice_settings: {
+            stability: 0.7, 
+            similarity_boost: 0.85,  
+          },
+        }),
+      });
+  
+      if (!response.ok) throw new Error("Failed to convert text to speech.");
+  
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audioRef.current = audio;
+      audio.play();
+    } catch (error) {
+      console.error("Error in text-to-speech:", error);
+    }
+  };
+  
+  const updatePhase = (newPhase) => {
+    if (phaseRef.current !== newPhase) {
+      phaseRef.current = newPhase;
+      setPhase(newPhase);
+      falarTexto(newPhase); 
+    }
+  };
+
   useEffect(() => {
     let timer;
-
     if (running) {
       if (time < 4) {
-        setPhase("Inspire o Ar");
+        updatePhase("Puxe o Ar");
       } else if (time < 11) {
-        setPhase("Segure o Ar");
+        updatePhase("Segure o Ar");
       } else if (time < 19) {
-        setPhase("Expire o Ar");
+        updatePhase("Solte o Ar");
       } else {
-        setPhase("Concluído");
+        updatePhase("Concluído");
         setRunning(false);
       }
 
@@ -55,6 +99,7 @@ export default function Cronometro() {
   const startTimer = () => {
     setTime(0);
     setRunning(true);
+    phaseRef.current = "";
   };
 
   const pauseTimer = () => {
@@ -65,15 +110,14 @@ export default function Cronometro() {
     setTime(0);
     setRunning(false);
     setPhase("Clique em iniciar para começarmos");
+    phaseRef.current = "";
   };
 
   const progress = (time / 19) * 100;
   const strokeWidth = 20;
-  const radius = 90 - strokeWidth / 2;
+  const radius = 90;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (progress / 100) * circumference;
-
-
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -108,7 +152,7 @@ export default function Cronometro() {
                 {time}
               </text>
             </svg>
-            <div className="mt-4 text-lg text-center font-medium">{phase}</div>
+            <div className="mt-4 text-center font-medium">{phase}</div>
             <div className="flex space-x-4 mt-6">
               {!running ? (
                 <button
@@ -147,7 +191,6 @@ export default function Cronometro() {
                 </div>
               </Link>
             </div>
-
           </div>
         </div>
       </Container>

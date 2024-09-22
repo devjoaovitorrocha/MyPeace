@@ -48,10 +48,7 @@ const getMessageForCategory = (category) => {
     case "ansiedade":
       return (
         <>
-          Sabemos que a ansiedade pode ser avassaladora. Tente conversar com alguém de confiança ou ligue para o CVV: 188.{' '}
-          <a href="https://cvv.org.br/chat/" target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">
-            https://cvv.org.br/chat/
-          </a>
+          Sabemos que a ansiedade pode ser avassaladora. Tente conversar com alguém de confiança ou use nossa respiração guiada{' '}
         </>
       );
     case "autoagressao":
