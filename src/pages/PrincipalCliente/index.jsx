@@ -211,7 +211,27 @@ export default function PrincipalCliente() {
       setModalEdt(true);
     }
   };
+  const openPhotoModel = (paciente) => {
+    if (paciente){
+      setModalPhoto(true)
+    }
+  }
 
+  const openDeleteModal = (paciente) => {
+    if (paciente) {
+      setCurrentPaciente(paciente);
+      setModalAvisoDel(true);
+    }
+  };
+
+  const handleWarningConfirm = () => {
+    setModalAvisoDel(false);
+    setModalDel(true); 
+  };
+
+  const handlePhotoConfirm = () => {
+    setModalPhoto(false);
+  }
   return (
     <>
       <Toaster
