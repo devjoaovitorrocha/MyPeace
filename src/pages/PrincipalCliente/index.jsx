@@ -16,6 +16,7 @@ import Modal from "../../components/Modal";
 import HoverForCards from "../../components/HoverForCards";
 import Inputs from "../../components/Inputs";
 import { Toaster, toast } from "sonner";
+import Notification from "../../components/Notification"; 
 import axios from "axios";
 
 export default function PrincipalCliente() {
@@ -24,7 +25,7 @@ export default function PrincipalCliente() {
   const [modalPhoto, setModalPhoto] = useState(false);
   const [modalEdt, setModalEdt] = useState(false);
   const [modalDel, setModalDel] = useState(false);
-  const [modalAvisoDel, setModalAvisoDel] = useState(false); 
+  const [modalAvisoDel, setModalAvisoDel] = useState(false);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [token, setToken] = useState("");
@@ -48,6 +49,17 @@ export default function PrincipalCliente() {
       setPacienteNome(state.nome);
     }
   }, [navigate, state]);
+
+  const showNotification = ({ name, description, type, time="Agora" }) => {
+    toast(
+      <Notification
+      name={name}
+      description={description}
+      time={time}
+      type={type}
+      />
+    );
+  };
 
   const handleCronometro = () => {
     navigate("/principalCliente/cronometro", {
@@ -81,31 +93,36 @@ export default function PrincipalCliente() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      const { name, email } = response.data;
-      setNome(name);
-      setEmail(email);
+      if (response.data) {
+        const { name, email } = response.data;
+        setNome(name);
+        setEmail(email);
+      } else {
+        throw new Error("Dados do paciente não encontrados.");
+      }
     } catch (error) {
-      toast.error("Erro ao buscar informações do paciente.");
-      console.error(error);
+      showNotification({
+        name: "Erro!",
+        description: "Erro ao buscar informações do paciente.",
+        type: "error",
+      });
+      console.error("Erro ao buscar paciente:", error.response?.data || error.message);
     }
   };
 
   const edtDadosSubmit = async (e) => {
     e.preventDefault();
     try {
-     
       const response = await axios.post(
         `https://api-mypeace.vercel.app/update/pacients/${id}`,
-        {
-          name: nome,
-          email: email,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { name: nome, email: email },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success(`${response.data.msg}` || "Dados editados com sucesso!");
-
+      showNotification({
+        name: "Sucesso!",
+        description: "Dados editados com sucesso!",
+        type: "success",
+      });
       setPacienteNome(nome);
 
       if (currentPassword && newPassword && confirmPassword) {
@@ -113,28 +130,31 @@ export default function PrincipalCliente() {
           toast.error("As novas senhas não coincidem!");
           return;
         }
-
-        const senhaResponse = await axios.post(
-          `https://api-mypeace.vercel.app/update/password/pacients/${id}`,
-          {
-            currentPassword,
-            newPassword,
-            confirmPassword,
-          },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        if (senhaResponse.status === 200) {
-          toast.success(`${senhaResponse.data.msg}` || "Senha atualizada com sucesso!");
-          setCurrentPassword("");
-          setNewPassword("");
-          setConfirmPassword("");
-        }
+        await updatePassword();
       }
-
       setModalEdt(false);
+    } catch (error) {
+      handleErrorResponse(error);
+    }
+  };
+
+  const updatePassword = async () => {
+    try {
+      const senhaResponse = await axios.post(
+        `https://api-mypeace.vercel.app/update/password/pacients/${id}`,
+        { currentPassword, newPassword, confirmPassword },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (senhaResponse.status === 200) {
+        showNotification({
+          name: "Sucesso!",
+          description: "Senha atualizada com sucesso!",
+          type: "success",
+        });
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      }
     } catch (error) {
       handleErrorResponse(error);
     }
@@ -149,7 +169,11 @@ export default function PrincipalCliente() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      toast.success(`${response.data.msg}` || "Paciente deletado com sucesso!");
+      showNotification({
+        name: "Sucesso!",
+        description: "Paciente deletado com sucesso!",
+        type: "success",
+      });
       setModalDel(false);
       setTimeout(() => {
         navigate("/");
@@ -160,12 +184,21 @@ export default function PrincipalCliente() {
   };
 
   const handleErrorResponse = (error) => {
-    const errorMsg = error.response?.data?.msg || "Erro ao processar a solicitação. Por favor, tente novamente mais tarde.";
+    const errorMsg =
+      error.response?.data?.msg || "Erro ao processar a solicitação.";
     if (error.response?.status === 401) {
-      alert("Sessão expirada");
+      showNotification({
+        name: "Info",
+        description: "Sessão expirada. Redirecionando para login.",
+        type: "info",
+      });
       navigate("/login");
     } else {
-      toast.error(errorMsg);
+      showNotification({
+        name: "Erro!",
+        description: errorMsg,
+        type: "error",
+      });
     }
   };
 
@@ -178,7 +211,6 @@ export default function PrincipalCliente() {
       setModalEdt(true);
     }
   };
-
   const openPhotoModel = (paciente) => {
     if (paciente){
       setModalPhoto(true)
@@ -200,9 +232,24 @@ export default function PrincipalCliente() {
   const handlePhotoConfirm = () => {
     setModalPhoto(false);
   }
-
   return (
     <>
+      <Toaster
+        expand
+        position="top-center"
+        richColors
+        toastOptions={{
+          style: {
+            margin: "10px",
+            padding: "15px",
+            maxWidth: "500px",
+            borderRadius: "8px",
+            gap: "10px",
+            boxShadow: "none",
+            background: " transparent",
+          },
+        }}
+      />
       {modalPhoto && (
         <Modal
           isOpen={modalPhoto}
@@ -285,21 +332,7 @@ export default function PrincipalCliente() {
           delOnClick={deletar}
         />
       )}
-      <Toaster
-        expand
-        position="top-center"
-        richColors
-        toastOptions={{
-          style: {
-            margin: "10px",
-            padding: "15px",
-            maxWidth: "400px",
-            borderRadius: "8px",
-            gap: "10px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
-          },
-        }}
-      />
+
       <header className="p-3 z-50 w-full text-white">
         <div className="bg-green-900 rounded-2xl px-6 py-4 shadow-xl flex items-center justify-center md:justify-between md:flex-row flex-col border-b-4 border-green-400">
           <div className="flex md:flex-row flex-col items-center gap-4">
@@ -315,7 +348,7 @@ export default function PrincipalCliente() {
           <Link to="/" className="md:m-6 group relative w-max">
             <div className="flex items-center transition-all gap-1 hover:gap-2">
               <ArrowLeft size={20} />
-              <h1 className="font-medium">Início</h1>
+              <h1 className="font-medium">Sair</h1>
             </div>
             <span className="absolute -bottom-1 left-1/2 w-0 transition-all h-0.5 bg-white group-hover:w-3/6"></span>
             <span className="absolute -bottom-1 right-1/2 w-0 transition-all h-0.5 bg-white group-hover:w-3/6"></span>
@@ -414,8 +447,6 @@ const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClick
         Icon={Trash}
         onClick={onClickDel}
       />
-
-      
     </div>
   );
 };

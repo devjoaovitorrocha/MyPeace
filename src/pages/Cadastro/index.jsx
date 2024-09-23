@@ -7,6 +7,19 @@ import { Toaster, toast } from "sonner";
 import { http } from "../../App";
 import Modal from "../../components/Modal";
 import FloatingPhone from "../../components/FloatingPhone";
+import Notification from "../../components/Notification"; 
+
+
+const showNotification = ({ name, description, type, time = "Agora" }) => {
+  toast(
+    <Notification
+      name={name}
+      description={description}
+      time={time}
+      type={type}
+    />
+  );
+};
 
 export default function CadastroPsicologo() {
   const [nome, setNome] = useState("");
@@ -25,17 +38,32 @@ export default function CadastroPsicologo() {
     event.preventDefault();
 
     if (senha !== confirmarSenha) {
-      toast.error("As senhas não coincidem.");
+      showNotification({
+        name: "Info!",
+        description: "As senhas não coincidem.",
+        type: "info",
+      });
+      
       return;
     }
 
     if (cpf.replace(/\D/g, "").length !== 11) {
-      toast.error("CPF inválido. Verifique o número.");
+      showNotification({
+        name: "Info!",
+        description: "CPF inválido. Verifique o número.",
+        type: "info",
+      });
+      
       return;
     }
 
     if (registroNumero.replace(/\D/g, "").length !== 7) {
-      toast.error("CRP inválido. Verifique o número.");
+      showNotification({
+        name: "Info!",
+        description: "CRP inválido. Verifique o número.",
+        type: "info",
+      });
+    
       return;
     }
 
@@ -55,11 +83,17 @@ export default function CadastroPsicologo() {
       .catch((error) => {
         console.error(error);
         if (error.response) {
-          toast.error(`${error.response.data.msg}`);
+          showNotification({
+            name: "Aviso!",
+            description: `${error.response.data.msg}`,
+            type: "warning",
+          });
         } else {
-          toast.error(
-            "Erro ao cadastrar psicólogo. Por favor, tente novamente mais tarde."
-          );
+          showNotification({
+            name: "Erro!",
+            description:   "Erro ao cadastrar psicólogo. Por favor, tente novamente mais tarde.",
+            type: "error",
+          });
         }
       });
   };
@@ -70,7 +104,11 @@ export default function CadastroPsicologo() {
     const token = localStorage.getItem("token");
 
     if (!codigo || !idUsuario || !token) {
-      toast.error("Dados faltando. Verifique o código e tente novamente.");
+      showNotification({
+        name: "Aviso!",
+        description: "Dados faltando. Verifique o código e tente novamente.",
+        type: "warning",
+      });
       return;
     }
 
@@ -84,17 +122,28 @@ export default function CadastroPsicologo() {
           },
         }
       );
-      toast.success("Verificação de e-mail concluída com sucesso");
+      showNotification({
+        name: "Sucesso!",
+        description: "Verificação de e-mail concluída com sucesso",
+        type: "success",
+      });
       setEmailVerificationVisible(false);
       setTimeout(() => navigate("/login"), 1000);
     } catch (error) {
       console.error(error);
       if (error.response) {
-        toast.error(error.response.data.msg);
+        showNotification({
+          name: "Aviso!",
+          description: `${error.response.data.msg}`,
+          type: "warning",
+        });
       } else {
-        toast.error(
-          "Erro ao verificar o código. Por favor, tente novamente mais tarde."
-        );
+        showNotification({
+          name: "Erro!",
+          description: "Erro ao verificar o código. Por favor, tente novamente mais tarde.",
+          type: "error",
+        });
+        
       }
     }
   };
@@ -115,7 +164,7 @@ export default function CadastroPsicologo() {
 
   return (
     <section className="bg-white">
-      <Toaster
+       <Toaster
         expand
         position="top-center"
         richColors
@@ -123,10 +172,11 @@ export default function CadastroPsicologo() {
           style: {
             margin: "10px",
             padding: "15px",
-            maxWidth: "400px",
+            maxWidth: "500px",
             borderRadius: "8px",
             gap: "10px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+            boxShadow: "none",
+            background: " transparent",
           },
         }}
       />

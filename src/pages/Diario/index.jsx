@@ -6,6 +6,20 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Spinner } from 'flowbite-react';
 
+import Notification from "../../components/Notification"; 
+
+
+const showNotification = ({ name, description, type, time = "Agora" }) => {
+  toast(
+    <Notification
+      name={name}
+      description={description}
+      time={time}
+      type={type}
+    />
+  );
+};
+
 const emojis = {
   feliz: '😊',
   contente: '🙂',
@@ -54,7 +68,11 @@ export default function Diario() {
       );
       setEmociones(orderedEmotions);
     } catch (error) {
-      toast.error("Erro ao buscar emoções. Por favor, tente novamente.");
+      showNotification({
+        name: "Erro!",
+        description: "Erro ao buscar emoções. Por favor, tente novamente.",
+        type: "error",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -94,10 +112,11 @@ export default function Diario() {
           style: {
             margin: "10px",
             padding: "15px",
-            maxWidth: "400px",
+            maxWidth: "500px",
             borderRadius: "8px",
             gap: "10px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+            boxShadow: "none",
+            background: " transparent",
           },
         }}
       />

@@ -1,10 +1,23 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, SignIn } from "@phosphor-icons/react";
-import { Toaster, toast } from "sonner";
+import { Toaster, toast } from "sonner"; 
 import { http } from "../../App"; 
 import Inputs from "../../components/Inputs"; 
 import { Spinner } from "flowbite-react";
+import Notification from "../../components/Notification"; 
+
+
+const showNotification = ({ name, description, type, time = "Agora" }) => {
+  toast(
+    <Notification
+      name={name}
+      description={description}
+      time={time}
+      type={type}
+    />
+  );
+};
 
 export default function Login() {
   const [email, setEmail] = useState("");  
@@ -30,10 +43,18 @@ export default function Login() {
       setToken(response.data.token);
       setType(response.data.type);
 
+      
       const decodedToken = JSON.parse(atob(response.data.token.split('.')[1]));
       setNome(decodedToken.name);  
 
-    
+     
+      showNotification({
+        name: "Sucesso!",
+        description: `Bem-vindo(a) de volta, ${decodedToken.name}!`,
+        type: "success",
+      });
+
+      
       if (response.data.type === "pacient") {
         navigate("/principalCliente", { state: { token: response.data.token, id: response.data.id, nome: decodedToken.name } });
       } else if (response.data.type === "psychologist") {
@@ -41,7 +62,46 @@ export default function Login() {
       }
 
     } catch (e) {
-      toast.error(`${e.response.data.msg}`);
+    
+      if (e.response) {
+        const errorMsg = e.response.data.msg;
+
+        
+        if (e.response.status === 401) {
+          if (errorMsg.includes("Senha incorreta")) {
+            showNotification({
+              name: "Erro!",
+              description: "A senha fornecida está incorreta. Por favor, tente novamente.",
+              type: "error",
+            });
+          } else if (errorMsg.includes("Email não encontrado")) {
+            showNotification({
+              name: "Erro!",
+              description: "O email fornecido não está cadastrado.",
+              type: "error",
+            });
+          } else {
+            showNotification({
+              name: "Erro!",
+              description: errorMsg || "Erro de autenticação. Por favor, tente novamente.",
+              type: "error",
+            });
+          }
+        } else {
+          showNotification({
+            name: "Erro!",
+            description: "Ocorreu um erro inesperado. Tente novamente mais tarde.",
+            type: "error",
+          });
+        }
+      } else {
+   
+        showNotification({
+          name: "Erro!",
+          description: "Falha de conexão com o servidor. Verifique sua conexão com a internet e tente novamente.",
+          type: "error",
+        });
+      }
       console.log(e);
     } finally {
       setIsLoading(false);  
@@ -52,16 +112,17 @@ export default function Login() {
     <>
       <Toaster
         expand
-        position="bottom-center"
+        position="top-center"
         richColors
         toastOptions={{
           style: {
             margin: "10px",
             padding: "15px",
-            maxWidth: "400px",
+            maxWidth: "500px",
             borderRadius: "8px",
             gap: "10px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+            boxShadow: "none",
+            background: " transparent",
           },
         }}
       />
@@ -102,7 +163,7 @@ export default function Login() {
                 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}  
               >
                 {isLoading ? (
-                  <Spinner color="white"aria-label="Extra large spinner example" size="lg" />
+                  <Spinner color="white" aria-label="Extra large spinner example" size="lg" />
                 ) : (
                   <>
                     <SignIn />
@@ -110,9 +171,7 @@ export default function Login() {
                   </>
                 )}
               </button>
-              <p
-                className="mt-4 text-sm text-gray-500 sm:mt-0"
-              >
+              <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                 Não tem uma conta?{" "}
                 <Link
                   to={"/cadastroPsicologo"}

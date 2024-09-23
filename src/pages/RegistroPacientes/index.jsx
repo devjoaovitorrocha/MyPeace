@@ -5,6 +5,19 @@ import { ArrowLeft, Eye, MagnifyingGlass, Notepad } from '@phosphor-icons/react'
 import axios from 'axios';
 import { Spinner } from 'flowbite-react';
 import CustomDropdown from '../../components/DropDowm';
+import Notification from "../../components/Notification"; 
+
+const showNotification = ({ name, description, type, time = "Agora" }) => {
+  toast(
+    <Notification
+      name={name}
+      description={description}
+      time={time}
+      type={type}
+    />
+  );
+};
+
 
 export default function RegistroPacientes() {
   const { state } = useLocation();
@@ -51,9 +64,18 @@ export default function RegistroPacientes() {
     } catch (error) {
       if (error.response?.status === 401) {
         toast.error("Sessão expirada. Por favor, faça login novamente.");
+        showNotification({
+          name: "Avisp!",
+          description: "Sessão expirada. Por favor, faça login novamente.",
+          type: "warning",
+        });
         navigate("/login");
       } else {
-        toast.error("Erro ao buscar pacientes ou emoções. Por favor, tente novamente mais tarde.");
+        showNotification({
+          name: "Erro!",
+          description: "Erro ao buscar pacientes. Por favor, tente novamente mais tarde.",
+          type: "error",
+        });
       }
     } finally {
       setLoading({ pacientes: false, emociones: false });
@@ -70,7 +92,11 @@ export default function RegistroPacientes() {
       );
       return response.data.reports; 
     } catch (error) {
-      toast.error("Erro ao buscar emoções. Por favor, tente novamente.");
+      showNotification({
+        name: "Erro!",
+        description: "Erro ao buscar emoções. Por favor, tente novamente mais tarde.",
+        type: "error",
+      });
       return [];
     }
   }
@@ -109,10 +135,11 @@ export default function RegistroPacientes() {
           style: {
             margin: "10px",
             padding: "15px",
-            maxWidth: "400px",
+            maxWidth: "500px",
             borderRadius: "8px",
             gap: "10px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+            boxShadow: "none",
+            background: " transparent",
           },
         }}
       />
@@ -207,7 +234,7 @@ export default function RegistroPacientes() {
                   <button
                     key={i + 1}
                     onClick={() => paginate(i + 1)}
-                    className={`mx-1 px-4 py-2 border rounded-lg ${currentPage === i + 1 ? 'bg-blue-500 text-white' : 'bg-gray-200'
+                    className={`mx-1 px-4 py-2 border rounded-lg ${currentPage === i + 1 ? 'bg-[#00bfa6] text-white' : 'bg-gray-200'
                       }`}
                   >
                     {i + 1}
