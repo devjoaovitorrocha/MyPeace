@@ -3,6 +3,19 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
 import { ArrowLeft, ArrowCircleLeft, ArrowCircleRight } from '@phosphor-icons/react';
 import { Spinner } from 'flowbite-react';
+import Notification from "../../components/Notification"; 
+
+
+const showNotification = ({ name, description, type, time = "Agora" }) => {
+  toast(
+    <Notification
+      name={name}
+      description={description}
+      time={time}
+      type={type}
+    />
+  );
+};
 
 export default function DetalhesPaciente() {
   const { state } = useLocation();
@@ -23,7 +36,12 @@ export default function DetalhesPaciente() {
   useEffect(() => {
     console.log("Estado recebido em DetalhesPaciente:", { paciente, token, idUser, nome });
     if (!paciente || !token || !idUser || !nome) {
-      toast.error("Dados insuficientes. Redirecionando para a página principal.");
+    
+      showNotification({
+        name: "Aviso!",
+        description: "Dados insuficientes. Redirecionando para a página principal.",
+        type: "warning",
+      });
       navigate("/principalPsico/registropaciente");
     } else {
       setIsLoading(false);
@@ -44,7 +62,11 @@ export default function DetalhesPaciente() {
 
   const handleReturn = () => {
     if (!nome) {
-      toast.error("Erro: Nome não encontrado. Redirecionando para a página principal.");
+      showNotification({
+        name: "Aviso!",
+        description: "Erro: Nome não encontrado. Redirecionando para a página principal.",
+        type: "warning",
+      });
       navigate("/principalPsico/registropaciente");
     } else {
       navigate("/principalPsico/registropaciente", { state: { token, idUser: idUser, id, nome: nome } });
@@ -53,7 +75,7 @@ export default function DetalhesPaciente() {
 
   return (
     <div className="bg-[#3c5454] h-screen p-6 overflow-y-auto">
-      <Toaster
+     <Toaster
         expand
         position="top-center"
         richColors
@@ -61,10 +83,11 @@ export default function DetalhesPaciente() {
           style: {
             margin: "10px",
             padding: "15px",
-            maxWidth: "400px",
+            maxWidth: "500px",
             borderRadius: "8px",
             gap: "10px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+            boxShadow: "none",
+            background: " transparent",
           },
         }}
       />

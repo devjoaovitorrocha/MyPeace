@@ -7,6 +7,19 @@ import { ArrowLeft } from "@phosphor-icons/react";
 import Chat from "../../components/Chat";
 import axios from "axios";  
 import { http } from "../../App";
+import { Toaster, toast } from "sonner";  
+import Notification from "../../components/Notification"; 
+
+const showNotification = ({ name, description, type, time = "Agora" }) => {
+  toast(
+    <Notification
+      name={name}
+      description={description}
+      time={time}
+      type={type}
+    />
+  );
+};
 
 const emojis = {
   feliz: '😊',
@@ -67,6 +80,7 @@ const getMessageForCategory = (category) => {
 
 export default function RegistroEmocao() {
   const { state } = useLocation();
+  const navigate = useNavigate();
   const [selectedFeeling, setSelectedFeeling] = useState("");
   const [description, setDescription] = useState("");
   const [phase, setPhase] = useState("Insira suas emoções do dia!");
@@ -75,7 +89,6 @@ export default function RegistroEmocao() {
   const [savedFeelings, setSavedFeelings] = useState([]);
   const [token, setToken] = useState();
   const [id, setId] = useState();
-  const navigate = useNavigate();
   const [pacienteNome, setPacienteNome] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
@@ -90,27 +103,38 @@ export default function RegistroEmocao() {
       setPacienteNome(state.nome);
     }
 
-    
     fetchSensitiveWords().then(data => setSensitiveCategories(data));
   }, [navigate, state]);
-
 
   const fetchSensitiveWords = async () => {
     const response = await fetch('/sensitiveWords.json'); 
     const data = await response.json();
     return data;
   };
+
+  const handleCronometro = () => {
+    navigate("/principalCliente/cronometro", {
+      state: { token, id, nome: pacienteNome },
+    });
+  };
+
   const handleSave = () => {
     if (!token || !id) {
-      setMensagem("Erro: Token ou ID ausente. Por favor, faça login novamente.");
-      setMensagemTipo("error");
+      showNotification({
+        name: "Aviso!",
+        description: "Token ou ID ausente. Por favor, faça login novamente.",
+        type: "warning",
+      });
       LimparMensagem();
       return;
     }
 
     if (description === "" || selectedFeeling === "") {
-      setMensagem("Por favor, preencha a descrição e selecione uma emoção.");
-      setMensagemTipo("error");
+      showNotification({
+        name: "Aviso!",
+        description: "Por favor, preencha a descrição e selecione uma emoção.",
+        type: "warning",
+      });
       LimparMensagem();
       return;
     }
@@ -136,26 +160,37 @@ export default function RegistroEmocao() {
         },
       }
     )
-      .then(() => {
-        setMensagem("Salvo com sucesso!");
-        setMensagemTipo("success");
+      .then((response) => {
+        const msg = response?.data?.msg || "Salvo com sucesso!";
+        showNotification({
+          name: "Sucesso!",
+          description: msg,
+          type: "success",
+        });
         setDescription("");
         setSelectedFeeling("");
         LimparMensagem();
 
-        if (category) {
+        if (category === "ansiedade") {
+          handleCronometro();
+        } else if (category) {
           const message = getMessageForCategory(category);
           setIsChatOpen(true);
           setChatMessages([{ text: message, sent: false }]);
         }
       })
       .catch((error) => {
-        const errorMsg = error.response?.data?.msg || "Erro ao salvar os dados.";
-        setMensagem(errorMsg);
-        setMensagemTipo("error");
+        const errorMsg = error?.response?.data?.msg || "Erro ao salvar os dados.";
+        showNotification({
+          name: "Erro!",
+          description: errorMsg,
+          type: "error",
+        });
         LimparMensagem();
 
-        if (category) {
+        if (category === "ansiedade") {
+          handleCronometro();
+        } else if (category) {
           const message = getMessageForCategory(category);
           setIsChatOpen(true);
           setChatMessages([{ text: message, sent: false }]);
@@ -169,7 +204,6 @@ export default function RegistroEmocao() {
       setMensagemTipo("");
     }, 1000);
   };
-
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       <Header />
@@ -246,6 +280,23 @@ export default function RegistroEmocao() {
           initialMessages={chatMessages}
         />
       )}
+
+      <Toaster
+        expand
+        position="top-center"
+        richColors
+        toastOptions={{
+          style: {
+            margin: "10px",
+            padding: "15px",
+            maxWidth: "500px",
+            borderRadius: "8px",
+            gap: "10px",
+            boxShadow: "none",
+            background: "transparent",
+          },
+        }}
+      />
     </div>
   );
 }

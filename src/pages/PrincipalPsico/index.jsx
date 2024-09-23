@@ -17,6 +17,7 @@ import React from "react";
 import HoverForCards from "../../components/HoverForCards";
 import axios from "axios";
 import Inputs from "../../components/Inputs";
+import Notification from "../../components/Notification";
 
 const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel, onClickEdt, onClickRegistro }) => (
   <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4 py-11">
@@ -50,7 +51,7 @@ const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel, onClickEdt,
       Icon={Trash}
       onClick={onClickDel}
     />
-    
+
   </div>
 );
 
@@ -81,6 +82,17 @@ export default function PrincipalPsico() {
     }
   }, [navigate, state]);
 
+  const showNotification = ({ name, description, type, time = "Agora" }) => {
+    toast(
+      <Notification
+        name={name}
+        description={description}
+        time={time}
+        type={type}
+      />
+    );
+  };
+
 
   const fetchPsychologistInfo = async () => {
     try {
@@ -93,8 +105,12 @@ export default function PrincipalPsico() {
       setCpf(cpf);
       setRegisterNumber(registerNumber);
     } catch (error) {
-      toast.error("Erro ao buscar informações do psicólogo.");
-      console.error(error);
+      showNotification({
+        name: "Erro!",
+        description: "Erro ao buscar informações do psicólogo.",
+        type: "error",
+      });
+      console.error("Erro ao buscar paciente:", error.response?.data || error.message);
     }
   };
 
@@ -107,12 +123,12 @@ export default function PrincipalPsico() {
   };
 
   const handleRegistroPacientes = () => {
-    navigate('/principalPsico/registropaciente', { state: { token, id, nome: psicologoNome} });
+    navigate('/principalPsico/registropaciente', { state: { token, id, nome: psicologoNome } });
   };
 
-  
 
-  
+
+
   const handleCpfChange = (e) => {
     const formattedCpf = e.target.value
       .replace(/\D/g, "")
@@ -131,7 +147,7 @@ export default function PrincipalPsico() {
     e.preventDefault();
 
     try {
-      
+
       const dadosResponse = await axios.post(
         `https://api-mypeace.vercel.app/update/psychologists/${id}`,
         {
@@ -144,34 +160,49 @@ export default function PrincipalPsico() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      toast.success(dadosResponse.data.msg || "Dados editados com sucesso!");
+      showNotification({
+        name: "Sucesso!",
+        description: "Dados editados com sucesso!",
+        type: "success",
+      });
+      setPsicologoNome(nome);
 
-      
       if (currentPassword && newPassword && confirmPassword) {
         if (newPassword !== confirmPassword) {
           toast.error("As novas senhas não coincidem!");
           return;
         }
+        await updatePassword();
+      }
+      setModalEdt(false);
+    } catch (error) {
+      handleErrorResponse(error);
+    }
+  };
 
-        const senhaResponse = await axios.post(
-          `https://api-mypeace.vercel.app/update/password/psychologist/${id}`,
-          {
-            currentPassword,
-            newPassword,
-            confirmPassword,
-          },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        toast.success(senhaResponse.data.msg || "Senha atualizada com sucesso!");
+  const updatePassword = async () => {
+    try {
+      const senhaResponse = await axios.post(
+        `https://api-mypeace.vercel.app/update/password/psychologist/${id}`,
+        {
+          currentPassword,
+          newPassword,
+          confirmPassword,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (senhaResponse.status === 200) {
+        showNotification({
+          name: "Sucesso!",
+          description: "Senha atualizada com sucesso!",
+          type: "success",
+        });
         setCurrentPassword("");
         setNewPassword("");
         setConfirmPassword("");
       }
-
-      setModalEdt(false);
     } catch (error) {
       handleErrorResponse(error);
     }
@@ -188,7 +219,7 @@ export default function PrincipalPsico() {
 
   const openEditModal = () => {
     setModalEdt(true);
-    fetchPsychologistInfo();  
+    fetchPsychologistInfo();
   };
 
   const deletar = async () => {
@@ -200,7 +231,11 @@ export default function PrincipalPsico() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      toast.success(response.data.msg || "Conta deletada com sucesso!");
+      showNotification({
+        name: "Sucesso!",
+        description: "Paciente deletado com sucesso!",
+        type: "success",
+      });
       setModalDel(false);
       setTimeout(() => {
         navigate("/");
@@ -211,18 +246,27 @@ export default function PrincipalPsico() {
   };
 
   const handleErrorResponse = (error) => {
-    const errorMsg = error.response?.data?.msg || "Erro ao processar a solicitação. Por favor, tente novamente mais tarde.";
+    const errorMsg =
+      error.response?.data?.msg || "Erro ao processar a solicitação.";
     if (error.response?.status === 401) {
-      alert("Sessão expirada");
+      showNotification({
+        name: "Info",
+        description: "Sessão expirada. Redirecionando para login.",
+        type: "info",
+      });
       navigate("/login");
     } else {
-      toast.error(errorMsg);
+      showNotification({
+        name: "Erro!",
+        description: errorMsg,
+        type: "error",
+      });
     }
   };
 
   return (
     <>
-        {modalEdt && (
+      {modalEdt && (
         <Modal
           isOpen={modalEdt}
           setIsOpen={setModalEdt}
@@ -231,56 +275,56 @@ export default function PrincipalPsico() {
         >
           <form className="mt-5 space-y-8" onSubmit={edtDadosSubmit}>
             <div className="relative  z-0">
-            <Inputs
-              label="Nome:"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-            />
+              <Inputs
+                label="Nome:"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+              />
             </div>
             <div className="relative z-0">
-            <Inputs
-              label="Email:"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+              <Inputs
+                label="Email:"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div className="relative z-0">
-            <Inputs
-              label="CPF:"
-              value={cpf}
-              onChange={handleCpfChange}
-            />
+              <Inputs
+                label="CPF:"
+                value={cpf}
+                onChange={handleCpfChange}
+              />
             </div>
             <div className="relative z-0">
-            <Inputs
-              label="Número de Registro:"
-              value={registerNumber}
-              onChange={handleCrpChange}
-            />
+              <Inputs
+                label="Número de Registro:"
+                value={registerNumber}
+                onChange={handleCrpChange}
+              />
             </div>
             <div className="relative z-0">
-            <Inputs
-              label="Senha Atual:"
-              isSenha
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-            />
+              <Inputs
+                label="Senha Atual:"
+                isSenha
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
             </div>
             <div className="relative z-0">
-            <Inputs
-              label="Nova Senha:"
-              isSenha
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
+              <Inputs
+                label="Nova Senha:"
+                isSenha
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
             </div>
             <div className="relative z-0">
-            <Inputs
-              label="Confirmar Nova Senha:"
-              isSenha
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
+              <Inputs
+                label="Confirmar Nova Senha:"
+                isSenha
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
             </div>
             <button className="bg-[#00bfa6] rounded-lg hover:opacity-90 transition-opacity text-white font-semibold w-full py-2">
               Salvar
@@ -319,10 +363,11 @@ export default function PrincipalPsico() {
           style: {
             margin: "10px",
             padding: "15px",
-            maxWidth: "400px",
+            maxWidth: "500px",
             borderRadius: "8px",
             gap: "10px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+            boxShadow: "none",
+            background: " transparent",
           },
         }}
       />
@@ -342,7 +387,7 @@ export default function PrincipalPsico() {
           <Link to="/" className="md:m-6 group relative w-max">
             <div className="flex items-center transition-all gap-1 hover:gap-2">
               <ArrowLeft size={20} />
-              <h1 className="font-medium">Início</h1>
+              <h1 className="font-medium">Sair</h1>
             </div>
             <span className="absolute -bottom-1 left-1/2 w-0 transition-all h-0.5 bg-white group-hover:w-3/6"></span>
             <span className="absolute -bottom-1 right-1/2 w-0 transition-all h-0.5 bg-white group-hover:w-3/6"></span>

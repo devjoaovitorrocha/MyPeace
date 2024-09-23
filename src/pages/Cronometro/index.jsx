@@ -4,6 +4,20 @@ import Header from "../../components/Header";
 import Container from "../../components/Container";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
+import Notification from "../../components/Notification"; 
+
+
+const showNotification = ({ name, description, type, time = "Agora" }) => {
+  toast(
+    <Notification
+      name={name}
+      description={description}
+      time={time}
+      type={type}
+    />
+  );
+};
+
 
 export default function Cronometro() {
   const [time, setTime] = useState(0);
@@ -60,7 +74,11 @@ export default function Cronometro() {
       audioRef.current = audio;
       audio.play();
     } catch (error) {
-      console.error("Error in text-to-speech:", error);
+      showNotification({
+        name: "Erro!",
+        description: "Error in text-to-speech:",
+        type: "error",
+      });
     }
   };
   

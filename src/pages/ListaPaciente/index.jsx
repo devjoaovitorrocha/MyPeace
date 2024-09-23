@@ -6,6 +6,19 @@ import { Toaster, toast } from "sonner";
 import Inputs from "../../components/Inputs";
 import Modal from "../../components/Modal";
 import { Spinner } from 'flowbite-react'; 
+import Notification from "../../components/Notification"; 
+
+
+const showNotification = ({ name, description, type, time = "Agora" }) => {
+  toast(
+    <Notification
+      name={name}
+      description={description}
+      time={time}
+      type={type}
+    />
+  );
+};
 
 export default function ListaPaciente() {
   const { state } = useLocation();
@@ -23,7 +36,6 @@ export default function ListaPaciente() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
       navigate("/login");
@@ -38,7 +50,6 @@ export default function ListaPaciente() {
       }
     }
   }, [navigate, state]);
-
 
   useEffect(() => {
     setFilteredPacientes(
@@ -60,7 +71,11 @@ export default function ListaPaciente() {
       );
       setPacientes(response.data.allPacients);
     } catch (error) {
-      toast.error("Erro ao buscar pacientes. Por favor, tente novamente mais tarde.");
+      showNotification({
+        name: "Erro!",
+        description: "Erro ao buscar pacientes. Por favor, tente novamente mais tarde.",
+        type: "error",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +92,11 @@ export default function ListaPaciente() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      toast.success(`Senha do usuário: ${response.data.password}`);
+      showNotification({
+        name: "Paciente cadastrado com sucesso.!",
+        description: `Senha: ${response.data.password}`,
+        type: "success",
+      });
       setModalAdd(false); 
       await fetchPacientes(token, id); 
     } catch (error) {
@@ -87,7 +106,7 @@ export default function ListaPaciente() {
     }
   }
 
-  
+ 
   async function deletar() {
     if (!currentPaciente) return;
 
@@ -100,7 +119,11 @@ export default function ListaPaciente() {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      toast.success(response.data.msg || "Paciente deletado com sucesso!");
+      showNotification({
+        name: "Sucesso!",
+        description: response.data.msg || "Paciente deletado com sucesso!",
+        type: "success",
+      });
       setModalDel(false); 
       await fetchPacientes(token, id); 
     } catch (error) {
@@ -114,25 +137,30 @@ export default function ListaPaciente() {
   function handleErrorResponse(error) {
     if (error.response) {
       if (error.response.status === 401) {
-        alert("Sessão expirada");
+        alert("Sessão expirada. Redirecionando para o login.");
         navigate("/login");
       } else {
-        toast.error(
-          error.response.data.msg || "Erro ao processar a solicitação. Tente novamente."
-        );
+        showNotification({
+          name: "Erro!",
+          description: error.response.data.msg || "Erro ao processar a solicitação. Tente novamente.",
+          type: "error",
+        });
       }
     } else {
-      toast.error("Erro ao processar a solicitação. Tente novamente.");
+      showNotification({
+        name: "Erro!",
+        description: "Erro ao processar a solicitação. Tente novamente.",
+        type: "error",
+      });
     }
   }
 
-  
+
   function openDeleteModal(paciente) {
     setCurrentPaciente(paciente); 
     setModalDel(true);  
   }
 
- 
   const handleReturn = () => {
     navigate("/principalPsico", { state: { token, id, nome: psicologoNome } });
   };
@@ -147,15 +175,14 @@ export default function ListaPaciente() {
           style: {
             margin: "10px",
             padding: "15px",
-            maxWidth: "400px",
+            maxWidth: "500px",
             borderRadius: "8px",
             gap: "10px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+            boxShadow: "none",
+            background: " transparent",
           },
         }}
       />
-
-    
       {modalDel && (
         <Modal
           isOpen={modalDel}
@@ -163,13 +190,13 @@ export default function ListaPaciente() {
           del
           titulo={"Deletar conta permanentemente?"}
           conteudo={
-            "Ao excluir a conta seu paciente será deslogado do MyPeace e a conta será deletada permanentemente"
+            "Ao excluir a conta, seu paciente será deslogado do MyPeace e a conta será deletada permanentemente."
           }
           delOnClick={deletar} 
         />
       )}
 
-   
+      
       {modalAdd && (
         <Modal
           isOpen={modalAdd}  
@@ -202,7 +229,6 @@ export default function ListaPaciente() {
         </Modal>
       )}
 
-      
       <header className="flex flex-col md:flex-row items-center justify-between max-w-[1440px] mx-auto mb-4 md:mb-6">
         <h1 className="text-2xl md:text-4xl py-4 text-white text-center font-semibold">
           Lista de Pacientes

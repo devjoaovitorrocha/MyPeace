@@ -13,7 +13,12 @@ export default function BordoPaciente() {
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
-      navigate("/login");
+      showNotification({
+        name: "Aviso!",
+        description: "Dados insuficientes. Redirecionando para a página principal.",
+        type: "warning",
+      });
+      navigate("/principalCliente");
     } else {
       setToken(state.token);
       setId(state.id);
@@ -27,7 +32,7 @@ export default function BordoPaciente() {
 
   return (
     <div className="bg-[#3c5454] min-h-screen p-6">
-      <Toaster
+       <Toaster
         expand
         position="top-center"
         richColors
@@ -35,10 +40,11 @@ export default function BordoPaciente() {
           style: {
             margin: "10px",
             padding: "15px",
-            maxWidth: "400px",
+            maxWidth: "500px",
             borderRadius: "8px",
             gap: "10px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+            boxShadow: "none",
+            background: " transparent",
           },
         }}
       />
