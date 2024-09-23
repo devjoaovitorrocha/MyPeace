@@ -71,10 +71,12 @@ export default function CadastroPaciente() {
           style: {
             margin: "10px",
             padding: "15px",
-            maxWidth: "400px",
+            maxWidth: "500px",
             borderRadius: "8px",
             gap: "10px",
-            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+            boxShadow: "none",
+            background: "transparent",
+            border: "none",
           },
         }}
       />

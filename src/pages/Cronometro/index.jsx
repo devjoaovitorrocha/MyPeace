@@ -139,6 +139,7 @@ export default function Cronometro() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      
       <Header />
       <Container>
         <div className="flex-grow flex items-center justify-center my-12">

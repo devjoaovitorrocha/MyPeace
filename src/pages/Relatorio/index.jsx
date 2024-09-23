@@ -69,7 +69,8 @@ export default function Relatorio() {
             borderRadius: "8px",
             gap: "10px",
             boxShadow: "none",
-            background: " transparent",
+            background: "transparent",
+            border: "none",
           },
         }}
       />

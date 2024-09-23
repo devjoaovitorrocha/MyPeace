@@ -32,7 +32,7 @@ export default function BordoPaciente() {
 
   return (
     <div className="bg-[#3c5454] min-h-screen p-6">
-       <Toaster
+      <Toaster
         expand
         position="top-center"
         richColors
@@ -44,7 +44,8 @@ export default function BordoPaciente() {
             borderRadius: "8px",
             gap: "10px",
             boxShadow: "none",
-            background: " transparent",
+            background: "transparent",
+            border: "none",
           },
         }}
       />

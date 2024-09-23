@@ -355,7 +355,7 @@ export default function PrincipalPsico() {
         />
       )}
 
-      <Toaster
+<Toaster
         expand
         position="top-center"
         richColors
@@ -367,7 +367,8 @@ export default function PrincipalPsico() {
             borderRadius: "8px",
             gap: "10px",
             boxShadow: "none",
-            background: " transparent",
+            background: "transparent",
+            border: "none",
           },
         }}
       />
