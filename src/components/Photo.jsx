@@ -1,15 +1,40 @@
-import { UserPlus} from "@phosphor-icons/react";
+import { UserPlus, Trash, UploadSimple } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
 
-export default function Photo({
+export default function PhotoModal({
   isOpen,
   setIsOpen,
   titulo,
   photoSrc,
-  onExit,
   onContinue,
-  conteudo,
+  onExit,
+  onPhotoUpload,  
 }) {
+  const [selectedPhoto, setSelectedPhoto] = useState(photoSrc || null);
+
+  // Função para lidar com o upload da foto
+  const handlePhotoUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const photoURL = URL.createObjectURL(file);
+      setSelectedPhoto(photoURL); 
+    }
+  };
+
+  
+  const handleDeletePhoto = () => {
+    setSelectedPhoto(null); 
+  };
+
+  
+  const handleConfirm = () => {
+    if (selectedPhoto) {
+      onPhotoUpload(selectedPhoto);  
+    }
+    setIsOpen(false);
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -33,18 +58,48 @@ export default function Photo({
                 <UserPlus />
               </div>
               <h3 className="text-3xl font-bold text-center mb-2">{titulo}</h3>
-              <p className="text-center mb-6">{conteudo}</p>
-              {photoSrc ? (
+
+              
+              {selectedPhoto ? (
                 <img
-                  src={photoSrc}
-                  alt="Perfil"
+                  src={selectedPhoto}
+                  alt="Foto de Perfil"
                   className="w-full h-64 object-cover mb-4"
                 />
               ) : (
-                <div className="bg-gray-200 w-full h-64 flex items-center justify-center">
+                <div className="bg-gray-200 w-full h-64 flex items-center justify-center mb-4">
                   <UserPlus size={100} className="text-gray-500" />
                 </div>
               )}
+
+              
+              <div className="flex gap-2 mb-4">
+                <label
+                  htmlFor="photo-upload"
+                  className="bg-green-700 cursor-pointer text-white transition-colors border-2 border-green-700 font-semibold w-full py-2 rounded flex items-center justify-center gap-2"
+                >
+                  <UploadSimple size={20} />
+                  {selectedPhoto ? "Alterar Foto" : "Adicionar Foto"}
+                </label>
+                <input
+                  id="photo-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handlePhotoUpload}
+                />
+
+                {selectedPhoto && (
+                  <button
+                    onClick={handleDeletePhoto}
+                    className="bg-red-600 text-white transition-colors border-2 border-red-600 font-semibold w-full py-2 rounded flex items-center justify-center gap-2"
+                  >
+                    <Trash size={20} />
+                    Deletar Foto
+                  </button>
+                )}
+              </div>
+
               <div className="flex gap-2">
                 <button
                   onClick={onExit}
@@ -53,7 +108,7 @@ export default function Photo({
                   Sair
                 </button>
                 <button
-                  onClick={onContinue}
+                  onClick={handleConfirm}  
                   className="bg-[#00bfa6] text-white transition-colors border-2 border-[#00bfa6] hover:text-white font-semibold w-full py-2 rounded"
                 >
                   Continuar

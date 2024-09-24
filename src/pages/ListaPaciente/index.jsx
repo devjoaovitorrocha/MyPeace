@@ -93,7 +93,7 @@ export default function ListaPaciente() {
       );
 
       showNotification({
-        name: "Paciente cadastrado com sucesso.!",
+        name: "Sucesso",
         description: `Senha: ${response.data.password}`,
         type: "success",
       });

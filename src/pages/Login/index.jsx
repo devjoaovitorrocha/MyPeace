@@ -7,7 +7,6 @@ import Inputs from "../../components/Inputs";
 import { Spinner } from "flowbite-react";
 import Notification from "../../components/Notification";
 
-
 const showNotification = ({ name, description, type, time = "Agora" }) => {
   toast(
     <Notification
@@ -43,17 +42,14 @@ export default function Login() {
       setToken(response.data.token);
       setType(response.data.type);
 
-
       const decodedToken = JSON.parse(atob(response.data.token.split('.')[1]));
       setNome(decodedToken.name);
-
 
       showNotification({
         name: "Sucesso!",
         description: `Bem-vindo(a) de volta, ${decodedToken.name}!`,
         type: "success",
       });
-
 
       if (response.data.type === "pacient") {
         navigate("/principalCliente", { state: { token: response.data.token, id: response.data.id, nome: decodedToken.name } });
@@ -62,10 +58,8 @@ export default function Login() {
       }
 
     } catch (e) {
-
       if (e.response) {
-        const errorMsg = e.response.data.msg;
-
+        const errorMsg = e.response.data?.msg || "Erro de autenticação. Por favor, tente novamente.";
 
         if (e.response.status === 401) {
           if (errorMsg.includes("Senha incorreta")) {
@@ -83,7 +77,7 @@ export default function Login() {
           } else {
             showNotification({
               name: "Erro!",
-              description: errorMsg || "Erro de autenticação. Por favor, tente novamente.",
+              description: errorMsg,
               type: "error",
             });
           }
@@ -94,11 +88,16 @@ export default function Login() {
             type: "error",
           });
         }
-      } else {
-
+      } else if (e.request) {
         showNotification({
           name: "Erro!",
           description: "Falha de conexão com o servidor. Verifique sua conexão com a internet e tente novamente.",
+          type: "error",
+        });
+      } else {
+        showNotification({
+          name: "Erro!",
+          description: "Erro desconhecido. Por favor, tente novamente mais tarde.",
           type: "error",
         });
       }
