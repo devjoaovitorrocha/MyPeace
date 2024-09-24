@@ -7,7 +7,7 @@ import {
   UserList,
   AddressBook,
   NotePencil,
-
+  UserPlus,
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -18,8 +18,9 @@ import HoverForCards from "../../components/HoverForCards";
 import axios from "axios";
 import Inputs from "../../components/Inputs";
 import Notification from "../../components/Notification";
+import PhotoModal from "../../components/PhotoModal";
 
-const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel, onClickEdt, onClickRegistro }) => (
+const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel, onClickEdt, onClickRegistro, onClickPhoto }) => (
   <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4 py-11">
     <HoverForCards
       title="Adicionar Pacientes"
@@ -38,6 +39,12 @@ const HoverDevCards = ({ onVerPacientes, onAddPacientes, onClickDel, onClickEdt,
       subtitle={<ArrowUpRight />}
       Icon={UserList}
       onClick={onVerPacientes}
+    />
+    <HoverForCards
+      title="Adicionar Foto"
+      subtitle={<ArrowUpRight />}
+      Icon={UserPlus}
+      onClick={onClickPhoto}
     />
     <HoverForCards
       title="Editar Dados"
@@ -61,6 +68,7 @@ export default function PrincipalPsico() {
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
   const [psicologoNome, setPsicologoNome] = useState("");
+  const [modalPhoto, setModalPhoto] = useState(false);
   const [modalEdt, setModalEdt] = useState(false);
   const [modalDel, setModalDel] = useState(false);
   const [modalAvisoDel, setModalAvisoDel] = useState(false);
@@ -71,6 +79,7 @@ export default function PrincipalPsico() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [photoSrc, setPhotoSrc] = useState("");
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
@@ -245,6 +254,16 @@ export default function PrincipalPsico() {
     }
   };
 
+  const handleSavePhoto = async (newPhoto) => {
+
+  };
+
+  const openPhotoModel = () => {
+
+    setModalPhoto(true);
+
+  };
+
   const handleErrorResponse = (error) => {
     const errorMsg =
       error.response?.data?.msg || "Erro ao processar a solicitação.";
@@ -266,6 +285,17 @@ export default function PrincipalPsico() {
 
   return (
     <>
+      {modalPhoto && (
+        <PhotoModal
+          isOpen={modalPhoto}
+          setIsOpen={setModalPhoto}
+          titulo="Adicionar Foto"
+          photoSrc={photoSrc}
+          onPhotoUpload={handleSavePhoto}
+          onContinue={() => setModalPhoto(false)}
+          onExit={() => setModalPhoto(false)}
+        />
+      )}
       {modalEdt && (
         <Modal
           isOpen={modalEdt}
@@ -355,7 +385,7 @@ export default function PrincipalPsico() {
         />
       )}
 
-<Toaster
+      <Toaster
         expand
         position="top-center"
         richColors
@@ -377,7 +407,15 @@ export default function PrincipalPsico() {
         <div className=" bg-green-900 rounded-2xl px-6 py-4 shadow-xl flex items-center justify-center md:justify-between md:flex-row flex-col border-b-4 border-green-400">
           <div className="flex md:flex-row flex-col items-center gap-4">
             <div className="rounded-full border-2 border-green-500 w-16 h-16 flex items-center justify-center">
-              <User fill="white" size={24} />
+              {photoSrc ? (
+                <img
+                  src={photoSrc}
+                  alt="Foto de Perfil"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                <User fill="white" size={24} />
+              )}
             </div>
             <div className="md:text-start text-center text-lg">
               <h1 className="font-bold">Olá, </h1>
@@ -403,6 +441,7 @@ export default function PrincipalPsico() {
           onVerPacientes={handleVerPacientes}
           onAddPacientes={handleAddPaciente}
           onClickEdt={openEditModal}
+          onClickPhoto={openPhotoModel}
           onClickRegistro={handleRegistroPacientes}
         />
         <section className="flex flex-col gap-10">

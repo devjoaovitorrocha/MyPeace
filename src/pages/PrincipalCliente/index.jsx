@@ -18,7 +18,7 @@ import Inputs from "../../components/Inputs";
 import { Toaster, toast } from "sonner";
 import Notification from "../../components/Notification"; 
 import axios from "axios";
-import PhotoModal from "../../components/Photo";
+import PhotoModal from "../../components/PhotoModal";
 
 export default function PrincipalCliente() {
   const navigate = useNavigate();
@@ -49,6 +49,7 @@ export default function PrincipalCliente() {
       setToken(state.token);
       setId(state.id);
       setPacienteNome(state.nome);
+      
     }
   }, [navigate, state]);
 
@@ -88,9 +89,6 @@ export default function PrincipalCliente() {
   };
 
 
-  const handlePhotoUpload = (newPhoto) => {
-    setPhotoSrc(newPhoto);  
-  };
 
   const fetchPacientInfo = async () => {
     try {
@@ -190,6 +188,10 @@ export default function PrincipalCliente() {
     }
   };
 
+  const handleSavePhoto = async (newPhoto) => {
+    
+ };
+
   const handleErrorResponse = (error) => {
     const errorMsg =
       error.response?.data?.msg || "Erro ao processar a solicitação.";
@@ -237,9 +239,7 @@ export default function PrincipalCliente() {
     setModalDel(true); 
   };
 
-  const handlePhotoConfirm = () => {
-    setModalPhoto(false);
-  }
+
   return (
     <>
       <Toaster
@@ -265,7 +265,7 @@ export default function PrincipalCliente() {
           setIsOpen={setModalPhoto}
           titulo="Adicionar Foto"
           photoSrc={photoSrc}
-          onPhotoUpload={handlePhotoUpload}  
+          onPhotoUpload={handleSavePhoto} 
           onContinue={() => setModalPhoto(false)}
           onExit={() => setModalPhoto(false)}
         />
@@ -343,7 +343,7 @@ export default function PrincipalCliente() {
         />
       )}
 
-<header className="p-3 z-50 w-full text-white">
+      <header className="p-3 z-50 w-full text-white">
         <div className="bg-green-900 rounded-2xl px-6 py-4 shadow-xl flex items-center justify-center md:justify-between md:flex-row flex-col border-b-4 border-green-400">
           <div className="flex md:flex-row flex-col items-center gap-4">
             <div className="rounded-full border-2 border-green-500 w-16 h-16 flex items-center justify-center">
