@@ -16,13 +16,13 @@ import DetalhesPaciente from "./pages/DetalhesPaciente";
 import BordoPaciente from "./pages/BordoPaciente";
 import Relatorio from "./pages/Relatorio";
 
-
 export const http = axios.create({
   baseURL: 'https://api-mypeace.vercel.app/'
 });
 
 function App() {
   return (
+    
     <BrowserRouter>
       <Routes>
         {/* Rotas da Home */}
@@ -35,7 +35,7 @@ function App() {
         <Route path="/principalPsico/listapaciente" element={<ListaPaciente />} />
         <Route path="/principalPsico/registropaciente" element={<RegistroPacientes />} />
         <Route path="/principalPsico/registropaciente/detalhesPaciente" element={<DetalhesPaciente />} />
-        <Route path="/principalPsico/registropaciente/relatorio" element={<Relatorio/>} />
+        <Route path="/principalPsico/registropaciente/relatorio" element={<Relatorio/>} />  
         <Route path="/cadastroPsicologo" element={<CadastroPsicologo />} />
 
         {/* Rotas do Cliente */}
@@ -47,6 +47,7 @@ function App() {
         <Route path="/cadastroCliente" element={<CadastroPaciente />} />
       </Routes>
     </BrowserRouter>
+    
   );
 }
 

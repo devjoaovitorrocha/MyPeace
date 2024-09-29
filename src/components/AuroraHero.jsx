@@ -8,12 +8,10 @@ import {
   motion,
   animate,
 } from "framer-motion";
-import { useNavigate } from "react-router-dom";  
 
 const COLORS_TOP = ["#13FFAA", "#4DB6AC", "#014737", "#3C5454"];
 
 export const AuroraHero = () => {
-  const navigate = useNavigate();  
   const color = useMotionValue(COLORS_TOP[0]);
 
   useEffect(() => {
@@ -29,10 +27,6 @@ export const AuroraHero = () => {
   const border = useMotionTemplate`1px solid ${color}`;
   const boxShadow = useMotionTemplate`0px 4px 24px ${color}`;
 
-  
-  const handleConferirClick = () => {
-    navigate("/cadastroPsicologo");  
-  }
   return (
     <motion.section
       style={{
@@ -59,7 +53,6 @@ export const AuroraHero = () => {
             scale: 0.985,
           }}
           className="group relative flex w-fit items-center gap-1.5 rounded-full bg-gray-950 px-4 py-2 text-gray-50 transition-colors hover:bg-gray-950/50"
-          onClick={handleConferirClick}  
         >
           Conferir
           <ArrowRight className="transition-transform group-hover:-rotate-45 group-active:-rotate-12" />
@@ -67,11 +60,11 @@ export const AuroraHero = () => {
       </div>
 
       <div className="absolute inset-0 z-0">
-        <Canvas>
-          <ambientLight intensity={0.5} />
-          <pointLight position={[10, 10, 10]} />
-          <Cloud />
-        </Canvas>
+      <Canvas>
+      <ambientLight intensity={0.5} />
+      <pointLight position={[10, 10, 10]} />
+      <Cloud />
+    </Canvas>
       </div>
     </motion.section>
   );
