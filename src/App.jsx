@@ -30,7 +30,6 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<Pagina404 />} />
 
-
         {/* Rotas do Psicólogo */}
         <Route path="/principalPsico" element={<PrincipalPsico />} />
         <Route path="/principalPsico/listapaciente" element={<ListaPaciente />} />
