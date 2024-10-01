@@ -4,19 +4,19 @@ const Notification = ({ name, description, time, type }) => {
   const typeStyles = {
     success: {
       backgroundColor: "#00C9A7",
-      icon: <Check size={24} weight="bold" className="text-white" />, 
+      icon: <Check size={34} weight="bold" className="text-white" />, 
     },
     error: {
       backgroundColor: "#FF3D71",
-      icon: <XCircle size={24} weight="bold" className="text-white" />,
+      icon: <XCircle size={34} weight="bold" className="text-white" />,
     },
     warning: {
       backgroundColor: "#FFB800",
-      icon: <Warning size={24} weight="bold" className="text-white" />,
+      icon: <Warning size={34} weight="bold" className="text-white" />,
     },
     info: {
       backgroundColor: "#1E86FF",
-      icon: <Info size={24} weight="bold" className="text-white" />,
+      icon: <Info size={34} weight="bold" className="text-white" />,
     },
   };
 

@@ -206,6 +206,23 @@ export default function RegistroEmocao() {
   };
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
+      <Toaster
+        expand
+        position="top-center"
+        richColors
+        toastOptions={{
+          style: {
+            margin: "10px",
+            padding: "15px",
+            maxWidth: "500px",
+            borderRadius: "8px",
+            gap: "10px",
+            boxShadow: "none",
+            background: "transparent",
+            border: "none",
+          },
+        }}
+      />
       <Header />
       <Container>
         <div className="flex-grow flex items-center justify-center my-12">

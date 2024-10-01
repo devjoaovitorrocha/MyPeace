@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, SignIn } from "@phosphor-icons/react";
-import { Toaster, toast } from "sonner"; 
-import { http } from "../../App"; 
-import Inputs from "../../components/Inputs"; 
+import { Toaster, toast } from "sonner";
+import { http } from "../../App";
+import Inputs from "../../components/Inputs";
 import { Spinner } from "flowbite-react";
-import Notification from "../../components/Notification"; 
-
+import Notification from "../../components/Notification";
 
 const showNotification = ({ name, description, type, time = "Agora" }) => {
   toast(
@@ -20,21 +19,21 @@ const showNotification = ({ name, description, type, time = "Agora" }) => {
 };
 
 export default function Login() {
-  const [email, setEmail] = useState("");  
-  const [senha, setSenha] = useState("");   
-  const [token, setToken] = useState("");  
-  const [id, setId] = useState("");        
-  const [type, setType] = useState("");     
-  const [nome, setNome] = useState("");     
-  const [isLoading, setIsLoading] = useState(false);  
-  const navigate = useNavigate();        
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [token, setToken] = useState("");
+  const [id, setId] = useState("");
+  const [type, setType] = useState("");
+  const [nome, setNome] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setIsLoading(true);  
+    setIsLoading(true);
 
     try {
-      const response = await http.post("/auth/login", { 
+      const response = await http.post("/auth/login", {
         email: email,
         password: senha,
       });
@@ -43,18 +42,15 @@ export default function Login() {
       setToken(response.data.token);
       setType(response.data.type);
 
-      
       const decodedToken = JSON.parse(atob(response.data.token.split('.')[1]));
-      setNome(decodedToken.name);  
+      setNome(decodedToken.name);
 
-     
       showNotification({
         name: "Sucesso!",
         description: `Bem-vindo(a) de volta, ${decodedToken.name}!`,
         type: "success",
       });
 
-      
       if (response.data.type === "pacient") {
         navigate("/principalCliente", { state: { token: response.data.token, id: response.data.id, nome: decodedToken.name } });
       } else if (response.data.type === "psychologist") {
@@ -62,11 +58,9 @@ export default function Login() {
       }
 
     } catch (e) {
-    
       if (e.response) {
-        const errorMsg = e.response.data.msg;
+        const errorMsg = e.response.data?.msg || "Erro de autenticação. Por favor, tente novamente.";
 
-        
         if (e.response.status === 401) {
           if (errorMsg.includes("Senha incorreta")) {
             showNotification({
@@ -83,7 +77,7 @@ export default function Login() {
           } else {
             showNotification({
               name: "Erro!",
-              description: errorMsg || "Erro de autenticação. Por favor, tente novamente.",
+              description: errorMsg,
               type: "error",
             });
           }
@@ -94,17 +88,22 @@ export default function Login() {
             type: "error",
           });
         }
-      } else {
-   
+      } else if (e.request) {
         showNotification({
           name: "Erro!",
           description: "Falha de conexão com o servidor. Verifique sua conexão com a internet e tente novamente.",
           type: "error",
         });
+      } else {
+        showNotification({
+          name: "Erro!",
+          description: "Erro desconhecido. Por favor, tente novamente mais tarde.",
+          type: "error",
+        });
       }
       console.log(e);
     } finally {
-      setIsLoading(false);  
+      setIsLoading(false);
     }
   };
 
@@ -122,10 +121,12 @@ export default function Login() {
             borderRadius: "8px",
             gap: "10px",
             boxShadow: "none",
-            background: " transparent",
+            background: "transparent",
+            border: "none",
           },
         }}
       />
+
       <main className="w-full h-screen grid place-content-center bg-[#3c5454] space-y-6">
         <div className="flex flex-col items-center gap-y-6">
           <h1 className="font-semibold text-white text-2xl text-center">
@@ -154,13 +155,13 @@ export default function Login() {
             <div className="col-span-6 flex flex-col items-center justify-center sm:gap-4">
               <button
                 type="submit"
-                disabled={isLoading}  
+                disabled={isLoading}
                 className={`relative z-0 flex items-center justify-center gap-2 overflow-hidden rounded-lg border-[1px] 
                 border-[#00bfa6] px-4 py-2 font-semibold uppercase text-[#00bfa6] transition-all duration-300 
                 before:absolute before:inset-0 before:-z-10 before:translate-x-[150%] before:translate-y-[150%] before:scale-[2.5] 
                 before:rounded-[100%] before:bg-[#00bfa6] before:transition-transform before:duration-1000 before:content-[''] 
                 w-full hover:scale-105 hover:text-white hover:before:translate-x-[0%] hover:before:translate-y-[0%] active:scale-95
-                ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}  
+                ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {isLoading ? (
                   <Spinner color="white" aria-label="Extra large spinner example" size="lg" />

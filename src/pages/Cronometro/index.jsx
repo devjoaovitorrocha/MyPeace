@@ -5,6 +5,7 @@ import Container from "../../components/Container";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import Notification from "../../components/Notification"; 
+import { toast } from "sonner"; 
 
 
 const showNotification = ({ name, description, type, time = "Agora" }) => {
@@ -33,12 +34,21 @@ export default function Cronometro() {
   
   
   useEffect(() => {
-    if (!state?.token || !state?.id || !state?.nome) {
+    try {
+      if (!state?.token || !state?.id || !state?.nome) {
+        throw new Error("Parâmetros inválidos. Redirecionando para login.");
+      } else {
+        setToken(state.token);
+        setId(state.id);
+        setPacienteNome(state.nome);
+      }
+    } catch (error) {
+      showNotification({
+        name: "Erro de Autenticação",
+        description: error.message,
+        type: "error",
+      });
       navigate("/login");
-    } else {
-      setToken(state.token);
-      setId(state.id);
-      setPacienteNome(state.nome);
     }
   }, [navigate, state]);
 
@@ -66,7 +76,7 @@ export default function Cronometro() {
         }),
       });
   
-      if (!response.ok) throw new Error("Failed to convert text to speech.");
+      if (!response.ok) throw new Error("Falha na conversão de texto para fala.");
   
       const audioBlob = await response.blob();
       const audioUrl = URL.createObjectURL(audioBlob);
@@ -76,39 +86,51 @@ export default function Cronometro() {
     } catch (error) {
       showNotification({
         name: "Erro!",
-        description: "Error in text-to-speech:",
+        description: `Erro no text-to-speech: ${error.message}`,
         type: "error",
       });
     }
   };
   
   const updatePhase = (newPhase) => {
-    if (phaseRef.current !== newPhase) {
-      phaseRef.current = newPhase;
-      setPhase(newPhase);
-      falarTexto(newPhase); 
+    try {
+      if (phaseRef.current !== newPhase) {
+        phaseRef.current = newPhase;
+        setPhase(newPhase);
+        falarTexto(newPhase); 
+      }
+    } catch (error) {
+      console.log('${error.message}');
     }
   };
 
   useEffect(() => {
     let timer;
-    if (running) {
-      if (time < 4) {
-        updatePhase("Puxe o Ar");
-      } else if (time < 11) {
-        updatePhase("Segure o Ar");
-      } else if (time < 19) {
-        updatePhase("Solte o Ar");
-      } else {
-        updatePhase("Concluído");
-        setRunning(false);
-      }
+    try {
+      if (running) {
+        if (time < 4) {
+          updatePhase("Puxe o Ar");
+        } else if (time < 11) {
+          updatePhase("Segure o Ar");
+        } else if (time < 19) {
+          updatePhase("Solte o Ar");
+        } else {
+          updatePhase("Concluído");
+          setRunning(false);
+        }
 
-      timer = setInterval(() => {
-        setTime((prevTime) => prevTime + 1);
-      }, 1000);
-    } else {
-      clearInterval(timer);
+        timer = setInterval(() => {
+          setTime((prevTime) => prevTime + 1);
+        }, 1000);
+      } else {
+        clearInterval(timer);
+      }
+    } catch (error) {
+      showNotification({
+        name: "Erro no Timer",
+        description: `Erro no funcionamento do cronômetro: ${error.message}`,
+        type: "error",
+      });
     }
 
     return () => clearInterval(timer);
@@ -139,6 +161,7 @@ export default function Cronometro() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      
       <Header />
       <Container>
         <div className="flex-grow flex items-center justify-center my-12">

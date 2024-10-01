@@ -18,6 +18,7 @@ import Inputs from "../../components/Inputs";
 import { Toaster, toast } from "sonner";
 import Notification from "../../components/Notification"; 
 import axios from "axios";
+import PhotoModal from "../../components/PhotoModal";
 
 export default function PrincipalCliente() {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ export default function PrincipalCliente() {
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
   const [pacienteNome, setPacienteNome] = useState("");
+  const [photoSrc, setPhotoSrc] = useState(""); 
   const [currentPaciente, setCurrentPaciente] = useState({
     name: "",
     email: "",
@@ -47,6 +49,7 @@ export default function PrincipalCliente() {
       setToken(state.token);
       setId(state.id);
       setPacienteNome(state.nome);
+      
     }
   }, [navigate, state]);
 
@@ -84,6 +87,8 @@ export default function PrincipalCliente() {
       state: { token, id, nome: pacienteNome },
     });
   };
+
+
 
   const fetchPacientInfo = async () => {
     try {
@@ -183,6 +188,10 @@ export default function PrincipalCliente() {
     }
   };
 
+  const handleSavePhoto = async (newPhoto) => {
+    
+ };
+
   const handleErrorResponse = (error) => {
     const errorMsg =
       error.response?.data?.msg || "Erro ao processar a solicitação.";
@@ -211,11 +220,12 @@ export default function PrincipalCliente() {
       setModalEdt(true);
     }
   };
-  const openPhotoModel = (paciente) => {
-    if (paciente){
-      setModalPhoto(true)
+   const openPhotoModel = (paciente) => {
+    if (paciente) {
+      setModalPhoto(true);
     }
-  }
+  };
+
 
   const openDeleteModal = (paciente) => {
     if (paciente) {
@@ -229,9 +239,7 @@ export default function PrincipalCliente() {
     setModalDel(true); 
   };
 
-  const handlePhotoConfirm = () => {
-    setModalPhoto(false);
-  }
+
   return (
     <>
       <Toaster
@@ -246,17 +254,19 @@ export default function PrincipalCliente() {
             borderRadius: "8px",
             gap: "10px",
             boxShadow: "none",
-            background: " transparent",
+            background: "transparent",
+            border: "none",
           },
         }}
       />
-      {modalPhoto && (
-        <Modal
+     {modalPhoto && (
+        <PhotoModal
           isOpen={modalPhoto}
           setIsOpen={setModalPhoto}
           titulo="Adicionar Foto"
-          photo
-          onContinue={handlePhotoConfirm}
+          photoSrc={photoSrc}
+          onPhotoUpload={handleSavePhoto} 
+          onContinue={() => setModalPhoto(false)}
           onExit={() => setModalPhoto(false)}
         />
       )}
@@ -337,11 +347,19 @@ export default function PrincipalCliente() {
         <div className="bg-green-900 rounded-2xl px-6 py-4 shadow-xl flex items-center justify-center md:justify-between md:flex-row flex-col border-b-4 border-green-400">
           <div className="flex md:flex-row flex-col items-center gap-4">
             <div className="rounded-full border-2 border-green-500 w-16 h-16 flex items-center justify-center">
-              <User fill="white" size={24} />
+              {photoSrc ? (
+                <img
+                  src={photoSrc}
+                  alt="Foto de Perfil"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                <User fill="white" size={24} />
+              )}
             </div>
             <div className="md:text-start text-center text-lg">
               <h1 className="font-bold">Olá,</h1>
-              <h2 className="italic">{pacienteNome}</h2>
+              <h2 className="italic">{state?.nome}</h2>
             </div>
           </div>
           <div className="h-px w-full bg-white md:hidden block my-3" />
@@ -350,8 +368,6 @@ export default function PrincipalCliente() {
               <ArrowLeft size={20} />
               <h1 className="font-medium">Sair</h1>
             </div>
-            <span className="absolute -bottom-1 left-1/2 w-0 transition-all h-0.5 bg-white group-hover:w-3/6"></span>
-            <span className="absolute -bottom-1 right-1/2 w-0 transition-all h-0.5 bg-white group-hover:w-3/6"></span>
           </Link>
         </div>
       </header>

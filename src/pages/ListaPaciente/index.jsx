@@ -93,7 +93,7 @@ export default function ListaPaciente() {
       );
 
       showNotification({
-        name: "Paciente cadastrado com sucesso.!",
+        name: "Sucesso",
         description: `Senha: ${response.data.password}`,
         type: "success",
       });
@@ -179,7 +179,8 @@ export default function ListaPaciente() {
             borderRadius: "8px",
             gap: "10px",
             boxShadow: "none",
-            background: " transparent",
+            background: "transparent",
+            border: "none",
           },
         }}
       />

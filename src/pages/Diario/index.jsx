@@ -104,7 +104,7 @@ export default function Diario() {
 
   return (
     <div className="bg-[#3c5454] h-screen p-6 ">
-      <Toaster
+     <Toaster
         expand
         position="top-center"
         richColors
@@ -116,7 +116,8 @@ export default function Diario() {
             borderRadius: "8px",
             gap: "10px",
             boxShadow: "none",
-            background: " transparent",
+            background: "transparent",
+            border: "none",
           },
         }}
       />
