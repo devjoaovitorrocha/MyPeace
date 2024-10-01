@@ -1,6 +1,6 @@
-import { UserPlus, Trash, UserCirclePlus, UploadSimple } from "@phosphor-icons/react";
+import React, { useState, useEffect } from 'react';
+import { UserCirclePlus, Trash, UploadSimple } from "@phosphor-icons/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
 
 export default function PhotoModal({
   isOpen,
@@ -8,14 +8,28 @@ export default function PhotoModal({
   titulo,
   photoSrc,
   onPhotoUpload,
+  onDeletePhoto,
+  onContinue,
+  onExit
 }) {
-  const [selectedPhoto, setSelectedPhoto] = useState(photoSrc || null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handlePhotoUpload = (file) => {
-    if (file && file.type.startsWith("image/")) {
-      const photoURL = URL.createObjectURL(file);
-      setSelectedPhoto(photoURL);
+  useEffect(() => {
+    console.log("Photo URL:", photoSrc);
+  }, [photoSrc]);
+
+  const handleFileChange = (event) => {
+    setSelectedFile(event.target.files[0]);
+    console.log("File selected:", event.target.files[0]);
+  };
+
+  const handleUpload = () => {
+    if (selectedFile) {
+      console.log("Uploading file:", selectedFile);
+      onPhotoUpload(selectedFile);
+    } else {
+      console.error("No file selected for upload.");
     }
   };
 
@@ -28,22 +42,12 @@ export default function PhotoModal({
     event.preventDefault();
     setIsDragging(false);
     const file = event.dataTransfer.files[0];
-    handlePhotoUpload(file);
+    setSelectedFile(file);
+    console.log("File dropped:", file);
   };
 
   const handleDragLeave = () => {
     setIsDragging(false);
-  };
-
-  const handleDeletePhoto = () => {
-    setSelectedPhoto(null);
-  };
-
-  const handleConfirm = () => {
-    if (selectedPhoto) {
-      onPhotoUpload(selectedPhoto);
-    }
-    setIsOpen(false);
   };
 
   return (
@@ -67,11 +71,12 @@ export default function PhotoModal({
             <div className="relative z-10">
               <h3 className="text-3xl font-bold text-center mb-2 py-3">{titulo}</h3>
 
-              {selectedPhoto ? (
+              {photoSrc ? (
                 <img
-                  src={selectedPhoto}
+                  src={photoSrc}
                   alt="Foto de Perfil"
                   className="w-full h-56 object-cover rounded-lg mb-4 shadow-inner"
+                  onError={(e) => { e.target.onerror = null; e.target.src = "fallback-image-url"; }}
                 />
               ) : (
                 <div
@@ -96,19 +101,19 @@ export default function PhotoModal({
                   className="flex-1 py-2 px-4 bg-green-600 text-white rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-500 transition"
                 >
                   <UploadSimple size={20} />
-                  {selectedPhoto ? "Alterar Foto" : "Adicionar Foto"}
+                  {photoSrc ? "Alterar Foto" : "Adicionar Foto"}
                 </label>
                 <input
                   id="photo-upload"
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => handlePhotoUpload(e.target.files[0])}
+                  onChange={handleFileChange}
                 />
 
-                {selectedPhoto && (
+                {photoSrc && (
                   <button
-                    onClick={handleDeletePhoto}
+                    onClick={() => onDeletePhoto(photoSrc.split('/').pop())} // Passa apenas o nome do arquivo
                     className="flex-1 py-2 px-4 bg-red-600 text-white rounded-lg flex items-center justify-center hover:bg-red-500 transition"
                   >
                     <Trash size={20} />
@@ -119,13 +124,13 @@ export default function PhotoModal({
 
               <div className="flex gap-2">
                 <button
-                  onClick={() => setIsOpen(false)} 
+                  onClick={onExit} 
                   className="bg-red-600 hover:bg-red-500 transition-colors text-white font-semibold w-full py-2 rounded"
                 >
                   Voltar
                 </button>
                 <button
-                  onClick={handleConfirm}
+                  onClick={handleUpload}
                   className="bg-[#00bfa6] text-white transition-colors border-2 border-[#00bfa6]  font-semibold w-full py-2 rounded"
                 >
                   Continuar

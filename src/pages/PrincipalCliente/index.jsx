@@ -38,6 +38,7 @@ export default function PrincipalCliente() {
     email: "",
   });
 
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -49,7 +50,7 @@ export default function PrincipalCliente() {
       setToken(state.token);
       setId(state.id);
       setPacienteNome(state.nome);
-      
+      fetchPacientInfo(state.id, state.token);
     }
   }, [navigate, state]);
 
@@ -64,44 +65,25 @@ export default function PrincipalCliente() {
     );
   };
 
-  const handleCronometro = () => {
-    navigate("/principalCliente/cronometro", {
-      state: { token, id, nome: pacienteNome },
-    });
-  };
-
-  const handleRegistroEmocoes = () => {
-    navigate("/principalCliente/registroemocoes", {
-      state: { token, id, nome: pacienteNome },
-    });
-  };
-
-  const handleDiario = () => {
-    navigate("/principalCliente/diario", {
-      state: { token, id, nome: pacienteNome },
-    });
-  };
-
-  const handleDiarioBordo = () => {
-    navigate("/principalCliente/diariobordo", {
-      state: { token, id, nome: pacienteNome },
-    });
-  };
-
-
-
-  const fetchPacientInfo = async () => {
+  const fetchPacientInfo = async (userId, token) => {
     try {
+      console.log("Fetching patient info...");
       const response = await axios.get(
-        `https://api-mypeace.vercel.app/get/pacientInfo/${id}`,
+        `https://api-mypeace.vercel.app/get/pacientInfo/${userId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      console.log("Patient info response:", response.data);
       if (response.data) {
-        const { name, email } = response.data;
+        const { name, email, photo_name } = response.data;
         setNome(name);
         setEmail(email);
+        if (photo_name) {
+          const photoUrl = await getPhoto(userId, token, photo_name);
+          setPhotoSrc(photoUrl);
+          console.log("Photo URL set:", photoUrl);
+        }
       } else {
         throw new Error("Dados do paciente não encontrados.");
       }
@@ -113,6 +95,69 @@ export default function PrincipalCliente() {
       });
       console.error("Erro ao buscar paciente:", error.response?.data || error.message);
     }
+  };
+
+  const getPhoto = async (userId, token, photoName) => {
+    try {
+      const response = await axios.get(
+        `https://api-mypeace.vercel.app/get/photo/${userId}/${photoName}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          responseType: 'blob', 
+        }
+      );
+      const imageUrl = URL.createObjectURL(response.data);
+      return imageUrl;
+    } catch (error) {
+      console.error("Error fetching photo:", error.response?.data || error.message);
+      throw error;
+    }
+  };
+
+  const handleSavePhoto = async (newPhoto) => {
+    try {
+      console.log("Uploading photo...");
+      const formData = new FormData();
+      formData.append("photo", newPhoto);
+      formData.append("userType", "pacient");
+
+      
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
+
+      const response = await axios.post(
+        `https://api-mypeace.vercel.app/upload/photo/${id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Photo upload response:", response.data);
+      if (response.status === 201) {
+        showNotification({
+          name: "Sucesso!",
+          description: "Foto atualizada com sucesso!",
+          type: "success",
+        });
+        const photoUrl = await getPhoto(id, token, response.data.fileName);
+        setPhotoSrc(photoUrl);
+        console.log("Photo URL set:", photoUrl);
+        setModalPhoto(false);
+      }
+    } catch (error) {
+      console.error("Error uploading photo:", error.response?.data || error.message);
+      handleErrorResponse(error);
+    }
+  };
+
+  const handleDeletePhoto = async (photoName) => { //deletar foto
+    
   };
 
   const edtDadosSubmit = async (e) => {
@@ -188,10 +233,6 @@ export default function PrincipalCliente() {
     }
   };
 
-  const handleSavePhoto = async (newPhoto) => {
-    
- };
-
   const handleErrorResponse = (error) => {
     const errorMsg =
       error.response?.data?.msg || "Erro ao processar a solicitação.";
@@ -239,6 +280,30 @@ export default function PrincipalCliente() {
     setModalDel(true); 
   };
 
+  const handleCronometro = () => {
+    navigate("/principalCliente/cronometro", {
+      state: { token, id, nome: pacienteNome },
+    });
+  };
+
+  const handleRegistroEmocoes = () => {
+    navigate("/principalCliente/registroemocoes", {
+      state: { token, id, nome: pacienteNome },
+    });
+  };
+
+  const handleDiario = () => {
+    navigate("/principalCliente/diario", {
+      state: { token, id, nome: pacienteNome },
+    });
+  };
+
+  const handleDiarioBordo = () => {
+    navigate("/principalCliente/diariobordo", {
+      state: { token, id, nome: pacienteNome },
+    });
+  };
+
 
   return (
     <>
@@ -265,7 +330,8 @@ export default function PrincipalCliente() {
           setIsOpen={setModalPhoto}
           titulo="Adicionar Foto"
           photoSrc={photoSrc}
-          onPhotoUpload={handleSavePhoto} 
+          onPhotoUpload={handleSavePhoto}
+          onDeletePhoto={handleDeletePhoto}
           onContinue={() => setModalPhoto(false)}
           onExit={() => setModalPhoto(false)}
         />
