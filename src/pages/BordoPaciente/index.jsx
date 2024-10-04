@@ -1,17 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Toaster } from 'sonner';
+import { Toaster, toast } from 'sonner';
 import { ArrowLeft, ExclamationMark } from "@phosphor-icons/react";
+import { Spinner } from "flowbite-react";
 import { http } from "../../App";
+import Notification from "../../components/Notification";
+
+const showNotification = ({ name, description, type, time = "Agora" }) => {
+  toast(
+    <Notification
+      name={name}
+      description={description}
+      time={time}
+      type={type}
+    />
+  );
+};
+
+const handleErroResponse = (error) => {
+  if (error.response) {
+    const { status, data } = error.response;
+    let message = "Ocorreu um erro inesperado.";
+    if (status === 400) {
+      message = data.message || "Requisição inválida.";
+    } else if (status === 401) {
+      message = "Autenticação falhou. Faça login novamente.";
+    } else if (status === 404) {
+      message = "Recurso não encontrado.";
+    } else if (status === 500) {
+      message = "Erro interno no servidor. Tente novamente mais tarde.";
+    }
+    
+    showNotification({
+      name: `Erro ${status}`,
+      description: message,
+      type: "error",
+    });
+  } else {
+    showNotification({
+      name: "Erro de conexão",
+      description: "Não foi possível se conectar ao servidor.",
+      type: "error",
+    });
+  }
+};
 
 export default function BordoPaciente() {
   const { state } = useLocation();
   const [token, setToken] = useState();
   const [id, setId] = useState();
   const [pacienteNome, setPacienteNome] = useState("");
+  const [reports, setReports] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("Estado recebido:", state); 
     if (!state?.token || !state?.id || !state?.nome) {
       showNotification({
         name: "Aviso!",
@@ -23,8 +67,28 @@ export default function BordoPaciente() {
       setToken(state.token);
       setId(state.id);
       setPacienteNome(state.nome);
+      fetchReports(state.id, state.token);
     }
   }, [navigate, state]);
+
+  const fetchReports = async (id, token) => {
+    console.log("ID do Paciente:", id); 
+    console.log("Token:", token); 
+    try {
+        const response = await http.get(`https://api-mypeace.vercel.app/getAll/reports/psychologist/pacient/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        console.log("Resposta da API:", response); 
+        setReports(response.data.reports); 
+        
+    } catch (error) {
+        console.error("Erro ao buscar relatórios:", error.response ? error.response.data : error.message);
+        handleErroResponse(error);
+    } finally {
+        setIsLoading(false);
+    }
+  };
 
   const handleReturn = () => {
     navigate("/principalCliente", { state: { token, id, nome: pacienteNome } });
@@ -50,7 +114,6 @@ export default function BordoPaciente() {
         }}
       />
 
-
       <header className="flex flex-col md:flex-row items-center justify-between max-w-[1440px] mx-auto mb-4 md:mb-6">
         <h1 className="text-2xl md:text-4xl py-4 text-white text-center font-semibold">
           Diario de Bordo
@@ -71,46 +134,57 @@ export default function BordoPaciente() {
         </span>
       </header>
 
-
       <main className="max-w-[1440px] mx-auto bg-white shadow-lg rounded-lg p-8">
         <div className="space-y-6">
-
-          <div className="mb-4 p-6 rounded-lg shadow-sm">
-            <h2 className="text-2xl font-semibold mb-2 text-gray-700">Relatório da sua última consulta</h2>
-
-            <div className="space-y-4">
-              <div>
-                <p className="text-gray-700 font-medium">Tópicos Abordados:</p>
-                <p className="text-gray-600">Melhorar a autoestima, enfrentamento de desafios emocionais.</p>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <Spinner color="indigo" size="xl" />
+            </div>
+          ) : reports.length > 0 ? (
+            reports.map((report, index) => (
+              <div key={index} className="mb-4 p-6 rounded-lg shadow-sm">
+                <h2 className="text-2xl font-semibold mb-2 text-gray-700">Relatório da sua última consulta</h2>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-gray-700 font-medium">Tópicos Abordados:</p>
+                    <p className="text-gray-600">{report.topics}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-700 font-medium">Desafios e Dificuldades:</p>
+                    <p className="text-gray-600">{report.challenges}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-700 font-medium">Tarefas para o Cliente:</p>
+                    <p className="text-gray-600">{report.tasks}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-700 font-medium">Observações:</p>
+                    <p className="text-gray-600">{report.observations}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-700 font-medium">Progressos Notáveis:</p>
+                    <p className="text-gray-600">{report.progress}</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-gray-700 font-medium">Desafios e Dificuldades:</p>
-                <p className="text-gray-600">Insegurança no ambiente de trabalho, falta de organização.</p>
-              </div>
-              <div>
-                <p className="text-gray-700 font-medium">Tarefas para o Cliente:</p>
-                <p className="text-gray-600">Estabelecer uma rotina de exercícios físicos.</p>
+            ))
+          ) : (
+            <div className="p-6 rounded-lg">
+              <div className="cursor-pointer w-full p-4 rounded relative overflow-hidden group bg-white shadow-3D" onClick={handleReturn}>
+                <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300" />
+                <ExclamationMark className="absolute z-10 -top-12 -right-12 text-9xl text-slate-100 group-hover:text-green-400 group-hover:rotate-12 transition-transform duration-300" />
+                <ArrowLeft className="mb-2 text-2xl text-green-600 group-hover:text-white transition-colors relative z-10 duration-300" />
+                <h3 className="font-medium text-lg text-slate-950 group-hover:text-white relative z-10 duration-300 text-center sm:text-left">
+                  O psicólogo ainda não enviou nenhum relatório.
+                </h3>
+                <p className="text-slate-400 group-hover:text-green-200 relative z-10 duration-300 mt-2  text-center sm:text-left">
+                  Continue praticando as tarefas discutidas e nos veremos na próxima consulta.
+                </p>
               </div>
             </div>
-          </div>
-
-
-          <div className="p-6 rounded-lg">
-            <div className="cursor-pointer w-full p-4 rounded relative overflow-hidden group bg-white shadow-3D" onClick={handleReturn}>
-              <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-300" />
-              <ExclamationMark className="absolute z-10 -top-12 -right-12 text-9xl text-slate-100 group-hover:text-green-400 group-hover:rotate-12 transition-transform duration-300" />
-              <ArrowLeft className="mb-2 text-2xl text-green-600 group-hover:text-white transition-colors relative z-10 duration-300" />
-              <h3 className="font-medium text-lg text-slate-950 group-hover:text-white relative z-10 duration-300 text-center sm:text-left">
-                Continue praticando as tarefas discutidas e nos veremos na próxima consulta.
-              </h3>
-              <p className="text-slate-400 group-hover:text-green-200 relative z-10 duration-300 mt-2 group-hover:rotate-1 text-center sm:text-left">
-              </p>
-            </div>
-          </div>
-
+          )}
         </div>
       </main>
-
 
       <div className="flex justify-center md:hidden py-6">
         <span onClick={handleReturn} className="cursor-pointer hover:opacity-95 relative w-fit block">
