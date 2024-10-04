@@ -8,20 +8,28 @@ export default function PhotoModal({
   titulo,
   photoSrc,
   onPhotoUpload,
-  onDeletePhoto,
-  onContinue,
-  onExit
+  onDeletePhoto
 }) {
   const [selectedFile, setSelectedFile] = useState(null);
+  const [preview, setPreview] = useState(photoSrc);
   const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     console.log("Photo URL:", photoSrc);
+    setPreview(photoSrc); // Atualiza a pré-visualização com a foto atual
   }, [photoSrc]);
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-    console.log("File selected:", event.target.files[0]);
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result); // Define a pré-visualização da imagem
+      };
+      reader.readAsDataURL(file);
+      setSelectedFile(file);
+      console.log("File selected:", file);
+    }
   };
 
   const handleUpload = () => {
@@ -43,6 +51,11 @@ export default function PhotoModal({
     setIsDragging(false);
     const file = event.dataTransfer.files[0];
     setSelectedFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result); // Define a pré-visualização da imagem
+    };
+    reader.readAsDataURL(file);
     console.log("File dropped:", file);
   };
 
@@ -65,15 +78,15 @@ export default function PhotoModal({
             animate={{ scale: 1, rotate: "0deg" }}
             exit={{ scale: 0, rotate: "0deg" }}
             onClick={(e) => e.stopPropagation()} 
-            className="bg-gradient-to-r from-green-500 to-green-700 text-white p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden"
+            className="bg-white border-2 border-[#00bfa6] text-gray-800 p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden"
           >
-            <UserCirclePlus className="text-white/10 rotate-12 text-[250px] absolute z-0 -top-24 -left-24" />
+            <UserCirclePlus className="text-[#00bfa6] rotate-12 text-[250px] absolute z-0 -top-24 -left-24" />
             <div className="relative z-10">
               <h3 className="text-3xl font-bold text-center mb-2 py-3">{titulo}</h3>
 
-              {photoSrc ? (
+              {preview ? (
                 <img
-                  src={photoSrc}
+                  src={preview}
                   alt="Foto de Perfil"
                   className="w-full h-56 object-cover rounded-lg mb-4 shadow-inner"
                   onError={(e) => { e.target.onerror = null; e.target.src = "fallback-image-url"; }}
@@ -95,13 +108,13 @@ export default function PhotoModal({
                 </div>
               )}
 
-              <div className="flex justify-between gap-4 mb-4">
+              <div className="flex justify-center space-x-2 mb-4">
                 <label
                   htmlFor="photo-upload"
-                  className="flex-1 py-2 px-4 bg-green-600 text-white rounded-lg flex items-center justify-center cursor-pointer hover:bg-green-500 transition"
+                  className="flex-1 py-2 px-4 bg-[#00bfa6] text-white rounded-lg flex items-center justify-center cursor-pointer hover:bg-[#009b8a] transition"
                 >
                   <UploadSimple size={20} />
-                  {photoSrc ? "Alterar Foto" : "Adicionar Foto"}
+                  {preview ? "Alterar Foto" : "Adicionar Foto"}
                 </label>
                 <input
                   id="photo-upload"
@@ -111,9 +124,9 @@ export default function PhotoModal({
                   onChange={handleFileChange}
                 />
 
-                {photoSrc && (
+                {preview && (
                   <button
-                    onClick={() => onDeletePhoto(photoSrc.split('/').pop())} // Passa apenas o nome do arquivo
+                    onClick={() => onDeletePhoto(preview.split('/').pop())} // Passa apenas o nome do arquivo
                     className="flex-1 py-2 px-4 bg-red-600 text-white rounded-lg flex items-center justify-center hover:bg-red-500 transition"
                   >
                     <Trash size={20} />
@@ -122,20 +135,14 @@ export default function PhotoModal({
                 )}
               </div>
 
-              <div className="flex gap-2">
-                <button
-                  onClick={onExit} 
-                  className="bg-red-600 hover:bg-red-500 transition-colors text-white font-semibold w-full py-2 rounded"
-                >
-                  Voltar
-                </button>
+              {preview && ( // Mover o botão Enviar para baixo
                 <button
                   onClick={handleUpload}
-                  className="bg-[#00bfa6] text-white transition-colors border-2 border-[#00bfa6]  font-semibold w-full py-2 rounded"
+                  className="w-full py-2 px-4 bg-[#00bfa6] text-white rounded-lg flex items-center justify-center hover:bg-[#009b8a] transition"
                 >
-                  Continuar
+                  Enviar
                 </button>
-              </div>
+              )}
             </div>
           </motion.div>
         </motion.div>

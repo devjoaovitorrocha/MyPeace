@@ -28,8 +28,7 @@ export default function CadastroPsicologo() {
   const [registroNumero, setRegistroNumero] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [isEmailVerificationVisible, setEmailVerificationVisible] =
-    useState(false);
+  const [isEmailVerificationVisible, setEmailVerificationVisible] = useState(false);
   const [codigo, setCodigo] = useState("");
   const [idUsuario, setIdUsuario] = useState("");
   const navigate = useNavigate();
@@ -43,7 +42,6 @@ export default function CadastroPsicologo() {
         description: "As senhas não coincidem.",
         type: "info",
       });
-      
       return;
     }
 
@@ -53,7 +51,6 @@ export default function CadastroPsicologo() {
         description: "CPF inválido. Verifique o número.",
         type: "info",
       });
-      
       return;
     }
 
@@ -63,7 +60,6 @@ export default function CadastroPsicologo() {
         description: "CRP inválido. Verifique o número.",
         type: "info",
       });
-    
       return;
     }
 
@@ -91,7 +87,7 @@ export default function CadastroPsicologo() {
         } else {
           showNotification({
             name: "Erro!",
-            description:   "Erro ao cadastrar psicólogo. Por favor, tente novamente mais tarde.",
+            description: "Erro ao cadastrar psicólogo. Por favor, tente novamente mais tarde.",
             type: "error",
           });
         }
@@ -143,7 +139,6 @@ export default function CadastroPsicologo() {
           description: "Erro ao verificar o código. Por favor, tente novamente mais tarde.",
           type: "error",
         });
-        
       }
     }
   };
@@ -164,7 +159,7 @@ export default function CadastroPsicologo() {
 
   return (
     <section className="bg-white">
-       <Toaster
+      <Toaster
         expand
         position="top-center"
         richColors
