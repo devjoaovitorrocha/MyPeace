@@ -20,7 +20,7 @@ export default function Modal({
   onExit,
   children,
   photo,
-  addpacient
+  addpacient,
 }) {
   return (
     <AnimatePresence>

@@ -9,6 +9,7 @@ import {
   UserPlus,
   Wind,
   BookOpenText,
+  Chats,
 } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -19,6 +20,7 @@ import { Toaster, toast } from "sonner";
 import Notification from "../../components/Notification"; 
 import axios from "axios";
 import PhotoModal from "../../components/PhotoModal";
+import ModalChatAviso from '../../components/ModalChatAviso';
 
 export default function PrincipalCliente() {
   const navigate = useNavigate();
@@ -42,6 +44,8 @@ export default function PrincipalCliente() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [modalChatAviso, setModalChatAviso] = useState(false);
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
@@ -323,6 +327,15 @@ export default function PrincipalCliente() {
     });
   };
 
+  const handleChat = () => {
+    setModalChatAviso(true); // Abre o modal de aviso
+  };
+
+  const handleChatRedirect = () => {
+    window.open("https://chat-paulo.vercel.app/", "_blank"); // Redireciona para o site
+    setModalChatAviso(false); // Fecha o modal
+  };
+
 
   return (
     <>
@@ -427,6 +440,13 @@ export default function PrincipalCliente() {
           delOnClick={deletar}
         />
       )}
+      {modalChatAviso && (
+        <ModalChatAviso
+          isOpen={modalChatAviso}
+          setIsOpen={setModalChatAviso}
+          onContinue={handleChatRedirect} // Redireciona ao continuar
+        />
+      )}
 
       <header className="p-3 z-50 w-full text-white">
         <div className="bg-green-900 rounded-2xl px-6 py-4 shadow-xl flex items-center justify-center md:justify-between md:flex-row flex-col border-b-4 border-green-400">
@@ -466,6 +486,7 @@ export default function PrincipalCliente() {
           onClickDiario={handleDiario}
           onClickPhoto={() => openPhotoModel(currentPaciente)}
           onClickDiarioBordo={handleDiarioBordo}
+          onClickChat={handleChat}
         />
         <h1 className="py-11 text-2xl font-bold">Guias</h1>
         <section className="flex items-center flex-col gap-10">
@@ -503,7 +524,7 @@ export default function PrincipalCliente() {
   );
 }
 
-const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClickCronometro, onClickDiario, onClickPhoto, onClickDiarioBordo }) => {
+const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClickCronometro, onClickDiario, onClickPhoto, onClickDiarioBordo, onClickChat }) => {
   return (
     <div className="grid justify-between gap-4 grid-cols-2 lg:grid-cols-4">
       <HoverForCards
@@ -529,6 +550,12 @@ const HoverDevCards = ({ onClickEdt, onClickDel, onClickRegistroEmocoes, onClick
         subtitle={<ArrowUpRight />}
         Icon={Database}
         onClick={onClickRegistroEmocoes}
+      />
+      <HoverForCards
+        title="Chat"
+        subtitle={<ArrowUpRight />}
+        Icon={Chats}
+        onClick={onClickChat}
       />
       <HoverForCards
         title="Adicionar Foto"
