@@ -156,8 +156,27 @@ export default function PrincipalCliente() {
     }
   };
 
-  const handleDeletePhoto = async (photoName) => { //deletar foto
-    
+  const handleDeletePhoto = async (photoName) => {
+    try {
+      const response = await axios.post(
+        `https://api-mypeace.vercel.app/delete/photo/${id}/${photoName}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response.status === 200) {
+        showNotification({
+          name: "Sucesso!",
+          description: "Foto deletada com sucesso!",
+          type: "success",
+        });
+        setPhotoSrc(""); // Limpa a foto atual
+      }
+    } catch (error) {
+      console.error("Erro ao deletar foto:", error.response?.data || error.message);
+      handleErrorResponse(error);
+    }
   };
 
   const edtDadosSubmit = async (e) => {

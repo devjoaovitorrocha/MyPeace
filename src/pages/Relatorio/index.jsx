@@ -52,14 +52,22 @@ export default function Relatorio() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const { paciente, token, idUser, nome } = state || {};
-  const id = idUser;
+  const idPsicologo = idUser; 
+  const idPacient = paciente?._id; 
+
+  
+  console.log("Token recebido:", token);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [topics, setTopics] = useState("");
+  const [observations, setObservations] = useState("");
+  const [progress, setProgress] = useState("");
+  const [challenges, setChallenges] = useState("");
+  const [tasks, setTasks] = useState("");
 
   useEffect(() => {
     console.log("Estado recebido em DetalhesPaciente:", { paciente, token, idUser, nome });
     if (!paciente || !token || !idUser || !nome) {
-    
       showNotification({
         name: "Aviso!",
         description: "Dados insuficientes. Redirecionando para a página principal.",
@@ -80,7 +88,7 @@ export default function Relatorio() {
       });
       navigate("/principalPsico/registropaciente");
     } else {
-      navigate("/principalPsico/registropaciente", { state: { token, idUser: idUser, id, nome: nome } });
+      navigate("/principalPsico/registropaciente", { state: { token, idUser: idPsicologo, id: idPacient, nome: nome } });
     }
   };
 
@@ -88,18 +96,46 @@ export default function Relatorio() {
     try {
       setIsLoading(true);
   
-      const response = await http.post("", {
-        pacienteId: paciente?.id,
-       
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
+      // Verifique se o idPacient está definido
+      if (!idPacient) {
+        showNotification({
+          name: "Erro!",
+          description: "ID do paciente não está definido.",
+          type: "error",
+        });
+        return;
+      }
+      
+     
+      console.log("Dados enviados:", {
+        topics,
+        observations,
+        progress,
+        challenges,
+        tasks,
       });
+
+      const response = await http.post(
+        `https://api-mypeace.vercel.app/register/report/psychologist/${idPsicologo}/${idPacient}`, 
+        {
+          topics,
+          observations,
+          progress,
+          challenges,
+          tasks,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
       showNotification({
         name: "Sucesso!",
         description: "Relatório enviado com sucesso.",
         type: "success",
       });
     } catch (error) {
+      console.error("Erro ao enviar relatório:", error); 
       handleErroResponse(error);
     } finally {
       setIsLoading(false);
@@ -152,15 +188,51 @@ export default function Relatorio() {
               <h2 className="text-2xl font-semibold mb-4">Registro do paciente</h2>
               <p className="text-gray-600 mb-6">Nome do paciente: {paciente?.name || "Paciente não identificado"}</p> 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
-                {["Tópicos Abordados", "Observações", "Progressos Notáveis", "Desafios e Dificuldades", "Tarefas para o Cliente"].map((label) => (
-                  <div key={label}>
-                    <label className="block text-sm font-medium text-gray-700">{label}:</label>
-                    <textarea
-                      className="w-full h-24 p-3 mt-1 bg-gray-100 text-gray-700 border border-green-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-shadow"
-                      placeholder={`Escreva sobre ${label.toLowerCase()}...`}
-                    />
-                  </div>
-                ))}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Tópicos Abordados:</label>
+                  <textarea
+                    className="w-full h-24 p-3 mt-1 bg-gray-100 text-gray-700 border border-green-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-300 transition-shadow"
+                    placeholder="Escreva sobre os tópicos abordados..."
+                    value={topics}
+                    onChange={(e) => setTopics(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Observações:</label>
+                  <textarea
+                    className="w-full h-24 p-3 mt-1 bg-gray-100 text-gray-700 border border-green-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-300 transition-shadow"
+                    placeholder="Escreva suas observações..."
+                    value={observations}
+                    onChange={(e) => setObservations(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Progressos Notáveis:</label>
+                  <textarea
+                    className="w-full h-24 p-3 mt-1 bg-gray-100 text-gray-700 border border-green-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-300 transition-shadow"
+                    placeholder="Escreva sobre os progressos notáveis..."
+                    value={progress}
+                    onChange={(e) => setProgress(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Desafios e Dificuldades:</label>
+                  <textarea
+                    className="w-full h-24 p-3 mt-1 bg-gray-100 text-gray-700 border border-green-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-300 transition-shadow"
+                    placeholder="Escreva sobre os desafios e dificuldades..."
+                    value={challenges}
+                    onChange={(e) => setChallenges(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Tarefas para o Cliente:</label>
+                  <textarea
+                    className="w-full h-24 p-3 mt-1 bg-gray-100 text-gray-700 border border-green-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-300 transition-shadow"
+                    placeholder="Escreva sobre as tarefas para o cliente..."
+                    value={tasks}
+                    onChange={(e) => setTasks(e.target.value)}
+                  />
+                </div>
               </div>
               <div className="flex justify-end mt-6">
                 <button 

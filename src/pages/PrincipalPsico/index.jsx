@@ -88,6 +88,7 @@ export default function PrincipalPsico() {
       setToken(state.token);
       setId(state.id);
       setPsicologoNome(state.nome);
+      fetchPsychologistInfo(state.id, state.token);
     }
   }, [navigate, state]);
 
@@ -102,24 +103,53 @@ export default function PrincipalPsico() {
     );
   };
 
+  
 
-  const fetchPsychologistInfo = async () => {
+  const fetchPsychologistInfo = async (id, token) => {
     try {
       const response = await axios.get(`https://api-mypeace.vercel.app/get/psychologistInfo/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      const { name, email, cpf, registerNumber } = response.data;
+    });
+     if(response.data){ 
+      const { name, email, cpf, registerNumber, photo_name } = response.data;
       setNome(name);
       setEmail(email);
       setCpf(cpf);
       setRegisterNumber(registerNumber);
+      if (photo_name) {
+        const photoUrl = await getPhoto(id, token, photo_name);
+        setPhotoSrc(photoUrl);
+        console.log("Photo URL set:", photoUrl);
+      }
+    } else {
+      throw new Error("Dados do psicologo não encontrados.");
+    }
+  } catch (error) {
+    showNotification({
+      name: "Erro!",
+      description: "Erro ao buscar informações do psicologo.",
+      type: "error",
+    });
+    console.error("Erro ao buscar psicologo:", error.response?.data || error.message);
+  }
+};
+
+  const getPhoto = async (id, token, photoName) => {
+    try {
+      const response = await axios.get(
+        `https://api-mypeace.vercel.app/get/photo/${id}/${photoName}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          responseType: 'blob', 
+        }
+      );
+      const imageUrl = URL.createObjectURL(response.data);
+      return imageUrl;
     } catch (error) {
-      showNotification({
-        name: "Erro!",
-        description: "Erro ao buscar informações do psicólogo.",
-        type: "error",
-      });
-      console.error("Erro ao buscar paciente:", error.response?.data || error.message);
+      console.error("Error fetching photo:", error.response?.data || error.message);
+      throw error;
     }
   };
 
@@ -255,7 +285,60 @@ export default function PrincipalPsico() {
   };
 
   const handleSavePhoto = async (newPhoto) => {
+    try {
+      const formData = new FormData();
+      formData.append("photo", newPhoto);
+      formData.append("userType", "psychologist");
 
+      for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
+
+      const response = await axios.post(`https://api-mypeace.vercel.app/upload/photo/${id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+     console.log("Photo upload response:", response.data);
+      if (response.status === 201) {
+        showNotification({
+          name: "Sucesso!",
+          description: "Foto atualizada com sucesso!",
+          type: "success",
+        });
+        const photoUrl = await getPhoto(id, token, response.data.fileName);
+        setPhotoSrc(photoUrl);
+        console.log("Photo URL set:", photoUrl);
+        setModalPhoto(false);
+      }
+    } catch (error) {
+      console.error("Error uploading photo:", error.response?.data || error.message);
+      handleErrorResponse(error);
+    }
+  };
+
+  const handleDeletePhoto = async (photoName) => {
+    try {
+      const response = await axios.post(
+        `https://api-mypeace.vercel.app/delete/photo/${id}/${photoName}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response.status === 200) {
+        showNotification({
+          name: "Sucesso!",
+          description: "Foto deletada com sucesso!",
+          type: "success",
+        });
+        setPhotoSrc(""); // Limpa a foto atual
+      }
+    } catch (error) {
+      console.error("Erro ao deletar foto:", error.response?.data || error.message);
+      handleErrorResponse(error);
+    }
   };
 
   const openPhotoModel = () => {
@@ -292,8 +375,7 @@ export default function PrincipalPsico() {
           titulo="Adicionar Foto"
           photoSrc={photoSrc}
           onPhotoUpload={handleSavePhoto}
-          onContinue={() => setModalPhoto(false)}
-          onExit={() => setModalPhoto(false)}
+          onDeletePhoto={(photoName) => handleDeletePhoto(photoName)}
         />
       )}
       {modalEdt && (
