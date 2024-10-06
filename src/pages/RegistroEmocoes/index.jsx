@@ -5,7 +5,6 @@ import Container from "../../components/Container";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft } from "@phosphor-icons/react";
 import Chat from "../../components/Chat";
-import axios from "axios";  
 import { http } from "../../App";
 import { Toaster, toast } from "sonner";  
 import Notification from "../../components/Notification"; 
@@ -118,14 +117,14 @@ export default function RegistroEmocao() {
     });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!token || !id) {
       showNotification({
         name: "Aviso!",
         description: "Token ou ID ausente. Por favor, faça login novamente.",
         type: "warning",
       });
-      LimparMensagem();
+      clearMessage();
       return;
     }
 
@@ -135,7 +134,7 @@ export default function RegistroEmocao() {
         description: "Por favor, preencha a descrição e selecione uma emoção.",
         type: "warning",
       });
-      LimparMensagem();
+      clearMessage();
       return;
     }
 
@@ -149,61 +148,59 @@ export default function RegistroEmocao() {
     };
     setSavedFeelings([...savedFeelings, newEntry]);
 
-    http.post(`/register/report/${id}`,
-      {
+    try {
+      const response = await http.post(`/register/report/${id}`, {
         feeling: selectedFeeling,
         description: description,
-      },
-      {
+      }, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
-    )
-      .then((response) => {
-        const msg = response?.data?.msg || "Salvo com sucesso!";
-        showNotification({
-          name: "Sucesso!",
-          description: msg,
-          type: "success",
-        });
-        setDescription("");
-        setSelectedFeeling("");
-        LimparMensagem();
-
-        if (category === "ansiedade") {
-          handleCronometro();
-        } else if (category) {
-          const message = getMessageForCategory(category);
-          setIsChatOpen(true);
-          setChatMessages([{ text: message, sent: false }]);
-        }
-      })
-      .catch((error) => {
-        const errorMsg = error?.response?.data?.msg || "Erro ao salvar os dados.";
-        showNotification({
-          name: "Erro!",
-          description: errorMsg,
-          type: "error",
-        });
-        LimparMensagem();
-
-        if (category === "ansiedade") {
-          handleCronometro();
-        } else if (category) {
-          const message = getMessageForCategory(category);
-          setIsChatOpen(true);
-          setChatMessages([{ text: message, sent: false }]);
-        }
       });
+
+      const msg = response?.data?.msg || "Salvo com sucesso!";
+      showNotification({
+        name: "Sucesso!",
+        description: msg,
+        type: "success",
+      });
+      setDescription("");
+      setSelectedFeeling("");
+      clearMessage();
+
+     
+      if (category === "ansiedade") {
+        showNotification({
+          name: "Respiração",
+          description: "Você será direcionado para a respiração em 2 segundos.",
+          type: "info",
+        });
+        setTimeout(() => {
+          handleCronometro(); 
+        }, 2000);
+      } else if (category) {
+        const message = getMessageForCategory(category);
+        setIsChatOpen(true);
+        setChatMessages([{ text: message, sent: false }]);
+      }
+    } catch (error) {
+      const errorMsg = error?.response?.data?.msg || "Erro ao salvar os dados.";
+      showNotification({
+        name: "Erro!",
+        description: errorMsg,
+        type: "error",
+      });
+      clearMessage();
+    }
   };
 
-  const LimparMensagem = () => {
+  const clearMessage = () => {
     setTimeout(() => {
       setMensagem("");
       setMensagemTipo("");
     }, 1000);
   };
+
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       <Toaster
@@ -244,10 +241,7 @@ export default function RegistroEmocao() {
                 <button
                   key={index}
                   onClick={() => setSelectedFeeling(feeling)}
-                  className={`text-3xl p-2 transition-all ${selectedFeeling === feeling
-                    ? "border-2 bg-[#00bfa6] rounded-full"
-                    : ""
-                    }`}
+                  className={`text-3xl p-2 transition-all ${selectedFeeling === feeling ? "border-2 bg-[#00bfa6] rounded-full" : ""}`}
                 >
                   {emoji}
                 </button>
@@ -274,8 +268,8 @@ export default function RegistroEmocao() {
             <div className="mt-4 flex justify-center">
               <Link
                 className="cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] 
-              after:absolute after:h-[2px] after:bg-black text-black after:w-full after:scale-x-0 
-              after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
+                after:absolute after:h-[2px] after:bg-black text-black after:w-full after:scale-x-0 
+                after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
                 to="/principalCliente"
                 state={{ token, id, nome: pacienteNome }}
               >
@@ -297,23 +291,6 @@ export default function RegistroEmocao() {
           initialMessages={chatMessages}
         />
       )}
-
-      <Toaster
-        expand
-        position="top-center"
-        richColors
-        toastOptions={{
-          style: {
-            margin: "10px",
-            padding: "15px",
-            maxWidth: "500px",
-            borderRadius: "8px",
-            gap: "10px",
-            boxShadow: "none",
-            background: "transparent",
-          },
-        }}
-      />
     </div>
   );
 }

@@ -80,7 +80,7 @@ export default function PhotoModal({
             onClick={(e) => e.stopPropagation()} 
             className="bg-white border-2 border-[#00bfa6] text-gray-800 p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden"
           >
-            <UserCirclePlus className="text-[#00bfa6] rotate-12 text-[250px] absolute z-0 -top-24 -left-24" />
+            <UserCirclePlus className="text-slate-200  rotate-12 text-[250px] absolute z-0 -top-24 -left-24" />
             <div className="relative z-10">
               <h3 className="text-3xl font-bold text-center mb-2 py-3">{titulo}</h3>
 
