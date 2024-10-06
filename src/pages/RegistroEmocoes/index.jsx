@@ -201,6 +201,7 @@ export default function RegistroEmocao() {
     }, 1000);
   };
 
+  
   return (
     <div className="flex flex-col min-h-screen overflow-hidden">
       <Toaster
