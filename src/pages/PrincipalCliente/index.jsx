@@ -20,7 +20,6 @@ import { Toaster, toast } from "sonner";
 import Notification from "../../components/Notification"; 
 import axios from "axios";
 import PhotoModal from "../../components/PhotoModal";
-import ModalChatAviso from '../../components/ModalChatAviso';
 
 export default function PrincipalCliente() {
   const navigate = useNavigate();
@@ -69,11 +68,11 @@ export default function PrincipalCliente() {
     );
   };
 
-  const fetchPacientInfo = async (userId, token) => {
+  const fetchPacientInfo = async (id, token) => {
     try {
       console.log("Fetching patient info...");
       const response = await axios.get(
-        `https://api-mypeace.vercel.app/get/pacientInfo/${userId}`,
+        `https://api-mypeace.vercel.app/get/pacientInfo/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -84,7 +83,7 @@ export default function PrincipalCliente() {
         setNome(name);
         setEmail(email);
         if (photo_name) {
-          const photoUrl = await getPhoto(userId, token, photo_name);
+          const photoUrl = await getPhoto(id, token, photo_name);
           setPhotoSrc(photoUrl);
           console.log("Photo URL set:", photoUrl);
         }
@@ -101,10 +100,10 @@ export default function PrincipalCliente() {
     }
   };
 
-  const getPhoto = async (userId, token, photoName) => {
+  const getPhoto = async (id, token, photoName) => {
     try {
       const response = await axios.get(
-        `https://api-mypeace.vercel.app/get/photo/${userId}/${photoName}`,
+        `https://api-mypeace.vercel.app/get/photo/${id}/${photoName}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -175,7 +174,7 @@ export default function PrincipalCliente() {
           description: "Foto deletada com sucesso!",
           type: "success",
         });
-        setPhotoSrc(""); // Limpa a foto atual
+        setPhotoSrc(""); 
       }
     } catch (error) {
       console.error("Erro ao deletar foto:", error.response?.data || error.message);
@@ -277,7 +276,7 @@ export default function PrincipalCliente() {
 
   const openEditModal = (paciente) => {
     if (paciente) {
-      fetchPacientInfo();
+      fetchPacientInfo(id, token);
       setCurrentPaciente(paciente);
       setNome(paciente.name);
       setEmail(paciente.email);
@@ -328,12 +327,12 @@ export default function PrincipalCliente() {
   };
 
   const handleChat = () => {
-    setModalChatAviso(true); // Abre o modal de aviso
+    setModalChatAviso(true); 
   };
 
   const handleChatRedirect = () => {
-    window.open("https://chat-paulo.vercel.app/", "_blank"); // Redireciona para o site
-    setModalChatAviso(false); // Fecha o modal
+    window.open("https://chat-paulo.vercel.app/", "_blank");
+    setModalChatAviso(false); 
   };
 
 
@@ -441,10 +440,13 @@ export default function PrincipalCliente() {
         />
       )}
       {modalChatAviso && (
-        <ModalChatAviso
+        <Modal
           isOpen={modalChatAviso}
           setIsOpen={setModalChatAviso}
-          onContinue={handleChatRedirect} // Redireciona ao continuar
+          titulo="Aviso"
+          aviso
+          conteudo={`Você será direcionado para outro site. Deseja continuar?`}
+          onContinue={handleChatRedirect}
         />
       )}
 

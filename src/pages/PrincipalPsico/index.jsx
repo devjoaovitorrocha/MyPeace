@@ -258,7 +258,7 @@ export default function PrincipalPsico() {
 
   const openEditModal = () => {
     setModalEdt(true);
-    fetchPsychologistInfo();
+    fetchPsychologistInfo(id, token);
   };
 
   const deletar = async () => {
@@ -333,7 +333,7 @@ export default function PrincipalPsico() {
           description: "Foto deletada com sucesso!",
           type: "success",
         });
-        setPhotoSrc(""); // Limpa a foto atual
+        setPhotoSrc("");
       }
     } catch (error) {
       console.error("Erro ao deletar foto:", error.response?.data || error.message);
@@ -342,9 +342,7 @@ export default function PrincipalPsico() {
   };
 
   const openPhotoModel = () => {
-
     setModalPhoto(true);
-
   };
 
   const handleErrorResponse = (error) => {

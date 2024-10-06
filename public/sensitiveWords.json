@@ -1,6 +1,6 @@
 {
   "suicidio": ["suicídio", "morte", "acabou", "desistir", "não aguento mais", "quero morrer", "não vejo saída", "tchau", "vou me matar", "ninguém me entende", "só quero paz"],
   "depressao": ["triste", "depressão", "sofrimento", "sem esperança", "não consigo mais", "não vale a pena", "vazio", "nada importa", "estou cansado", "choro constante", "ninguém se importa"],
-  "ansiedade": ["ansiedade", "pânico", "medo", "angústia", "não consigo respirar", "coração acelerado", "nervosismo", "estou surtando", "preocupado demais", "tensão", "insônia", "mãos suando"],
+  "ansiedade": ["ansiedade", "ansioso", "ansiosa", "pânico", "medo", "angústia", "não consigo respirar", "coração acelerado", "nervosismo", "estou surtando", "preocupado demais", "tensão", "insônia", "mãos suando"],
   "autoagressao": ["autoagressão", "autolesão", "isolamento", "dor", "cortes", "me machuquei", "ninguém se importa", "me odeio", "quero sentir algo", "me punir", "preciso de ajuda"]
 }
