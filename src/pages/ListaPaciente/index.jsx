@@ -8,7 +8,6 @@ import Modal from "../../components/Modal";
 import { Spinner } from 'flowbite-react'; 
 import Notification from "../../components/Notification"; 
 
-
 const showNotification = ({ name, description, type, time = "Agora" }) => {
   toast(
     <Notification
@@ -19,6 +18,28 @@ const showNotification = ({ name, description, type, time = "Agora" }) => {
     />
   );
 };
+
+// Função para tratar erro 
+function handleErrorResponse(error) {
+  if (error.response) {
+    if (error.response.status === 401) {
+      alert("Sessão expirada. Redirecionando para o login.");
+      navigate("/login");
+    } else {
+      showNotification({
+        name: "Erro!",
+        description: error.response.data.msg || "Erro ao processar a solicitação. Tente novamente.",
+        type: "error",
+      });
+    }
+  } else {
+    showNotification({
+      name: "Erro!",
+      description: "Erro ao processar a solicitação. Tente novamente.",
+      type: "error",
+    });
+  }
+}
 
 export default function ListaPaciente() {
   const { state } = useLocation();
@@ -35,6 +56,8 @@ export default function ListaPaciente() {
   const [psicologoNome, setPsicologoNome] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const patientsPerPage = 10; // Definindo o número de pacientes por página
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
@@ -43,6 +66,9 @@ export default function ListaPaciente() {
       setToken(state.token);
       setId(state.id);
       setPsicologoNome(state.nome);
+      localStorage.setItem('token', state.token);
+      localStorage.setItem('id', state.id);
+      localStorage.setItem('nome', state.nome);
       fetchPacientes(state.token, state.id);
 
       if (state?.openModal) {
@@ -52,14 +78,18 @@ export default function ListaPaciente() {
   }, [navigate, state]);
 
   useEffect(() => {
-    setFilteredPacientes(
-      pacientes.filter(paciente =>
-        paciente.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+    const filtered = pacientes.filter(paciente =>
+      paciente.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    setFilteredPacientes(filtered);
+
+    // Reseta a página para 1 se a lista de pacientes filtrados estiver vazia
+    if (filtered.length === 0) {
+      setCurrentPage(1);
+    }
   }, [searchTerm, pacientes]);
 
-  
+  // Função para buscar os pacientes
   async function fetchPacientes(token, idUser) {
     setIsLoading(true);
     try {
@@ -81,7 +111,7 @@ export default function ListaPaciente() {
     }
   }
 
-
+  // Função para cadastrar o Paciente
   async function cadastrar(event) {
     event.preventDefault();
     setIsLoading(true); 
@@ -106,7 +136,7 @@ export default function ListaPaciente() {
     }
   }
 
- 
+  //Função para Deletar o Paciente
   async function deletar() {
     if (!currentPaciente) return;
 
@@ -133,37 +163,26 @@ export default function ListaPaciente() {
     }
   }
 
-  
-  function handleErrorResponse(error) {
-    if (error.response) {
-      if (error.response.status === 401) {
-        alert("Sessão expirada. Redirecionando para o login.");
-        navigate("/login");
-      } else {
-        showNotification({
-          name: "Erro!",
-          description: error.response.data.msg || "Erro ao processar a solicitação. Tente novamente.",
-          type: "error",
-        });
-      }
-    } else {
-      showNotification({
-        name: "Erro!",
-        description: "Erro ao processar a solicitação. Tente novamente.",
-        type: "error",
-      });
-    }
-  }
-
-
+  // Função para abrir o modal de deletar 
   function openDeleteModal(paciente) {
     setCurrentPaciente(paciente); 
     setModalDel(true);  
   }
 
+  // Função para voltar a página anterior
   const handleReturn = () => {
     navigate("/principalPsico", { state: { token, id, nome: psicologoNome } });
   };
+
+  // Função para paginar
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Cálculo dos índices para a paginação
+  const indexOfLastPatient = currentPage * patientsPerPage;
+  const indexOfFirstPatient = indexOfLastPatient - patientsPerPage;
+  const currentPatients = filteredPacientes.slice(indexOfFirstPatient, indexOfLastPatient);
 
   return (
     <div className="bg-[#3c5454] h-screen p-4 md:p-6">
@@ -197,7 +216,6 @@ export default function ListaPaciente() {
         />
       )}
 
-      
       {modalAdd && (
         <Modal
           isOpen={modalAdd}  
@@ -285,11 +303,11 @@ export default function ListaPaciente() {
                 </tr>
               </thead>
               <tbody>
-                {filteredPacientes.length > 0 ? (
-                  filteredPacientes.map((paciente, index) => (
+                {currentPatients.length > 0 ? (
+                  currentPatients.map((paciente, index) => (
                     <tr key={paciente._id}>
                       <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900">
-                        {index + 1}
+                        {index + 1 + (currentPage - 1) * patientsPerPage} 
                       </td>
                       <td className="whitespace-nowrap px-4 py-2 text-gray-700">
                         {paciente.name}
@@ -309,13 +327,27 @@ export default function ListaPaciente() {
                   ))
                 ) : (
                   <tr>
-                    <td className="py-2 italic" colSpan="5">Nenhum paciente encontrado</td>
+                    <td className="py-2 italic" colSpan="4">Nenhum paciente encontrado</td>
                   </tr>
                 )}
               </tbody>
             </table>
           )}
         </div>
+
+        {filteredPacientes.length > patientsPerPage && ( 
+          <div className="flex justify-center mt-4">
+            {Array.from({ length: Math.ceil(filteredPacientes.length / patientsPerPage) }, (_, i) => ( 
+              <button
+                key={i + 1}
+                onClick={() => paginate(i + 1)}
+                className={`mx-1 px-4 py-2 border rounded-lg ${currentPage === i + 1 ? 'bg-[#00bfa6] text-white' : 'bg-gray-200'}`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        )}
       </main>
 
       <div className="flex justify-center md:hidden py-6">

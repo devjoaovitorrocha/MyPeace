@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
-import { ArrowLeft, ArrowCircleLeft, ArrowCircleRight } from '@phosphor-icons/react';
+import { ArrowLeft } from '@phosphor-icons/react';
 import { Spinner } from 'flowbite-react';
 import Notification from "../../components/Notification"; 
-
 
 const showNotification = ({ name, description, type, time = "Agora" }) => {
   toast(
@@ -35,15 +34,36 @@ export default function DetalhesPaciente() {
 
   useEffect(() => {
     console.log("Estado recebido em DetalhesPaciente:", { paciente, token, idUser, nome });
+
     if (!paciente || !token || !idUser || !nome) {
-    
-      showNotification({
-        name: "Aviso!",
-        description: "Dados insuficientes. Redirecionando para a página principal.",
-        type: "warning",
-      });
-      navigate("/principalPsico/registropaciente");
+      const storedToken = localStorage.getItem('token');
+      const storedIdUser = localStorage.getItem('idUser');
+      const storedNome = localStorage.getItem('nome');
+
+      if (storedToken && storedIdUser && storedNome) {
+        setToken(storedToken);
+        setId(storedIdUser);
+        setPacienteNome(storedNome);
+      } else {
+        showNotification({
+          name: "Aviso!",
+          description: "Dados insuficientes. Redirecionando para a página principal.",
+          type: "warning",
+        });
+        navigate("/principalPsico/registropaciente");
+      }
     } else {
+      localStorage.setItem('token', token);
+      localStorage.setItem('idUser', idUser);
+      localStorage.setItem('nome', nome);
+
+      console.log("Dados armazenados no estado:", { token, idUser, nome });
+      console.log("Dados armazenados no localStorage:", {
+        token: localStorage.getItem('token'),
+        idUser: localStorage.getItem('idUser'),
+        nome: localStorage.getItem('nome'),
+      });
+
       setIsLoading(false);
     }
   }, [token, idUser, nome, paciente, navigate]);
@@ -61,6 +81,10 @@ export default function DetalhesPaciente() {
   };
 
   const handleReturn = () => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('idUser', idUser);
+    localStorage.setItem('nome', nome);
+
     if (!nome) {
       showNotification({
         name: "Aviso!",
@@ -74,8 +98,8 @@ export default function DetalhesPaciente() {
   };
 
   return (
-    <div className="bg-[#3c5454] h-screen p-6 overflow-y-auto">
-    <Toaster
+    <div className="bg-[#3c5454] h-screen p-4 md:p-6">
+      <Toaster
         expand
         position="top-center"
         richColors
@@ -92,8 +116,8 @@ export default function DetalhesPaciente() {
           },
         }}
       />
-      <header className="flex flex-col md:flex-row items-center justify-between max-w-[1440px] mx-auto">
-        <h1 className="text-3xl md:text-4xl py-6 md:py-12 text-white text-center font-semibold flex items-center gap-2">
+      <header className="flex flex-col md:flex-row items-center justify-between max-w-[1440px] mx-auto mb-4 md:mb-6">
+        <h1 className="text-2xl md:text-4xl py-4 text-white text-center font-semibold">
           Detalhes do Paciente
         </h1>
         <span
@@ -107,14 +131,14 @@ export default function DetalhesPaciente() {
         </span>
       </header>
 
-      <main className="max-w-[1440px] mx-auto bg-white shadow-lg rounded-xl p-6 mt-6">
-        <div className='flex items-center gap-2' >
-          <h2 className="text-2xl font-semibold mb-4 ">
-          Registros de Emoções 
-         </h2>
-         <h2 className="text-2xl text-gray-400 font-medium mb-4 ">
-          {paciente?.name || "Paciente não identificado"}
-         </h2>
+      <main className="max-w-[1440px] mx-auto bg-white shadow-3D rounded-lg md:rounded-xl p-4 md:p-6 overflow-auto">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-300 pb-4 md:pb-6">
+          <h2 className="text-xl md:text-2xl font-semibold">
+            Registros de Emoções
+          </h2>
+          <h2 className="text-gray-400 text-sm sm:text-lg font-bold">
+            {paciente?.name || "Paciente não identificado"}
+          </h2>
         </div>
 
         {isLoading ? (
@@ -142,44 +166,41 @@ export default function DetalhesPaciente() {
               <p className="text-center text-gray-500">Nenhum registro de emoção disponível.</p>
             )}
 
-
-            <div className="flex flex-col md:flex-row justify-between items-center mt-6">
-              <button
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-                className={`bg-gray-300 text-black px-4 py-2 rounded flex items-center ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-400'}`}
-              >
-                <ArrowCircleLeft weight="bold" className="inline-block mr-2" />
-                Anterior
-              </button>
-
-              <span className="text-lg font-semibold mb-2 md:mb-0">
-                Página {currentPage} de {totalPages}
-              </span>
-
-              <button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-                className={`bg-gray-300 text-black px-4 py-2 rounded flex items-center ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-400'}`}
-              >
-                Próxima
-                <ArrowCircleRight weight="bold" className="inline-block ml-2" />
-              </button>
-            </div>
+            
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-4">
+               
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => setCurrentPage(i + 1)}
+                    className={`mx-1 px-4 py-2 border rounded-lg ${
+                      currentPage === i + 1
+                        ? "bg-[#00bfa6] text-white"
+                        : "bg-gray-200"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+      
+              </div>
+            )}
           </>
         )}
       </main>
 
       <div className="flex justify-center md:hidden py-6">
-        <span
-          onClick={handleReturn}
-          className="cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
+        <Link
+          className="mb-6 cursor-pointer hover:opacity-95 relative w-fit block after:block after:content-[''] after:absolute after:h-[2px] after:bg-white after:w-full after:scale-x-0 after:hover:scale-x-100 after:transition after:duration-300 after:origin-center"
+          to="/principalPsico"
+          state={{ token, id, nome: nome }}
         >
           <div className="flex items-center hover:gap-x-1.5 gap-x-1 transition-all text-white font-light">
             <ArrowLeft weight="bold" />
             Voltar
           </div>
-        </span>
+        </Link>
       </div>
     </div>
   );

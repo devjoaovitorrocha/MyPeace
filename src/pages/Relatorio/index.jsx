@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Toaster, toast } from 'sonner';  
 import { ArrowLeft } from "@phosphor-icons/react";
 import { Spinner } from "flowbite-react";
@@ -17,29 +17,15 @@ const showNotification = ({ name, description, type, time = "Agora" }) => {
   );
 };
 
-
 const handleErroResponse = (error) => {
-
-  if (error.response) {
-    const { status, data } = error.response;
-    let message = "Ocorreu um erro inesperado.";
-    if (status === 400) {
-      message = data.message || "Requisição inválida.";
-    } else if (status === 401) {
-      message = "Autenticação falhou. Faça login novamente.";
-    } else if (status === 404) {
-      message = "Recurso não encontrado.";
-    } else if (status === 500) {
-      message = "Erro interno no servidor. Tente novamente mais tarde.";
-    }
-    
+  const errorMsg = error.response?.data?.msg || "Erro ao processar a solicitação.";
+  if(error.response?.status){
     showNotification({
-      name: `Erro ${status}`,
-      description: message,
+      name: `Erro ${error.response?.status}`,
+      description: errorMsg,
       type: "error",
     });
   } else {
-    
     showNotification({
       name: "Erro de conexão",
       description: "Não foi possível se conectar ao servidor.",
@@ -48,15 +34,16 @@ const handleErroResponse = (error) => {
   }
 };
 
+
+
 export default function Relatorio() {
   const { state } = useLocation();
   const navigate = useNavigate();
   const { paciente, token, idUser, nome } = state || {};
+  const id = idUser;
+
   const idPsicologo = idUser; 
   const idPacient = paciente?._id; 
-
-  
-  console.log("Token recebido:", token);
 
   const [isLoading, setIsLoading] = useState(true);
   const [topics, setTopics] = useState("");
@@ -67,19 +54,46 @@ export default function Relatorio() {
 
   useEffect(() => {
     console.log("Estado recebido em DetalhesPaciente:", { paciente, token, idUser, nome });
+
     if (!paciente || !token || !idUser || !nome) {
-      showNotification({
-        name: "Aviso!",
-        description: "Dados insuficientes. Redirecionando para a página principal.",
-        type: "warning",
-      });
-      navigate("/principalPsico/registropaciente");
+      const storedToken = localStorage.getItem('token');
+      const storedIdUser = localStorage.getItem('idUser');
+      const storedNome = localStorage.getItem('nome');
+
+      if (storedToken && storedIdUser && storedNome) {
+        setToken(storedToken);
+        setId(storedIdUser);
+        setPacienteNome(storedNome);
+      } else {
+        showNotification({
+          name: "Aviso!",
+          description: "Dados insuficientes. Redirecionando para a página principal.",
+          type: "warning",
+        });
+        navigate("/principalPsico/registropaciente");
+      }
     } else {
+      localStorage.setItem('token', token);
+      localStorage.setItem('idUser', idUser);
+      localStorage.setItem('nome', nome);
+
+      console.log("Dados armazenados no estado:", { token, idUser, nome });
+      console.log("Dados armazenados no localStorage:", {
+        token: localStorage.getItem('token'),
+        idUser: localStorage.getItem('idUser'),
+        nome: localStorage.getItem('nome'),
+      });
+
       setIsLoading(false);
     }
   }, [token, idUser, nome, paciente, navigate]);
 
+//Voltar para a página anterior
   const handleReturn = () => {
+    localStorage.setItem('token', token);
+    localStorage.setItem('idUser', idUser);
+    localStorage.setItem('nome', nome);
+
     if (!nome) {
       showNotification({
         name: "Aviso!",
@@ -88,10 +102,11 @@ export default function Relatorio() {
       });
       navigate("/principalPsico/registropaciente");
     } else {
-      navigate("/principalPsico/registropaciente", { state: { token, idUser: idPsicologo, id: idPacient, nome: nome } });
+      navigate("/principalPsico/registropaciente", { state: { token, idUser: idUser, id, nome: nome } });
     }
   };
-
+  
+//Envia o relátorio 
   const handleSubmit = async () => {
     try {
       setIsLoading(true);
@@ -106,7 +121,6 @@ export default function Relatorio() {
         return;
       }
       
-     
       console.log("Dados enviados:", {
         topics,
         observations,

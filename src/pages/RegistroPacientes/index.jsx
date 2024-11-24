@@ -118,7 +118,9 @@ export default function RegistroPacientes() {
   };
  
   const handleRelatorioClick = (paciente) => {
-    navigate('/principalPsico/registropaciente/relatorio', { state: { paciente, token, idUser: id, nome: state.nome },});
+    navigate('/principalPsico/registropaciente/relatorio', { 
+      state: { paciente, token, idUser: id, nome: state.nome },
+    });
   };
   
   const handleReturn = () => {

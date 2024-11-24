@@ -21,6 +21,7 @@ const showNotification = ({ name, description, type, time = "Agora" }) => {
   );
 };
 
+
 export default function CadastroPsicologo() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -33,6 +34,7 @@ export default function CadastroPsicologo() {
   const [idUsuario, setIdUsuario] = useState("");
   const navigate = useNavigate();
 
+//Função para cadastrar o psicologo
   const cadastrar = (event) => {
     event.preventDefault();
 
@@ -76,6 +78,7 @@ export default function CadastroPsicologo() {
         setIdUsuario(resp.data.idUser);
         setEmailVerificationVisible(true);
       })
+      //Função para tratar erros
       .catch((error) => {
         console.error(error);
         if (error.response) {
@@ -94,6 +97,7 @@ export default function CadastroPsicologo() {
       });
   };
 
+//Função para verificar o código de verificação
   const handleEmailVerification = async (e) => {
     e.preventDefault();
 
@@ -143,6 +147,7 @@ export default function CadastroPsicologo() {
     }
   };
 
+//Função para formatar o CPF
   const handleCpfChange = (e) => {
     const formattedCpf = e.target.value
       .replace(/\D/g, "")
@@ -150,6 +155,7 @@ export default function CadastroPsicologo() {
     setCpf(formattedCpf);
   };
 
+//Função para formatar o número de registro
   const handleCrpChange = (e) => {
     const formattedCrp = e.target.value
       .replace(/\D/g, "")

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Toaster, toast } from 'sonner';
-import { ArrowLeft, ArrowCircleLeft, ArrowCircleRight, Eye } from '@phosphor-icons/react';
+import { ArrowLeft, Eye } from '@phosphor-icons/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { Spinner } from 'flowbite-react';
 
 import Notification from "../../components/Notification"; 
-
 
 const showNotification = ({ name, description, type, time = "Agora" }) => {
   toast(
@@ -34,6 +33,7 @@ export default function Diario() {
 
   const [token, setToken] = useState("");
   const [id, setId] = useState("");
+  const [nome, setNome] = useState("");
   const [emociones, setEmociones] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -45,10 +45,25 @@ export default function Diario() {
 
   useEffect(() => {
     if (!state?.token || !state?.id || !state?.nome) {
-      navigate("/login");
+      const storedToken = localStorage.getItem('token');
+      const storedId = localStorage.getItem('id');
+      const storedNome = localStorage.getItem('nome');
+
+      if (storedToken && storedId && storedNome) {
+        setToken(storedToken);
+        setId(storedId);
+        setNome(storedNome);
+        fetchEmociones(storedToken, storedId);
+      } else {
+        navigate("/login");
+      }
     } else {
       setToken(state.token);
       setId(state.id);
+      setNome(state.nome);
+      localStorage.setItem('token', state.token);
+      localStorage.setItem('id', state.id);
+      localStorage.setItem('nome', state.nome);
       fetchEmociones(state.token, state.id);
     }
   }, [navigate, state]);
@@ -84,27 +99,21 @@ export default function Diario() {
   };
 
   const handleReturn = () => {
-    navigate("/principalCliente", { state: { token, id, nome: state.nome } });
-  };
+    localStorage.setItem('token', token);
+    localStorage.setItem('id', id);
+    localStorage.setItem('nome', nome);
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+    navigate("/principalCliente", { state: { token, id, nome } });
   };
 
   const startIndex = (currentPage - 1) * emotionsPerPage;
   const selectedEmotions = emociones.slice(startIndex, startIndex + emotionsPerPage);
 
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className="bg-[#3c5454] h-screen p-6 ">
-     <Toaster
+      <Toaster
         expand
         position="top-center"
         richColors
@@ -152,7 +161,7 @@ export default function Diario() {
                 </tr>
               </thead>
               <tbody>
-                {Array.isArray(selectedEmotions) && selectedEmotions.length > 0 ? (
+                {selectedEmotions.length > 0 ? (
                   selectedEmotions.map((emocion) => (
                     <tr key={emocion._id}>
                       <td className=" px-4 py-2">
@@ -163,7 +172,7 @@ export default function Diario() {
                       </td>
                       <td className="px-4 py-2">
                         <button
-                          className= "bg-[#00bfa6]  rounded-lg text-white border-[#009a87] hover:bg-white hover:text-[#00bfa6] transition-colors ease-in-out duration-300 py-2 px-4 " 
+                          className="bg-[#00bfa6]  rounded-lg text-white border-[#009a87] hover:bg-white hover:text-[#00bfa6] transition-colors ease-in-out duration-300 py-2 px-4"
                           onClick={() => handleVerificarClick(emocion)}
                         >
                           Visualizar
@@ -181,30 +190,19 @@ export default function Diario() {
               </tbody>
             </table>
 
-            <div className="flex flex-col md:flex-row justify-between items-center mt-6">
-              <button
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-                className={`bg-gray-300 text-black px-4 py-2 rounded flex items-center ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-400'}`}
-              >
-                <ArrowCircleLeft weight="bold" className="inline-block mr-2" />
-                Anterior
-              </button>
-
-              <span className="text-lg font-semibold mb-2 md:mb-0">
-                Página {currentPage} de {totalPages}
-              </span>
-
-              <button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-                className={`bg-gray-300 text-black px-4 py-2 rounded flex items-center ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-400'}`}
-              >
-                Próxima
-                <ArrowCircleRight weight="bold" className="inline-block ml-2" />
-              </button>
-            </div>
-          
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-4">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => paginate(i + 1)}
+                    className={`mx-1 px-4 py-2 border rounded-lg ${currentPage === i + 1 ? 'bg-[#00bfa6] text-white' : 'bg-gray-200'}`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+            )}
           </>
         )}
       </main>
@@ -221,7 +219,7 @@ export default function Diario() {
         </span>
       </div>
 
-    
+         
       <AnimatePresence>
         {showModal && (
           <motion.div
@@ -263,3 +261,5 @@ export default function Diario() {
     </div>
   );
 }
+
+

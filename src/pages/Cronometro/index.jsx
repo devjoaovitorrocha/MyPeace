@@ -41,6 +41,17 @@ export default function Cronometro() {
         setToken(state.token);
         setId(state.id);
         setPacienteNome(state.nome);
+        
+        localStorage.setItem('token', state.token);
+        localStorage.setItem('id', state.id);
+        localStorage.setItem('nome', state.nome);
+
+        console.log("Dados armazenados no estado:", { token: state.token, id: state.id, nome: state.nome });
+        console.log("Dados armazenados no localStorage:", {
+          token: localStorage.getItem('token'),
+          id: localStorage.getItem('id'),
+          nome: localStorage.getItem('nome'),
+        });
       }
     } catch (error) {
       showNotification({
@@ -51,7 +62,7 @@ export default function Cronometro() {
       navigate("/login");
     }
   }, [navigate, state]);
-
+//Função para converter texto para fala
   const falarTexto = async (texto) => {
     try {
       if (audioRef.current) {
@@ -91,7 +102,7 @@ export default function Cronometro() {
       });
     }
   };
-  
+//Função para atualizar a fase
   const updatePhase = (newPhase) => {
     try {
       if (phaseRef.current !== newPhase) {
@@ -104,6 +115,7 @@ export default function Cronometro() {
     }
   };
 
+//Função para iniciar o cronômetro
   useEffect(() => {
     let timer;
     try {
@@ -136,16 +148,19 @@ export default function Cronometro() {
     return () => clearInterval(timer);
   }, [running, time]);
 
+//Função para iniciar o cronômetro
   const startTimer = () => {
     setTime(0);
     setRunning(true);
     phaseRef.current = "";
   };
 
+//Função para pausar o cronômetro
   const pauseTimer = () => {
     setRunning(false);
   };
 
+//Função para reiniciar o cronômetro
   const resetTimer = () => {
     setTime(0);
     setRunning(false);
@@ -153,6 +168,7 @@ export default function Cronometro() {
     phaseRef.current = "";
   };
 
+//Função para calcular o progresso do cronômetro
   const progress = (time / 19) * 100;
   const strokeWidth = 20;
   const radius = 90;
