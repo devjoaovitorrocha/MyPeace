@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
 export default function Chat({ titulo = "Ajuda", onClose, initialMessages = [] }) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [messages, setMessages] = useState(initialMessages);
 
   useEffect(() => {

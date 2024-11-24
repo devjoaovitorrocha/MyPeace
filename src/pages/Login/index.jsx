@@ -18,16 +18,21 @@ const showNotification = ({ name, description, type, time = "Agora" }) => {
   );
 };
 
+const handleErrorResponse = (error) => {
+  const errorMsg = error.response?.data?.msg || "Erro ao processar a solicitação.";
+  showNotification({
+    name: "Erro!",
+    description: errorMsg,
+    type: "error",
+  });
+};
+
 export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [token, setToken] = useState("");
-  const [id, setId] = useState("");
-  const [type, setType] = useState("");
-  const [nome, setNome] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-
+//Função para enviar os dados do login
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
@@ -38,70 +43,37 @@ export default function Login() {
         password: senha,
       });
 
-      setId(response.data.id);
-      setToken(response.data.token);
-      setType(response.data.type);
+      const { id, token, type } = response.data;
+      const decodedToken = JSON.parse(atob(token.split('.')[1]));
+      const nome = decodedToken.name;
 
-      const decodedToken = JSON.parse(atob(response.data.token.split('.')[1]));
-      setNome(decodedToken.name);
+      localStorage.setItem('token', token);
+      localStorage.setItem('id', id);
+      localStorage.setItem('nome', nome);
+
+      console.log("Dados salvos:", { token, id, nome });
+      console.log("LocalStorage:", {
+        token: localStorage.getItem('token'),
+        id: localStorage.getItem('id'),
+        nome: localStorage.getItem('nome'),
+      });
 
       showNotification({
         name: "Sucesso!",
-        description: `Bem-vindo(a) de volta, ${decodedToken.name}!`,
+        description: `Bem-vindo(a) de volta, ${nome}!`,
         type: "success",
       });
 
-      if (response.data.type === "pacient") {
-        navigate("/principalCliente", { state: { token: response.data.token, id: response.data.id, nome: decodedToken.name } });
-      } else if (response.data.type === "psychologist") {
-        navigate("/principalPsico", { state: { token: response.data.token, id: response.data.id, nome: decodedToken.name } });
-      }
+      setTimeout(() => {
+        if (type === "pacient") {
+          navigate("/principalCliente", { state: { token, id, nome } });
+        } else if (type === "psychologist") {
+          navigate("/principalPsico", { state: { token, id, nome } });
+        }
+      }, 1000);
 
     } catch (e) {
-      if (e.response) {
-        const errorMsg = e.response.data?.msg || "Erro de autenticação. Por favor, tente novamente.";
-
-        if (e.response.status === 401) {
-          if (errorMsg.includes("Senha incorreta")) {
-            showNotification({
-              name: "Erro!",
-              description: "A senha fornecida está incorreta. Por favor, tente novamente.",
-              type: "error",
-            });
-          } else if (errorMsg.includes("Email não encontrado")) {
-            showNotification({
-              name: "Erro!",
-              description: "O email fornecido não está cadastrado.",
-              type: "error",
-            });
-          } else {
-            showNotification({
-              name: "Erro!",
-              description: errorMsg,
-              type: "error",
-            });
-          }
-        } else {
-          showNotification({
-            name: "Erro!",
-            description: "Ocorreu um erro inesperado. Tente novamente mais tarde.",
-            type: "error",
-          });
-        }
-      } else if (e.request) {
-        showNotification({
-          name: "Erro!",
-          description: "Falha de conexão com o servidor. Verifique sua conexão com a internet e tente novamente.",
-          type: "error",
-        });
-      } else {
-        showNotification({
-          name: "Erro!",
-          description: "Erro desconhecido. Por favor, tente novamente mais tarde.",
-          type: "error",
-        });
-      }
-      console.log(e);
+      handleErrorResponse(e);
     } finally {
       setIsLoading(false);
     }

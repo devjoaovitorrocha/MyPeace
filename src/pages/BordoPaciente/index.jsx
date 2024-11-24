@@ -18,22 +18,11 @@ const showNotification = ({ name, description, type, time = "Agora" }) => {
 };
 
 const handleErroResponse = (error) => {
-  if (error.response) {
-    const { status, data } = error.response;
-    let message = "Ocorreu um erro inesperado.";
-    if (status === 400) {
-      message = data.message || "Requisição inválida.";
-    } else if (status === 401) {
-      message = "Autenticação falhou. Faça login novamente.";
-    } else if (status === 404) {
-      message = "Recurso não encontrado.";
-    } else if (status === 500) {
-      message = "Erro interno no servidor. Tente novamente mais tarde.";
-    }
-    
+  const errorMsg = error.response?.data?.msg || "Erro ao processar a solicitação.";
+  if(error.response?.status){
     showNotification({
-      name: `Erro ${status}`,
-      description: message,
+      name: `Erro ${error.response?.status}`,
+      description: errorMsg,
       type: "error",
     });
   } else {
@@ -57,16 +46,30 @@ export default function BordoPaciente() {
   useEffect(() => {
     console.log("Estado recebido:", state); 
     if (!state?.token || !state?.id || !state?.nome) {
-      showNotification({
-        name: "Aviso!",
-        description: "Dados insuficientes. Redirecionando para a página principal.",
-        type: "warning",
-      });
-      navigate("/principalCliente");
+      const storedToken = localStorage.getItem('token');
+      const storedId = localStorage.getItem('id');
+      const storedNome = localStorage.getItem('nome');
+
+      if (!storedToken || !storedId || !storedNome) {
+        showNotification({
+          name: "Aviso!",
+          description: "Dados insuficientes. Redirecionando para a página principal.",
+          type: "warning",
+        });
+        navigate("/principalCliente");
+      } else {
+        setToken(storedToken);
+        setId(storedId);
+        setPacienteNome(storedNome);
+        fetchReports(storedId, storedToken);
+      }
     } else {
       setToken(state.token);
       setId(state.id);
       setPacienteNome(state.nome);
+      localStorage.setItem('token', state.token);
+      localStorage.setItem('id', state.id);
+      localStorage.setItem('nome', state.nome);
       fetchReports(state.id, state.token);
     }
   }, [navigate, state]);
@@ -91,7 +94,15 @@ export default function BordoPaciente() {
   };
 
   const handleReturn = () => {
-    navigate("/principalCliente", { state: { token, id, nome: pacienteNome } });
+    const returnToken = token || localStorage.getItem('token');
+    const returnId = id || localStorage.getItem('id');
+    const returnNome = pacienteNome || localStorage.getItem('nome');
+
+    if (!token) setToken(returnToken);
+    if (!id) setId(returnId);
+    if (!pacienteNome) setPacienteNome(returnNome);
+
+    navigate("/principalCliente", { state: { token: returnToken, id: returnId, nome: returnNome } });
   };
 
   return (
