@@ -5,7 +5,7 @@ import Inputs from "../../components/Inputs";
 import { Link, useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner";
 import { http } from "../../App";
-import Modal from "../../components/Modal";
+
 import FloatingPhone from "../../components/FloatingPhone";
 import Notification from "../../components/Notification"; 
 
@@ -29,9 +29,6 @@ export default function CadastroPsicologo() {
   const [registroNumero, setRegistroNumero] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [isEmailVerificationVisible, setEmailVerificationVisible] = useState(false);
-  const [codigo, setCodigo] = useState("");
-  const [idUsuario, setIdUsuario] = useState("");
   const navigate = useNavigate();
 
 //Função para cadastrar o psicologo
@@ -239,15 +236,6 @@ export default function CadastroPsicologo() {
               </div>
             </form>
           </div>
-          <Modal
-            isOpen={isEmailVerificationVisible}
-            setIsOpen={setEmailVerificationVisible}
-            emailVerification
-            email={email}
-            valueEmailV={codigo}
-            onChangeEmailV={(e) => setCodigo(e.target.value)}
-            onClickEmailV={handleEmailVerification}
-          />
         </main>
       </div>
     </section>
