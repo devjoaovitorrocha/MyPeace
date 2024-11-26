@@ -75,8 +75,7 @@ export default function CadastroPsicologo() {
         confirmPassword: confirmarSenha,
       })
       .then((resp) => {
-        setIdUsuario(resp.data.idUser);
-        setEmailVerificationVisible(true);
+        navigate("/login");
       })
       //Função para tratar erros
       .catch((error) => {
@@ -95,56 +94,6 @@ export default function CadastroPsicologo() {
           });
         }
       });
-  };
-
-//Função para verificar o código de verificação
-  const handleEmailVerification = async (e) => {
-    e.preventDefault();
-
-    const token = localStorage.getItem("token");
-
-    if (!codigo || !idUsuario || !token) {
-      showNotification({
-        name: "Aviso!",
-        description: "Dados faltando. Verifique o código e tente novamente.",
-        type: "warning",
-      });
-      return;
-    }
-
-    try {
-      const resp = await http.post(
-        `/auth/verifyEmail/${idUsuario}`,
-        { verifyCode: codigo },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      showNotification({
-        name: "Sucesso!",
-        description: "Verificação de e-mail concluída com sucesso",
-        type: "success",
-      });
-      setEmailVerificationVisible(false);
-      setTimeout(() => navigate("/login"), 1000);
-    } catch (error) {
-      console.error(error);
-      if (error.response) {
-        showNotification({
-          name: "Aviso!",
-          description: `${error.response.data.msg}`,
-          type: "warning",
-        });
-      } else {
-        showNotification({
-          name: "Erro!",
-          description: "Erro ao verificar o código. Por favor, tente novamente mais tarde.",
-          type: "error",
-        });
-      }
-    }
   };
 
 //Função para formatar o CPF
