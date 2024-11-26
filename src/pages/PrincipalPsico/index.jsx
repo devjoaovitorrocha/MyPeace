@@ -287,7 +287,7 @@ const deletar = async () => {
     );
     showNotification({
       name: "Sucesso!",
-      description: "Paciente deletado com sucesso!",
+      description: "Psicologo deletado com sucesso!",
       type: "success",
     });
     setModalDel(false);
